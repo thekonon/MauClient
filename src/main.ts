@@ -2,6 +2,8 @@ import { Application, Assets, Sprite } from "pixi.js";
 
 import { Card } from "./card.ts";
 import { PlayerHand } from "./player_hand.ts";
+import { MyButton } from "./button.ts";
+import { WebSocketHandle } from "./websocket_handle.ts";
 
 (async () => {
   // Create a new application
@@ -13,35 +15,22 @@ import { PlayerHand } from "./player_hand.ts";
   // Append the application canvas to the document body
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  // Load the bunny texture
-  const texture = await Assets.load("/assets/bunny.png");
-
-  // Create a bunny Sprite
-  const bunny = new Sprite(texture);
-  
-  // Center the sprite's anchor point
-  bunny.anchor.set(3);
-
-  // Move the sprite to the center of the screen
-  bunny.position.set(app.screen.width / 2, app.screen.height / 2);
-
-  // Add the bunny to the stage
-  app.stage.addChild(bunny);
   const card = await Card.create("C", "J");
-  // app.stage.addChild(card.get_sprite())
+
+  card.get_sprite().position.set(app.screen.width / 2, app.screen.height / 2)
 
   const player_hand = new PlayerHand(app.stage);
+  const button = new MyButton(app.stage)
+  const ws = new WebSocketHandle("ws://192.168.50.231:8765");
+  button.set_action(player_hand.draw_card.bind(player_hand))
+  // button.button.onPress.connect(() => {
+  //   ws.send("Čudl máčknut")
+  // });
 
   player_hand.draw_card(card);
 
-  
 
-  // Listen for animate update
-  app.ticker.add((time) => {
-    // Just for fun, let's rotate mr rabbit a little.
-    // * Delta is 1 if running at 100% performance *
-    // * Creates frame-independent transformation *
-    bunny.rotation += 0.1 * time.deltaTime;
-    // bunny.position.y += 1;
-  });
+  ws.onOpen = () => {
+    ws.send("Test");
+  };
 })();

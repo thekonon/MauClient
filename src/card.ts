@@ -7,10 +7,20 @@ export class Card {
     texture: string;
     sprite!: Sprite;
 
+    end_animation_point_x: number;
+    end_animation_point_y: number;
+
+    state: number;
+
     private constructor(type: string, value: string) {
         this.type = type;
         this.value = value;
         this.texture = "default";
+
+        this.end_animation_point_x = 0;
+        this.end_animation_point_y = 0;
+        // 0 - spawn, 1 - hand, 2 - played
+        this.state = 0;
     }
 
     public static async create(type: string, value: string): Promise<Card> {
@@ -22,19 +32,38 @@ export class Card {
         card.sprite.interactive = true;
 
         card.sprite.on("pointerdown", () => {
-        gsap.to(card.get_sprite(), {
-            x: Math.random()*1000,
-            y: Math.random()*1000,
-            rotation: (Math.random()-1)*10,
-            duration: 3,
-            ease: "power1.out",
-            })
+            gsap.to(card.get_sprite(), {
+                x: card.end_animation_point_x,
+                y: card.end_animation_point_y,
+                rotation: Math.PI*2,
+                duration: 1,
+                ease: "power1.out",
+                onComplete: () => {
+                    card.set_end_of_animation()
+                }
+                })
         })
         return card;
     }
 
     public get_sprite(): Sprite {
         return this.sprite;
+    }
+
+    public set_end_of_animation(): void{
+        switch (this.state){
+        case 0:
+            this.end_animation_point_x = 500;
+            this.end_animation_point_y = 500;
+            this.state = 1;
+            break;
+        case 1:
+            this.state = 2;
+            break;
+        default:
+            this.state = 2;
+        }
+
     }
 
     private get_texture(): Promise<Texture> {
