@@ -1,4 +1,4 @@
-import { Graphics, Container } from "pixi.js";
+import { Graphics, Container, Text, TextStyle } from "pixi.js";
 import { Button } from "@pixi/ui";
 import { Card } from "./card.ts";
 
@@ -12,21 +12,34 @@ export class MyButton {
             .fill(0xffffff);
 
         this.button = new Button(graphic);
-
+        this.button.view.x = 300;
+        this.button.view.y = 300;
         this.button.onPress.connect(() => {
             this.button_pressed()
         });
 
+        const style = new TextStyle({
+            fontSize: 16,
+            fill: 0x000000,
+            align: 'center'
+        });
+
+        const label = new Text(); // No arguments
+        label.text = "Draw a card";
+        label.style = style;
+
+        label.anchor.set(0.5);
+        label.x = this.button.view.width / 2;
+        label.y = this.button.view.height / 2;
+        this.button.view.addChild(label);
         stage.addChild(this.button.view);
     }
-    
-    private async button_pressed(){
+
+    private async button_pressed() {
         console.log("Button clicked from MyButton!");
-        var card = await Card.create("C", "A");
-        this.action(card);
     }
 
-    public set_action(fun: (card: Card) => void): void{
+    public set_action(fun: (card: Card) => void): void {
         this.action = fun;
     }
 }

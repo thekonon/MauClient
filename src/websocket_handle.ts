@@ -1,6 +1,9 @@
+import { Card } from "./card.ts";
+
 export class WebSocketHandle {
     private socket: WebSocket;
     private readonly url: string;
+    public draw_a_card!: (card: Card) => void;
 
     constructor(url = "ws://localhost:8765") {
         this.url = url;
@@ -37,7 +40,6 @@ export class WebSocketHandle {
     // Call this to manually send a message
     public send(data: string): void {
         if (this.socket.readyState === WebSocket.OPEN) {
-            console.log("Sending data")
             this.socket.send(data);
         } else {
             console.warn("WebSocket not open. Cannot send:", data);
@@ -45,8 +47,18 @@ export class WebSocketHandle {
     }
 
     // Event hooks (can be overridden or assigned externally)
-    public onMessage(data: string): void {
+    public async onMessage(data: string): Promise<void> {
+        console.log("We got an msg!");
         console.log(data);
+        if (data.startsWith("Draw")){
+            console.log("Drawing command executing!");
+            const split1 = data.split(":");
+            const split2 = split1[1].split("");
+            console.log("split data:");
+            console.log(split1);
+            const card = await Card.create(split2[0], split2[1])
+            this.draw_a_card(card);
+        }
     }
     public onOpen(): void {}
     public onClose(): void {}
