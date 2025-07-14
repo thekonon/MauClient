@@ -33,7 +33,6 @@ export class Deck extends Container {
 
     private deck_clicked() {
         console.log("Deck clicked");
-        
         this.deck_clicked_action(this.draw_command)
     }
 

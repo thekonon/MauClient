@@ -3,19 +3,36 @@ import { Card } from "./card.ts";
 export class WebSocketHandle {
     private socket: WebSocket;
     private readonly url: string;
+    private readonly cardNameMap = new Map<string, string>([
+            ["ACE", "A"],
+            ["KING", "K"],
+            ["QUEEN", "Q"],
+            ["JACK", "J"],
+            ["TEN", "10"],
+            ["NINE", "9"],
+            ["EIGHT", "8"],
+            ["SEVEN", "7"],
+            ["SIX", "6"],
+
+            ["HEARTS", "H"],
+            ["SPADES", "S"],
+            ["CLUBS", "C"],
+            ["DIAMONDS", "D"]
+        ]);
     public draw_a_card!: (card: Card) => void;
 
-    constructor(url = "ws://localhost:8765") {
+    constructor(url = "ws://localhost:8080/game?user=thekonon") {
         this.url = url;
         this.socket = this.createSocket();
     }
 
     private createSocket(): WebSocket {
+        console.log("Creating websocket started");
         const socket = new WebSocket(this.url);
+        console.log("Creating websocket finished");
 
         socket.addEventListener("open", () => {
             console.log("WebSocket connected");
-            socket.send("Hello from browser!");
             this.onOpen();
         });
 
@@ -51,15 +68,13 @@ export class WebSocketHandle {
     try {
         console.log("Parsing");
         const message = JSON.parse(data);
-        
-
-        if (message.TYPE === "DRAW" && Array.isArray(message.cards)) {
+        if (message.type === "DRAW" && Array.isArray(message.cards)) {
             console.log("Draw and array")
             for (const card_info of message.cards) {
                 const type = card_info.type;
                 const color = card_info.color;
 
-                const card = await Card.create(type, color);
+                const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
                 this.draw_a_card(card);
             }
         }

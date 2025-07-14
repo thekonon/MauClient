@@ -34,7 +34,7 @@ async def handler(websocket):
         connected.remove(websocket)
 
 async def main():
-    async with websockets.serve(handler, "localhost", 8765):
+    async with websockets.serve(handler, "192.168.50.231", 8765):
         await asyncio.Future()  # run forever
 
 asyncio.run(main())

@@ -30,6 +30,7 @@ export class Card {
         const scale = height / card.sprite.height;
         card.sprite.scale.set(scale);
         card.sprite.interactive = true;
+        // card.sprite.anchor.set(0.5)
 
         // card.sprite.filters = [
         //     new DropShadowFilter({
@@ -82,7 +83,6 @@ export class Card {
 
     private get_texture(): Promise<Texture> {
         const path = `assets/${this.texture}/${this.type}${this.value}.png`;
-        console.log(path)
         var loaded_texture;
         try
         {

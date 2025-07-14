@@ -25,7 +25,7 @@ import { Deck } from "./deck.ts";
   app.stage.addChild(deck);
 
   // WebSocket
-  const web_socket = new WebSocketHandle();
+  const web_socket = new WebSocketHandle("ws://localhost:8080/game?user=thekonon");
 
   deck.deck_clicked_action = web_socket.send.bind(web_socket);
   web_socket.draw_a_card = player_hand.draw_card.bind(player_hand);
