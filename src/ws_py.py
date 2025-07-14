@@ -25,6 +25,7 @@ async def handler(websocket):
             if json_dict.get("TYPE", None) == "DRAW":
                 print("Correct type - drawing")
                 for conn in connected:
+                    # command = '{{"TYPE": "DRAW", "cards": [{{"type": "{}", "color": "{}"}}]}}'.format(random.choice(types), random.choice(values))
                     command = '{{"TYPE": "DRAW", "cards": [{{"type": "{}", "color": "{}"}},{{"type": "{}", "color": "{}"}}]}}'.format(random.choice(types), random.choice(values), random.choice(types), random.choice(values))
                     print("sending command: "+command)
                     await conn.send(command)

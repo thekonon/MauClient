@@ -1,5 +1,5 @@
 // card.ts
-import { Assets, Sprite, Texture } from "pixi.js";
+import { Assets, Sprite, Texture, DropShadowFilter } from "pixi.js";
 import {gsap} from "gsap";
 export class Card {
     type: string;
@@ -30,6 +30,16 @@ export class Card {
         const scale = height / card.sprite.height;
         card.sprite.scale.set(scale);
         card.sprite.interactive = true;
+
+        // card.sprite.filters = [
+        //     new DropShadowFilter({
+        //         distance: 4,
+        //         rotation: 45,
+        //         blur: 4,
+        //         alpha: 0.5,
+        //         color: 0xFFFFFF,
+        //     })
+        // ];
 
         card.sprite.on("pointerdown", () => {
             card.play()
