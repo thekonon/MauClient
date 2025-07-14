@@ -36,5 +36,7 @@ import { Deck } from "./deck.ts";
   card.sprite.x = 300;
   card.sprite.y = 100;
 
+  
   player_hand.draw_card(card);
+  card.play()
 })();

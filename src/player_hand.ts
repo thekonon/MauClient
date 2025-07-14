@@ -34,12 +34,24 @@ export class PlayerHand extends Container {
     }
 
     public draw_card(card: Card){
-        [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location()
+        card.get_sprite().x = this.settings.get_deck_top_x();
+        card.get_sprite().y = this.settings.get_deck_top_y();
+        card.get_sprite().height = this.settings.card_height;
+        card.get_sprite().width = this.settings.card_width;
 
-        card.sprite.height = this.settings.card_height
-        card.sprite.width = this.settings.card_width
+        [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location();
+
         this.cards_list.push(card);
         this.addChild(card.get_sprite());
+        card.play();
+    }
+
+    public play_card(type: string, value: string){
+        this.cards_list.forEach(card => {
+            if ((card.type == type) && (card.value == value)){
+                card.play()
+            }
+        });
     }
 
     private get_new_card_location(): [number, number]{

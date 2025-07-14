@@ -32,18 +32,22 @@ export class Card {
         card.sprite.interactive = true;
 
         card.sprite.on("pointerdown", () => {
-            gsap.to(card.get_sprite(), {
-                x: card.end_animation_point_x,
-                y: card.end_animation_point_y,
-                rotation: Math.PI*2,
-                duration: 1,
-                ease: "power1.out",
-                onComplete: () => {
-                    card.set_end_of_animation()
-                }
-                })
+            card.play()
         })
         return card;
+    }
+
+    public play(){
+        gsap.to(this.get_sprite(), {
+            x: this.end_animation_point_x,
+            y: this.end_animation_point_y,
+            rotation: Math.PI*2,
+            duration: 1,
+            ease: "power1.out",
+            onComplete: () => {
+                this.set_end_of_animation()
+            }
+        })
     }
 
     public get_sprite(): Sprite {
