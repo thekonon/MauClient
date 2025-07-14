@@ -1,36 +1,50 @@
-import { Application} from "pixi.js";
+import { Container, Graphics} from "pixi.js";
 import { Card } from "./card.ts";
+import { GameSettings } from "./game_settings.ts";
 
-export class PlayerHand {
+export class PlayerHand extends Container {
     cards_list: Card[];
-    stage: Application['stage'];
+    settings: GameSettings;
 
-    hand_starting_position_x: number;
-    hand_starting_position_y: number;
     card_size:number;
     delta: number;
     
-    public constructor(stage: Application['stage']){
+    public constructor(settings: GameSettings){
+        super();
         this.cards_list = [];                   // List of cards in player hand
-        this.stage = stage;                     // Reference to canvas
+        this.settings = settings
 
-        this.hand_starting_position_x = 100;    // starting point of hand y
-        this.hand_starting_position_y = 500;    // starting point of hand y
+        this.draw_hand()
 
         this.card_size = 100;                   // Size of card
         this.delta = 10;                        // gap between two cards
     }
 
+    public draw_hand(): void{
+        const graphics = new Graphics();
+        
+        graphics.roundRect(
+            this.settings.get_player_hand_top_x(),
+            this.settings.get_player_hand_top_y(),
+            this.settings.get_player_hand_width(),
+            this.settings.get_player_hand_height(),
+            this.settings.player_hand_padding)
+        .fill(0xde3249);
+        this.addChild(graphics);
+    }
+
     public draw_card(card: Card){
         [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location()
 
+        card.sprite.height = this.settings.card_height
+        card.sprite.width = this.settings.card_width
         this.cards_list.push(card);
-        this.stage.addChild(card.get_sprite());
+        this.addChild(card.get_sprite());
     }
 
     private get_new_card_location(): [number, number]{
-        var x = this.hand_starting_position_x + (this.card_size+this.delta)*this.cards_length()
-        var y = this.hand_starting_position_y
+        var x = this.settings.get_player_hand_top_x() + this.settings.player_hand_padding + (this.settings.card_width+this.settings.player_hand_card_delta)*this.cards_length()
+        var y = this.settings.get_player_hand_top_y() + this.settings.player_hand_padding
         return [x, y]
     }
 

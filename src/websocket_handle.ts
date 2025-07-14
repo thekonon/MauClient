@@ -48,17 +48,24 @@ export class WebSocketHandle {
 
     // Event hooks (can be overridden or assigned externally)
     public async onMessage(data: string): Promise<void> {
-        console.log("We got an msg!");
-        console.log(data);
-        if (data.startsWith("Draw")){
-            console.log("Drawing command executing!");
-            const split1 = data.split(":");
-            const split2 = split1[1].split("");
-            console.log("split data:");
-            console.log(split1);
-            const card = await Card.create(split2[0], split2[1])
-            this.draw_a_card(card);
+    try {
+        console.log("Parsing");
+        const message = JSON.parse(data);
+        
+
+        if (message.TYPE === "DRAW" && Array.isArray(message.cards)) {
+            console.log("Draw and array")
+            for (const card_info of message.cards) {
+                const type = card_info.type;
+                const color = card_info.color;
+
+                const card = await Card.create(type, color);
+                this.draw_a_card(card);
+            }
         }
+    } catch (err) {
+        console.error("Invalid JSON or message format:", err);
+    }
     }
     public onOpen(): void {}
     public onClose(): void {}

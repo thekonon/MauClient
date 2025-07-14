@@ -23,12 +23,12 @@ export class Card {
         this.state = 0;
     }
 
-    public static async create(type: string, value: string): Promise<Card> {
+    public static async create(type: string, value: string, height: number = 100): Promise<Card> {
         const card = new Card(type, value);
         const texture = await card.get_texture();
         card.sprite = new Sprite(texture);
-        card.sprite.scale.set(0.1);
-        card.sprite.position.set(100, 100);
+        const scale = height / card.sprite.height;
+        card.sprite.scale.set(scale);
         card.sprite.interactive = true;
 
         card.sprite.on("pointerdown", () => {

@@ -2,6 +2,7 @@
 import asyncio
 import websockets
 import random
+import json
 
 connected = set()
 
@@ -15,10 +16,18 @@ async def handler(websocket):
         async for message in websocket:
             print(f"Received from client: {message}")
             # Echo back or broadcast to all clients
-            for conn in connected:
-                # await conn.send(f"Server got: {message}")
-                if message == "Draw a card please":
-                    await conn.send(f"Draw:{random.choice(types)}{random.choice(values)}")
+            json_dict = dict()
+            try:
+                json_dict = json.loads(message)
+                print(json_dict)
+            except:
+                pass
+            if json_dict.get("TYPE", None) == "DRAW":
+                print("Correct type - drawing")
+                for conn in connected:
+                    command = '{{"TYPE": "DRAW", "cards": [{{"type": "{}", "color": "{}"}}]}}'.format(random.choice(types), random.choice(values))
+                    print("sending command: "+command)
+                    await conn.send(command)
                 
     finally:
         connected.remove(websocket)
