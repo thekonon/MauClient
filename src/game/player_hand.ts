@@ -1,5 +1,5 @@
 import { Container, Graphics} from "pixi.js";
-import { Card } from "./card.ts";
+import { Card } from "./game/card.ts";
 import { GameSettings } from "./game_settings.ts";
 
 export class PlayerHand extends Container {

@@ -1,6 +1,6 @@
 import { Graphics, Container, Text, TextStyle } from "pixi.js";
 import { Button } from "@pixi/ui";
-import { Card } from "./card.ts";
+import { Card } from "./game/card.ts";
 
 export class MyButton {
     button: Button;

@@ -1,15 +1,24 @@
 export class GameSettings{
+    // General
     screen_height: number;
     screen_width: number;
 
+    // Loading screen
+    loading_screen_width_percent: number;
+    loading_screen_height_percent: number;
+    loading_screen_round_edge: number;
+
+    // Player hand
     player_hand_width_percent: number;
     player_hand_height_percent: number;
     player_hand_padding: number;
     player_hand_card_delta: number;
 
+    // Card
     card_height: number;
     card_width: number;
 
+    // Deck
     deck_margin: number;
 
 
@@ -18,6 +27,10 @@ export class GameSettings{
         this.screen_width = screen_width;
 
         // User settings
+        this.loading_screen_height_percent = 75;
+        this.loading_screen_width_percent = 50;
+        this.loading_screen_round_edge = 50;
+
         this.player_hand_height_percent = 25;
         this.player_hand_width_percent = 80;
         this.player_hand_padding = 20;
@@ -29,6 +42,20 @@ export class GameSettings{
         this.deck_margin = 50;
 
     }
+    public get_loading_screen_top_x(){
+        return this.get_mid_x() - this.get_loading_screen_width()/2;
+    }
+    public get_loading_screen_top_y(){
+        return this.get_mid_y() - this.get_loading_screen_height()/2;
+    }
+
+    public get_loading_screen_width(){
+        return this.screen_width * this.loading_screen_width_percent/100
+    }
+    public get_loading_screen_height(){
+        return this.screen_height * this.loading_screen_height_percent/100
+    }
+
     public get_deck_top_x(){
         return this.get_mid_x() + this.deck_margin;
     }
