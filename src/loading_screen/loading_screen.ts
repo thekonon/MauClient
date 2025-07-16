@@ -7,13 +7,13 @@ export class LoadingScreen extends Container {
 
     connected_player: string[];
 
-    public on_register_player: ((playerName: string) => void) | null = null;
+    public on_register_player: ((playerName: string, ip: string, port: string) => void) | null = null;
 
     constructor(app: Application, game_settings: GameSettings) {
         super();
         this.app = app;
         this.game_settings = game_settings;
-        this.connected_player = ["Pepa", "Wojta"];
+        this.connected_player = [];
 
         this.draw_loading_screen();
         this.add_loading_screen();
@@ -50,70 +50,76 @@ export class LoadingScreen extends Container {
 
         // Form styled to match PIXI background
         const uiContainer = document.createElement('div');
-        uiContainer.id = "loginMenu"
-        uiContainer.style.position = 'absolute';
+        uiContainer.id = "loginMenu";
+        uiContainer.classList.add('login-menu');
+
         uiContainer.style.left = `${topX}px`;
         uiContainer.style.top = `${topY}px`;
         uiContainer.style.width = `${width}px`;
         uiContainer.style.height = `${height}px`;
 
-        uiContainer.style.display = 'flex';
-        uiContainer.style.flexDirection = 'column';
-        uiContainer.style.justifyContent = 'center';
-        uiContainer.style.alignItems = 'center';
-
         uiContainer.innerHTML = `
-            <label for="playerName" style="font-size: 20px; margin-bottom: 10px;">Player Name:</label>
-            <input type="text" id="playerName"
-                style="width: 200px; height: 35px; font-size: 18px; padding: 5px 10px; border: 2px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
-
-            <button id="startGameButton" class="start-button">
-                Start Game!
+            <div class="input-row">
+                <label for="playerName">Player Name:</label>
+                <input type="text" id="playerName" class="form-input">
+            </div>
+            <div class="input-row">
+                <label for="playerName" >IP: </label>
+                <input type="text" id="IP" class="form-input" value="localhost">
+            </div>
+            <div class="input-row">
+                <label for="playerName">PORT: </label>
+                <input type="text" id="PORT" class="form-input" value="8080">
+            </div>
+            <button id="connectButton" class="connect-button">
+                Connect to lobby!
             </button>
 
-            <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Connected Players:</div>
-            <div id="connectedPlayersList"
-                style="
-                    width: 220px;
-                    height: 120px;
-                    border: 2px solid #ccc;
-                    border-radius: 8px;
-                    padding: 10px;
-                    background: #f9f9f9;
-                    overflow-y: auto;
-                    font-size: 16px;
-                    color: black;
-                    line-height: 1.4;
-                ">
+            <div>Connected Players:</div>
+            <div id="connectedPlayersList">
                 <em>No players connected yet.</em>
             </div>
         `;
         document.body.appendChild(uiContainer);
 
         // ✅ Add callback for Start Game button
-        const startButton = document.getElementById('startGameButton') as HTMLButtonElement;
-        startButton.addEventListener('click', () => {
+        const connectButton = document.getElementById('connectButton') as HTMLButtonElement;
+        connectButton.addEventListener('click', () => {
             const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
+            const IPInput = document.getElementById('IP') as HTMLInputElement;
+            const PORTInput = document.getElementById('PORT') as HTMLInputElement;
             const player_name = playerNameInput.value.trim();
-
+            const ip = IPInput.value.trim();
+            const port = PORTInput.value.trim();
+            
             if (player_name === '') {
                 alert('Please enter a player name.');
                 return;
             }
 
+            if (ip === '') {
+                alert('Kindof strange ip, don\'t you think?');
+                return;
+            }
+
+            if (port === '') {
+                alert('Kindof strange port, don\'t you think?');
+                return;
+            }
+
             console.log('Start Game button pressed. Player name:', player_name);
-            this.on_register_player?.(player_name);
+            this.on_register_player?.(player_name, ip, port);
             // ✅ Your custom logic here:
             // this.start_game_with_name?.(playerName);  // Call your own method if exists
         });
     }
 
-    public add_player_to_list(player: string){
+    public add_player_to_list(player: string) {
         this.connected_player.push(player);
         this.update_connected_player();
     }
 
-    public update_player_list(player_list: string[]){
+    public update_player_list(player_list: string[]) {
         this.connected_player = player_list;
         this.update_connected_player();
     }
@@ -146,7 +152,7 @@ export class LoadingScreen extends Container {
         });
     }
 
-    public end_loading_screen(){
+    public end_loading_screen() {
         const container = document.getElementById("loginMenu");
         container?.remove()
         this.app.stage.removeChild(this);

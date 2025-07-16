@@ -3,13 +3,12 @@ import { GameSettings } from "../game_settings";
 
 export class Deck extends Container {
     sprite!: Sprite;
-    draw_command: string;
 
     private constructor() {
         super();
         
         // Draw command to be defined there
-        this.draw_command = '{"TYPE":"DRAW", "USER": "PEPA"}'
+        
     }
 
     static async create(game_settings: GameSettings): Promise<Deck> {
@@ -33,8 +32,8 @@ export class Deck extends Container {
 
     private deck_clicked() {
         console.log("Deck clicked");
-        this.deck_clicked_action(this.draw_command)
+        this.deck_clicked_action()
     }
 
-    public deck_clicked_action(_str: string){console.log("not yet defined")};
+    public deck_clicked_action(){console.log("not yet defined")};
 }
