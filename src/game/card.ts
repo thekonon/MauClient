@@ -1,87 +1,75 @@
-// card.ts
-import { Assets, Sprite, Texture } from "pixi.js";
+import { Assets, Sprite, Texture, Container } from "pixi.js";
 import { gsap } from "gsap";
-export class Card {
+
+export class Card extends Container {
     type: string;
     value: string;
     texture: string;
-    sprite!: Sprite;
+    sprite: Sprite;
 
     end_animation_point_x: number;
     end_animation_point_y: number;
-    rotation: number;
-    public play_card: (type: string, value: string) => void;
-
+    rotation_angle: number;
     animation_duration: number;
 
-    public constructor(type: string, value: string) {
+    public play_card: (type: string, value: string) => void;
+
+    private constructor(type: string, value: string, sprite: Sprite) {
+        super();
+
         this.type = type;
         this.value = value;
         this.texture = "default";
 
+        this.sprite = sprite;
+        this.addChild(sprite);
+
         this.end_animation_point_x = 0;
         this.end_animation_point_y = 0;
-        this.rotation = 0;
+        this.rotation_angle = 0;
+        this.animation_duration = 1;
 
-        this.animation_duration = 1; // in sec
-
-        this.play_card = (type: string, value: string) => {
-            console.log("Not defined");   
+        this.play_card = (_type: string, _value: string) => {
+            console.log("Not defined");
         };
+
+        this.interactive = true;
+        this.on("pointerdown", () => {
+            this.play_card(this.type, this.value);
+        });
     }
 
     public static async create(type: string, value: string, height: number = 100): Promise<Card> {
-        const card = new Card(type, value);
-        const texture = await card.get_texture();
-        card.sprite = new Sprite(texture);
-        const scale = height / card.sprite.height;
-        card.sprite.scale.set(scale);
-        card.sprite.interactive = true;
-        card.sprite.rotation = -Math.PI*2;
+        const texture = await Card.load_texture(type, value);
+        const sprite = new Sprite(texture);
+        const scale = height / sprite.height;
+        sprite.scale.set(scale);
 
-        card.sprite.on("pointerdown", () => {
-            card.play_card(card.type, card.value)
-        })
-        return card;
+        return new Card(type, value, sprite);
     }
 
     public play(duration?: number, rotation?: number) {
-        if(duration===undefined){
-            duration = this.animation_duration;
-        }
-        if(rotation===undefined){
-            rotation = this.rotation;
-        }
-        gsap.to(this.sprite, {
+        gsap.to(this, {
             x: this.end_animation_point_x,
             y: this.end_animation_point_y,
-            rotation: rotation,
-            duration: duration,
-            ease: "power1.out",
-        })
-    }
-
-    public get_sprite(): Sprite {
-        return this.sprite;
+            rotation: rotation ?? this.rotation_angle,
+            duration: duration ?? this.animation_duration,
+            ease: "power1.out"
+        });
     }
 
     public set_end_of_animation(x: number, y: number, rotation: number): void {
-        // Overload: set_end_of_animation(x, y, rotation)
         this.end_animation_point_x = x;
         this.end_animation_point_y = y;
-        this.rotation = rotation;
+        this.rotation_angle = rotation;
     }
 
-    private get_texture(): Promise<Texture> {
-        const path = `assets/${this.texture}/${this.type}${this.value}.png`;
-        var loaded_texture;
+    private static async load_texture(type: string, value: string): Promise<Texture> {
+        const path = `assets/default/${type}${value}.png`;
         try {
-            loaded_texture = Assets.load(path);
+            return await Assets.load(path);
+        } catch {
+            return await Assets.load(`assets/default/default.png`);
         }
-        catch (err) {
-            const default_path = `assets/default/default.png`;
-            loaded_texture = Assets.load(default_path);
-        }
-        return loaded_texture;
     }
 }

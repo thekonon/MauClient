@@ -60,7 +60,7 @@ import { WebSocketHandle } from "./websocket_handle.ts";
 
   // Bypapass for testing
   loading_screen.on_register_player("thekonon", "localhost", "8080");
-  web_socket.start_game_action("");
+  web_socket.start_game_action();
   var message = JSON.parse('{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}');
   web_socket.start_pile_action(message);
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');

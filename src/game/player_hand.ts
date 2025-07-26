@@ -34,15 +34,15 @@ export class PlayerHand extends Container {
     }
 
     public draw_card(card: Card) {
-        card.get_sprite().x = this.settings.get_deck_top_x();
-        card.get_sprite().y = this.settings.get_deck_top_y();
-        card.get_sprite().height = this.settings.card_height;
-        card.get_sprite().width = this.settings.card_width;
+        card.x = this.settings.get_deck_top_x();
+        card.y = this.settings.get_deck_top_y();
+        card.height = this.settings.card_height;
+        card.width = this.settings.card_width;
 
         [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location();
 
         this.cards_list.push(card);
-        this.addChild(card.get_sprite());
+        this.addChild(card);
         card.play();
     }
 

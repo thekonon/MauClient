@@ -19,8 +19,8 @@ export class Pile extends Container {
             this.removeChild(this.previous_card.sprite);
         } else {
             // First card start from deck
-            card.get_sprite().x = this.game_settings.get_deck_top_x();
-            card.get_sprite().y = this.game_settings.get_deck_top_y();
+            card.x = this.game_settings.get_deck_top_x();
+            card.y = this.game_settings.get_deck_top_y();
         }
         this.previous_card = this.current_card;
         this.current_card = card;
@@ -30,12 +30,12 @@ export class Pile extends Container {
             this.game_settings.get_deck_top_x() - this.game_settings.card_height * 1.1,
             this.game_settings.get_deck_top_y() + (this.game_settings.card_height + this.game_settings.card_width) / 2,
             - Math.PI / 2);
-        this.addChild(this.current_card.get_sprite());
+        this.addChild(this.current_card);
         this.current_card.play();
     }
 
     private scale_card(card: Card) {
-        card.get_sprite().height = this.game_settings.card_height;
-        card.get_sprite().width = this.game_settings.card_width;
+        card.height = this.game_settings.card_height;
+        card.width = this.game_settings.card_width;
     }
 }

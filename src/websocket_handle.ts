@@ -210,10 +210,10 @@ export class WebSocketHandle {
             this.cardNameMap.get(card_info.type)!
         );
 
-        card.end_animation_point_x = card.get_sprite().position.x;
-        card.end_animation_point_y = card.get_sprite().position.y;
-        card.end_animation_point_x -= card.get_sprite().width * 1.1;
-        card.end_animation_point_y += card.get_sprite().height * 0.3;
+        card.end_animation_point_x = card.position.x;
+        card.end_animation_point_y = card.position.y;
+        card.end_animation_point_x -= card.width * 1.1;
+        card.end_animation_point_y += card.height * 0.3;
 
         card.rotation = Math.PI / 2;
         this.start_pile(card);
