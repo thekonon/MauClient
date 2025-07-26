@@ -20,7 +20,7 @@ export class Card {
 
         this.end_animation_point_x = 0;
         this.end_animation_point_y = 0;
-        this.rotation = Math.PI * 2;
+        this.rotation = 0;
 
         this.animation_duration = 1; // in sec
     }
@@ -32,6 +32,7 @@ export class Card {
         const scale = height / card.sprite.height;
         card.sprite.scale.set(scale);
         card.sprite.interactive = true;
+        card.sprite.rotation = -Math.PI*2;
 
         card.sprite.on("pointerdown", () => {
             card.play()
@@ -39,12 +40,18 @@ export class Card {
         return card;
     }
 
-    public play() {
+    public play(duration?: number, rotation?: number) {
+        if(duration===undefined){
+            duration = this.animation_duration;
+        }
+        if(rotation===undefined){
+            rotation = this.rotation;
+        }
         gsap.to(this.sprite, {
             x: this.end_animation_point_x,
             y: this.end_animation_point_y,
-            rotation: this.rotation,
-            duration: this.animation_duration,
+            rotation: rotation,
+            duration: duration,
             ease: "power1.out",
         })
     }
