@@ -1,4 +1,4 @@
-import { Container, Graphics} from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { Card } from "./game/card.ts";
 import { GameSettings } from "./game_settings.ts";
 
@@ -6,10 +6,10 @@ export class PlayerHand extends Container {
     cards_list: Card[];
     settings: GameSettings;
 
-    card_size:number;
+    card_size: number;
     delta: number;
-    
-    public constructor(settings: GameSettings){
+
+    public constructor(settings: GameSettings) {
         super();
         this.cards_list = [];                   // List of cards in player hand
         this.settings = settings
@@ -20,20 +20,20 @@ export class PlayerHand extends Container {
         this.delta = 10;                        // gap between two cards
     }
 
-    public draw_hand(): void{
+    public draw_hand(): void {
         const graphics = new Graphics();
-        
+
         graphics.roundRect(
             this.settings.get_player_hand_top_x(),
             this.settings.get_player_hand_top_y(),
             this.settings.get_player_hand_width(),
             this.settings.get_player_hand_height(),
             this.settings.player_hand_padding)
-        .fill(0xde3249);
+            .fill(0xde3249);
         this.addChild(graphics);
     }
 
-    public draw_card(card: Card){
+    public draw_card(card: Card) {
         card.get_sprite().x = this.settings.get_deck_top_x();
         card.get_sprite().y = this.settings.get_deck_top_y();
         card.get_sprite().height = this.settings.card_height;
@@ -46,21 +46,25 @@ export class PlayerHand extends Container {
         card.play();
     }
 
-    public play_card(type: string, value: string){
-        this.cards_list.forEach(card => {
-            if ((card.type == type) && (card.value == value)){
-                card.play()
+    public play_card(type: string, value: string): Card {
+        for (let i = 0; i < this.cards_list.length; i++) {
+            const card = this.cards_list[i];
+            if (card.type === type && card.value === value) {
+                this.cards_list.splice(i, 1); // Properly remove from array
+                return card;
             }
-        });
+        }
+        console.error("No such card found type:", type, "value:", value);
+        return undefined;
     }
 
-    private get_new_card_location(): [number, number]{
-        var x = this.settings.get_player_hand_top_x() + this.settings.player_hand_padding + (this.settings.card_width+this.settings.player_hand_card_delta)*this.cards_length()
+    private get_new_card_location(): [number, number] {
+        var x = this.settings.get_player_hand_top_x() + this.settings.player_hand_padding + (this.settings.card_width + this.settings.player_hand_card_delta) * this.cards_length()
         var y = this.settings.get_player_hand_top_y() + this.settings.player_hand_padding
         return [x, y]
     }
 
-    private cards_length(): number{
+    private cards_length(): number {
         return this.cards_list.length;
     }
 }

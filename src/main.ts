@@ -25,6 +25,7 @@ import { WebSocketHandle } from "./websocket_handle.ts";
 
   // Create loading screen - user is set here
   const loading_screen = new LoadingScreen(app, game_settings);
+  loading_screen.show();
 
   // Create a game instance in advance
   const game = new Game(app, game_settings);
@@ -32,7 +33,7 @@ import { WebSocketHandle } from "./websocket_handle.ts";
   // Websocket with 
   const web_socket = new WebSocketHandle();
 
-  // Create websocket connedtion after providing a name under which is user connected to WS
+  // Create websocket connection after providing a name under which is user connected to WS
   loading_screen.on_register_player = (playerName: string, ip: string, port: string) => {
     web_socket.set_user(playerName);
     web_socket.set_ip_port(ip, port);
@@ -41,18 +42,39 @@ import { WebSocketHandle } from "./websocket_handle.ts";
 
   web_socket.update_player_list = loading_screen.update_player_list.bind(loading_screen);
   web_socket.add_player = loading_screen.add_player_to_list.bind(loading_screen);
+  //when draw card command arrives, draw a card, yea ... naming sux
+  web_socket.start_pile = game.start_pile_command.bind(game);
+  web_socket.draw_a_card = game.draw_card_command_from_server.bind(game);
+  web_socket.play_card = game.play_card.bind(game);
+  game.draw_card_command_to_server = web_socket.draw_card_request.bind(web_socket);
 
-  web_socket.start_game = () => {
-    loading_screen.end_loading_screen();
+  web_socket.game_started = true;
 
-    game.draw_card_command_to_server = web_socket.draw_card_request.bind(web_socket);    //yea ... naming sux
-    game.draw_card_command_from_server = web_socket.draw_a_card;
-
-    game.start_game();
+  web_socket.start_game = async () => {
+    // When game stats, hide loading screen
+    loading_screen.hide();
+    // Start game
+    await game.start_game();
+    // Setup action functions
   }
 
+  // Bypapass for testing
+  loading_screen.on_register_player("thekonon", "localhost", "8080");
+  web_socket.start_game_action("");
+  var message = JSON.parse('{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}');
+  web_socket.start_pile_action(message);
+  message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
+  web_socket.draw_card_action(message)
+  // Wait for 1 second
+  
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  message = JSON.parse('{"type":"PLAY_CARD","card":{"type":"KING","color":"SPADES"}}');
+  web_socket.play_card_action(message);
 
+  // Play the card after delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  message = JSON.parse('{"type":"PLAY_CARD","card":{"type":"QUEEN","color":"DIAMONDS"}}');
+  web_socket.play_card_action(message);
 
-  // loading_screen.end_loading_screen();
-  // game.start_game();
+  
 })();

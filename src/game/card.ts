@@ -1,6 +1,6 @@
 // card.ts
-import { Assets, Sprite, Texture, DropShadowFilter } from "pixi.js";
-import {gsap} from "gsap";
+import { Assets, Sprite, Texture } from "pixi.js";
+import { gsap } from "gsap";
 export class Card {
     type: string;
     value: string;
@@ -9,18 +9,20 @@ export class Card {
 
     end_animation_point_x: number;
     end_animation_point_y: number;
+    rotation: number;
 
-    state: number;
+    animation_duration: number;
 
-    private constructor(type: string, value: string) {
+    public constructor(type: string, value: string) {
         this.type = type;
         this.value = value;
         this.texture = "default";
 
         this.end_animation_point_x = 0;
         this.end_animation_point_y = 0;
-        // 0 - spawn, 1 - hand, 2 - played
-        this.state = 0;
+        this.rotation = Math.PI * 2;
+
+        this.animation_duration = 1; // in sec
     }
 
     public static async create(type: string, value: string, height: number = 100): Promise<Card> {
@@ -30,17 +32,6 @@ export class Card {
         const scale = height / card.sprite.height;
         card.sprite.scale.set(scale);
         card.sprite.interactive = true;
-        // card.sprite.anchor.set(0.5)
-
-        // card.sprite.filters = [
-        //     new DropShadowFilter({
-        //         distance: 4,
-        //         rotation: 45,
-        //         blur: 4,
-        //         alpha: 0.5,
-        //         color: 0xFFFFFF,
-        //     })
-        // ];
 
         card.sprite.on("pointerdown", () => {
             card.play()
@@ -48,16 +39,13 @@ export class Card {
         return card;
     }
 
-    public play(){
-        gsap.to(this.get_sprite(), {
+    public play() {
+        gsap.to(this.sprite, {
             x: this.end_animation_point_x,
             y: this.end_animation_point_y,
-            rotation: Math.PI*2,
-            duration: 1,
+            rotation: this.rotation,
+            duration: this.animation_duration,
             ease: "power1.out",
-            onComplete: () => {
-                this.set_end_of_animation()
-            }
         })
     }
 
@@ -65,31 +53,20 @@ export class Card {
         return this.sprite;
     }
 
-    public set_end_of_animation(): void{
-        switch (this.state){
-        case 0:
-            this.end_animation_point_x = 500;
-            this.end_animation_point_y = 500;
-            this.state = 1;
-            break;
-        case 1:
-            this.state = 2;
-            break;
-        default:
-            this.state = 2;
-        }
-
+    public set_end_of_animation(x: number, y: number, rotation: number): void {
+        // Overload: set_end_of_animation(x, y, rotation)
+        this.end_animation_point_x = x;
+        this.end_animation_point_y = y;
+        this.rotation = rotation;
     }
 
     private get_texture(): Promise<Texture> {
         const path = `assets/${this.texture}/${this.type}${this.value}.png`;
         var loaded_texture;
-        try
-        {
+        try {
             loaded_texture = Assets.load(path);
         }
-        catch(err)
-        {
+        catch (err) {
             const default_path = `assets/default/default.png`;
             loaded_texture = Assets.load(default_path);
         }

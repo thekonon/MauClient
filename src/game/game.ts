@@ -3,6 +3,7 @@ import { Card } from "./card";
 import { Deck } from "./deck";
 import { GameSettings } from "../game_settings";
 import { PlayerHand } from "./player_hand";
+import { Pile } from "./pile";
 
 export class Game{
     private app: Application;
@@ -10,28 +11,46 @@ export class Game{
     public draw_card_command_to_server!: () => void;
     public draw_card_command_from_server!: (card: Card) => void;
     public play_card_command!: (card: Card) => void;
+    public start_pile_command!: (card: Card) => void;
+    player_hand: PlayerHand;
+    pile: Pile;
+    deck?: Deck;
     
     constructor(app: Application, game_settings: GameSettings){
         this.app = app;
         this.game_settings = game_settings;
+        // Create a player hand - place where user cards are stored
+        this.player_hand = new PlayerHand(this.game_settings);
+        this.draw_card_command_from_server = this.player_hand.draw_card.bind(this.player_hand);
+        
+        // Create a pile - place to which cards go
+        this.pile = new Pile(this.game_settings);
+        this.start_pile_command = this.pile.play_card.bind(this.pile);
+    }
+    
+    public async start_game(){
+        // Create a deck - place where user can request drawing card
+        this.deck = await Deck.create(this.game_settings);
+        this.deck.deck_clicked_action = this.draw_card_command_to_server.bind(this);
+        this.show()
     }
 
-    public async start_game(){
-        const player_hand = new PlayerHand(this.game_settings);
-        this.app.stage.addChild(player_hand);
+    public play_card(type: string, value: string){
+        // When there is request to play a card - find the right one and play it
+        const played_card = this.player_hand.play_card(type, value);
 
-        const deck = await Deck.create(this.game_settings);
-        this.app.stage.addChild(deck);
+        // Played card goes to pile
+        this.pile.play_card(played_card);
+    }
 
-        deck.deck_clicked_action = this.draw_card_command_to_server.bind(this);
-        this.draw_card_command_from_server = player_hand.draw_card.bind(player_hand);
+    private show(){
+        // Add player hand and deck to app
+        this.app.stage.addChild(this.player_hand);
+        this.app.stage.addChild(this.deck!);
+        this.app.stage.addChild(this.pile)
+    }
 
-        // Testing
-        // const card = await Card.create("C", "K", this.game_settings.card_height);
-        // card.sprite.x = 300;
-        // card.sprite.y = 100;
-
-        // player_hand.draw_card(card);
-        // card.play()
+    private scale_card(card: Card){
+        
     }
 }

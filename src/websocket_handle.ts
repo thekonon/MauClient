@@ -25,6 +25,8 @@ export class WebSocketHandle {
     public update_player_list!: (player_list: string[]) => void;
     public add_player!: (player: string) => void;
     public start_game!: () => void;
+    public start_pile!: (card: Card) => void;
+    public play_card!: (type: string, value: string) => void;
     ip: string;
     port: string;
 
@@ -52,23 +54,23 @@ export class WebSocketHandle {
         this.user_id = ""
     }
 
-    public set_ip_port(ip: string, port: string){
+    public set_ip_port(ip: string, port: string) {
         this.ip = ip;
         this.port = port;
     }
 
-    public set_user(user_name: string){
+    public set_user(user_name: string) {
         this.user_name = user_name;
     }
 
-    public create_connection(){
-        if(this.user_name == ""){
+    public create_connection() {
+        if (this.user_name == "") {
             throw new Error("UserName must be set first")
         }
-        if(this.ip == ""){
+        if (this.ip == "") {
             throw new Error("UserName must be set first")
         }
-        if(this.port == ""){
+        if (this.port == "") {
             throw new Error("UserName must be set first")
         }
         this.url = `ws://${this.ip}:${this.port}/game?user=${this.user_name}`;
@@ -76,7 +78,7 @@ export class WebSocketHandle {
     }
 
     private createSocket(): WebSocket {
-        console.log("Trying to connect to: ", this.url)
+        // console.log("Trying to connect to: ", this.url)
         const socket = new WebSocket(this.url);
 
         socket.addEventListener("open", () => {
@@ -112,7 +114,7 @@ export class WebSocketHandle {
     }
 
     // Call this method when there is a draw card request
-    public draw_card_request(){
+    public draw_card_request() {
         const draw_command = '{"TYPE":"DRAW", "USER": "THEKONO"}';
         this.send(draw_command);
     }
@@ -121,45 +123,90 @@ export class WebSocketHandle {
     public async onMessage(data: string): Promise<void> {
         try {
             const message = JSON.parse(data);
-            switch(message.type){
-                case "START_GAME":
-                    console.log("Starting game detected")
-                    this.start_game_action(message);
-                    break
-                case "DRAW":
-                    if(this.game_started){
-                        this.draw_card_action(message);
-                    }
-                    break
+            // console.log("Type of msg: ", message.type);
+            switch (message.type) {
                 case "PLAYERS":
                     this.players_action(message);
-                    break
+                    break;
                 case "REGISTER_PLAYER":
                     this.register_player_action(message);
+                    break;
+                case "START_GAME":
+                    // console.log("Starting game detected")
+                    this.start_game_action(message);
+                    break
+                case "START_PILE":
+                    if (this.game_started) {
+                        // console.log("Calling start pile action")
+                        this.start_pile_action(message);
+                    } else {
+                        console.error("Can not start pile when game is not started");
+                    }
+                    break;
+                case "DRAW":
+                    if (this.game_started) {
+                        this.draw_card_action(message);
+                    } else {
+                        console.error("Can not draw when game is not started")
+                    }
+                    break;
+                case "PLAY_CARD ":
+                    if (this.game_started) {
+                        this.play_card_action(message);
+                    }
+                    else {
+                        console.error("Can not play card when game is not started")
+                    }
+                    break;
             }
         } catch (err) {
             console.error("Invalid JSON or message format:", err);
         }
     }
+    play_card_action(message: any) {
+        const card_info = message.card;
+        this.play_card(
+            this.cardNameMap.get(card_info.color)!,
+            this.cardNameMap.get(card_info.type)!
+        );
+    }
 
-    public start_game_action(message: any){
+    public start_game_action(message: any) {
         this.start_game();
     }
 
     public register_player_action(message: any) {
+        // console.log("Player is beeing registered");
         const player = message.playerDto.username;
-        console.log("Player is beeing registered");
         this.add_player(player)
     }
 
-    public players_action(message: any){
+    public players_action(message: any) {
         const players = message.players;
-        console.log(players);
+        // console.log(players);
         this.update_player_list(players);
+    }
+
+    public async start_pile_action(message: any) {
+        // console.log("Starting pile");
+        const card_info = message.card;
+        const card = await Card.create(
+            this.cardNameMap.get(card_info.color)!,
+            this.cardNameMap.get(card_info.type)!
+        );
+
+        card.end_animation_point_x = card.get_sprite().position.x;
+        card.end_animation_point_y = card.get_sprite().position.y;
+        card.end_animation_point_x -= card.get_sprite().width * 1.1;
+        card.end_animation_point_y += card.get_sprite().height * 0.3;
+
+        card.rotation = Math.PI / 2;
+        this.start_pile(card);
     }
 
     public async draw_card_action(message: any) {
         for (const card_info of message.cards) {
+            // console.log("Drawing: ", card_info.type, card_info.color);
             const type = card_info.type;
             const color = card_info.color;
 

@@ -14,11 +14,19 @@ export class LoadingScreen extends Container {
         this.app = app;
         this.game_settings = game_settings;
         this.connected_player = [];
+    }
 
+    public show() {
+        this.app.stage.addChild(this);
         this.draw_loading_screen();
-        this.add_loading_screen();
         this.update_connected_player()
     }
+
+    public hide() {
+        document.getElementById("loginMenu")?.remove();
+        this.app.stage.removeChild(this);
+    }
+
 
     public draw_loading_screen() {
         // Draw background
@@ -91,7 +99,7 @@ export class LoadingScreen extends Container {
             const player_name = playerNameInput.value.trim();
             const ip = IPInput.value.trim();
             const port = PORTInput.value.trim();
-            
+
             if (player_name === '') {
                 alert('Please enter a player name.');
                 return;
@@ -107,7 +115,7 @@ export class LoadingScreen extends Container {
                 return;
             }
 
-            console.log('Start Game button pressed. Player name:', player_name);
+            // console.log('Start Game button pressed. Player name:', player_name);
             this.on_register_player?.(player_name, ip, port);
             // ✅ Your custom logic here:
             // this.start_game_with_name?.(playerName);  // Call your own method if exists
@@ -115,11 +123,17 @@ export class LoadingScreen extends Container {
     }
 
     public add_player_to_list(player: string) {
+        if (this.connected_player.length > 4) {
+            throw Error("This client supports maximum of 5 players");
+        }
         this.connected_player.push(player);
         this.update_connected_player();
     }
 
     public update_player_list(player_list: string[]) {
+        if (player_list.length > 5) {
+            throw Error("This client supports maximum of 5 players");
+        }
         this.connected_player = player_list;
         this.update_connected_player();
     }
@@ -148,17 +162,11 @@ export class LoadingScreen extends Container {
             div.style.marginBottom = "4px";
             container.appendChild(div);
 
-            console.log("Connected:", player); // Optional debug log
+            // console.log("Connected:", player); // Optional debug log
         });
     }
-
-    public end_loading_screen() {
-        const container = document.getElementById("loginMenu");
-        container?.remove()
-        this.app.stage.removeChild(this);
+    public get_player_list(): string[] {
+        return this.connected_player;
     }
 
-    private add_loading_screen() {
-        this.app.stage.addChild(this);
-    }
 }
