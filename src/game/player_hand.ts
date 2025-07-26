@@ -1,18 +1,16 @@
 import { Container, Graphics } from "pixi.js";
-import { Card } from "./game/card.ts";
-import { GameSettings } from "./game_settings.ts";
+import { GameSettings } from "../game_settings";
+import { Card } from "./card";
 
 export class PlayerHand extends Container {
     cards_list: Card[];
-    settings: GameSettings;
 
     card_size: number;
     delta: number;
 
-    public constructor(settings: GameSettings) {
+    public constructor() {
         super();
         this.cards_list = [];                   // List of cards in player hand
-        this.settings = settings
 
         this.draw_hand()
 
@@ -24,20 +22,20 @@ export class PlayerHand extends Container {
         const graphics = new Graphics();
 
         graphics.roundRect(
-            this.settings.get_player_hand_top_x(),
-            this.settings.get_player_hand_top_y(),
-            this.settings.get_player_hand_width(),
-            this.settings.get_player_hand_height(),
-            this.settings.player_hand_padding)
+            GameSettings.get_player_hand_top_x(),
+            GameSettings.get_player_hand_top_y(),
+            GameSettings.get_player_hand_width(),
+            GameSettings.get_player_hand_height(),
+            GameSettings.player_hand_padding)
             .fill(0xde3249);
         this.addChild(graphics);
     }
 
     public draw_card(card: Card) {
-        card.x = this.settings.get_deck_top_x();
-        card.y = this.settings.get_deck_top_y();
-        card.height = this.settings.card_height;
-        card.width = this.settings.card_width;
+        card.x = GameSettings.get_deck_top_x();
+        card.y = GameSettings.get_deck_top_y();
+        card.height = GameSettings.card_height;
+        card.width = GameSettings.card_width;
 
         [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location();
 
@@ -57,7 +55,7 @@ export class PlayerHand extends Container {
         }
         
         console.error("No such card found type:", type, "value:", value);
-        return undefined;
+        return null;
     }
 
     private reorder_cards() {
@@ -73,8 +71,8 @@ export class PlayerHand extends Container {
         if (n === undefined) {
             n = this.cards_length();
         }
-        const x = this.settings.get_player_hand_top_x() + this.settings.player_hand_padding + (this.settings.card_width + this.settings.player_hand_card_delta) * n;
-        const y = this.settings.get_player_hand_top_y() + this.settings.player_hand_padding;
+        const x = GameSettings.get_player_hand_top_x() + GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
+        const y = GameSettings.get_player_hand_top_y() + GameSettings.player_hand_padding;
         return [x, y];
     }
 

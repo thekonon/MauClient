@@ -3,16 +3,14 @@ import { GameSettings } from "../game_settings";
 
 export class LoadingScreen extends Container {
     app: Application
-    game_settings: GameSettings;
 
     connected_player: string[];
 
     public on_register_player: ((playerName: string, ip: string, port: string) => void) | null = null;
 
-    constructor(app: Application, game_settings: GameSettings) {
+    constructor(app: Application) {
         super();
         this.app = app;
-        this.game_settings = game_settings;
         this.connected_player = [];
     }
 
@@ -30,10 +28,10 @@ export class LoadingScreen extends Container {
 
     public draw_loading_screen() {
         // Draw background
-        const topX = this.game_settings.get_loading_screen_top_x();
-        const topY = this.game_settings.get_loading_screen_top_y();
-        const width = this.game_settings.get_loading_screen_width();
-        const height = this.game_settings.get_loading_screen_height();
+        const topX = GameSettings.get_loading_screen_top_x();
+        const topY = GameSettings.get_loading_screen_top_y();
+        const width = GameSettings.get_loading_screen_width();
+        const height = GameSettings.get_loading_screen_height();
 
         const background = new Graphics();
         background.roundRect(
@@ -41,7 +39,7 @@ export class LoadingScreen extends Container {
             topY,
             width,
             height,
-            this.game_settings.loading_screen_round_edge
+            GameSettings.loading_screen_round_edge
         ).fill(0xde3249);
         this.addChild(background);
 
@@ -52,7 +50,7 @@ export class LoadingScreen extends Container {
             fontWeight: 'bold',
         });
         const text = new Text({ text: 'MňauMňauGame', style });
-        text.position.x = this.game_settings.get_mid_x() - text.getSize().width / 2;
+        text.position.x = GameSettings.get_mid_x() - text.getSize().width / 2;
         text.position.y = topY + 5;
         this.addChild(text);
 

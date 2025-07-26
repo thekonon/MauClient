@@ -1,27 +1,36 @@
 import { Assets, Sprite, Texture, Container } from "pixi.js";
 import { gsap } from "gsap";
+import { GameSettings } from "../game_settings";
 
 export class Card extends Container {
-    type: string;
-    value: string;
-    texture: string;
-    sprite: Sprite;
+
+    // General settings of the card
+    type: string;       // C / D / H / S
+    value: string;      // 7/8/9/10/J/Q/K/A
+    texture: string;    // default / TODO
 
     end_animation_point_x: number;
     end_animation_point_y: number;
     rotation_angle: number;
     animation_duration: number;
-
+    
     public play_card: (type: string, value: string) => void;
-
-    private constructor(type: string, value: string, sprite: Sprite) {
+    public static async create(type: string, value: string, height: number = 100): Promise<Card> {
+        const game_settings = new GameSettings();
+        const texture = await Card.load_texture(type, value);
+        const sprite = new Sprite(texture);
+        const scale = height / sprite.height;
+        sprite.scale.set(scale);
+        return new Card(type, value, sprite);
+    }
+    
+    private constructor(type: string, value: string, sprite: Sprite, texture: string = "default") {
         super();
 
         this.type = type;
         this.value = value;
-        this.texture = "default";
+        this.texture = texture;
 
-        this.sprite = sprite;
         this.addChild(sprite);
 
         this.end_animation_point_x = 0;
@@ -39,14 +48,6 @@ export class Card extends Container {
         });
     }
 
-    public static async create(type: string, value: string, height: number = 100): Promise<Card> {
-        const texture = await Card.load_texture(type, value);
-        const sprite = new Sprite(texture);
-        const scale = height / sprite.height;
-        sprite.scale.set(scale);
-
-        return new Card(type, value, sprite);
-    }
 
     public play(duration?: number, rotation?: number) {
         gsap.to(this, {

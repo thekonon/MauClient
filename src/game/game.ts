@@ -7,7 +7,6 @@ import { Pile } from "./pile";
 
 export class Game{
     private app: Application;
-    private game_settings: GameSettings;
     public draw_card_command_to_server!: () => void;
     public draw_card_command_from_server!: (card: Card) => void;
     public play_card_command!: (card: Card) => void;
@@ -16,21 +15,20 @@ export class Game{
     pile: Pile;
     deck?: Deck;
     
-    constructor(app: Application, game_settings: GameSettings){
+    constructor(app: Application){
         this.app = app;
-        this.game_settings = game_settings;
         // Create a player hand - place where user cards are stored
-        this.player_hand = new PlayerHand(this.game_settings);
+        this.player_hand = new PlayerHand();
         this.draw_card_command_from_server = this.player_hand.draw_card.bind(this.player_hand);
         
         // Create a pile - place to which cards go
-        this.pile = new Pile(this.game_settings);
+        this.pile = new Pile();
         this.start_pile_command = this.pile.play_card.bind(this.pile);
     }
     
     public async start_game(){
         // Create a deck - place where user can request drawing card
-        this.deck = await Deck.create(this.game_settings);
+        this.deck = await Deck.create();
         this.deck.deck_clicked_action = this.draw_card_command_to_server.bind(this);
         this.show()
     }

@@ -21,14 +21,14 @@ import { WebSocketHandle } from "./websocket_handle.ts";
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
   // Create file with all  the graphics settings
-  const game_settings = new GameSettings(app.screen.height, app.screen.width);
+  GameSettings.setScreenDimensions(app.screen.height, app.screen.width);
 
   // Create loading screen - user is set here
-  const loading_screen = new LoadingScreen(app, game_settings);
+  const loading_screen = new LoadingScreen(app);
   loading_screen.show();
 
   // Create a game instance in advance
-  const game = new Game(app, game_settings);
+  const game = new Game(app);
 
   // Websocket with 
   const web_socket = new WebSocketHandle();
