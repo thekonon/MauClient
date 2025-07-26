@@ -64,7 +64,6 @@ export class PlayerHand extends Container {
         for (let i = 0; i < this.cards_list.length; i++) {
             const card = this.cards_list[i];
             const new_location = this.get_new_card_location(i);
-            console.log(new_location);
             card.set_end_of_animation(new_location[0], new_location[1], 0);
             card.play(0.1, 0);
         }
@@ -74,10 +73,8 @@ export class PlayerHand extends Container {
         if (n === undefined) {
             n = this.cards_length();
         }
-
         const x = this.settings.get_player_hand_top_x() + this.settings.player_hand_padding + (this.settings.card_width + this.settings.player_hand_card_delta) * n;
         const y = this.settings.get_player_hand_top_y() + this.settings.player_hand_padding;
-
         return [x, y];
     }
 

@@ -19,6 +19,9 @@ export class WebSocketHandle {
         ["CLUBS", "C"],
         ["DIAMONDS", "D"]
     ]);
+    private readonly cardShortToFullMap = new Map<string, string>(
+        Array.from(this.cardNameMap.entries()).map(([key, value]) => [value, key])
+    );
 
     // Game actions
     public draw_a_card!: (card: Card) => void;
@@ -119,6 +122,18 @@ export class WebSocketHandle {
         this.send(draw_command);
     }
 
+    public play_card_command(type: string, value: string) {
+        const message = JSON.stringify({
+            type: "PLAY_CARD",
+            card: {
+                type: this.cardShortToFullMap.get(value),
+                color: this.cardShortToFullMap.get(type)
+            },
+            user: "THEKONO"
+        });
+        this.send(message);
+    }
+
     // Event hooks (can be overridden or assigned externally)
     public async onMessage(data: string): Promise<void> {
         try {
@@ -133,7 +148,7 @@ export class WebSocketHandle {
                     break;
                 case "START_GAME":
                     // console.log("Starting game detected")
-                    this.start_game_action(message);
+                    this.start_game_action();
                     break
                 case "START_PILE":
                     if (this.game_started) {
@@ -163,7 +178,7 @@ export class WebSocketHandle {
             console.error("Invalid JSON or message format:", err);
         }
     }
-    play_card_action(message: any) {
+    public play_card_action(message: any) {
         const card_info = message.card;
         this.play_card(
             this.cardNameMap.get(card_info.color)!,
@@ -171,7 +186,7 @@ export class WebSocketHandle {
         );
     }
 
-    public start_game_action(message: any) {
+    public start_game_action() {
         this.start_game();
     }
 
@@ -211,6 +226,7 @@ export class WebSocketHandle {
             const color = card_info.color;
 
             const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
+            card.play_card = this.play_card_command.bind(this)
             this.draw_a_card(card);
         }
     }

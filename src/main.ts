@@ -67,7 +67,7 @@ import { WebSocketHandle } from "./websocket_handle.ts";
   web_socket.draw_card_action(message)
 
   // Wait for 1 second
-  
+
   await new Promise(resolve => setTimeout(resolve, 1000));
   message = JSON.parse('{"type":"PLAY_CARD","card":{"type":"KING","color":"SPADES"}}');
   web_socket.play_card_action(message);
@@ -81,4 +81,20 @@ import { WebSocketHandle } from "./websocket_handle.ts";
   await new Promise(resolve => setTimeout(resolve, 1000));
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"SEVEN","color":"DIAMONDS"},{"type":"SEVEN","color":"CLUBS"},{"type":"SEVEN","color":"SPADES"},{"type":"SEVEN","color":"HEARTS"}]}');
   web_socket.draw_card_action(message)
+
+  const colors: string[] = ["CLUBS","DIAMONDS", "HEARTS", "SPADES"];
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  for (let i = 0; i < 4; i++) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+      const message = {
+        type: "PLAY_CARD",
+        card: {
+            type: "SEVEN",
+            color: colors[i]
+        }
+    };
+    web_socket.play_card_action(message);
+  }
 })();

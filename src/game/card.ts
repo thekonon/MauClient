@@ -10,6 +10,7 @@ export class Card {
     end_animation_point_x: number;
     end_animation_point_y: number;
     rotation: number;
+    public play_card: (type: string, value: string) => void;
 
     animation_duration: number;
 
@@ -23,6 +24,10 @@ export class Card {
         this.rotation = 0;
 
         this.animation_duration = 1; // in sec
+
+        this.play_card = (type: string, value: string) => {
+            console.log("Not defined");   
+        };
     }
 
     public static async create(type: string, value: string, height: number = 100): Promise<Card> {
@@ -35,7 +40,7 @@ export class Card {
         card.sprite.rotation = -Math.PI*2;
 
         card.sprite.on("pointerdown", () => {
-            card.play()
+            card.play_card(card.type, card.value)
         })
         return card;
     }
