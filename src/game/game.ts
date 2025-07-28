@@ -7,10 +7,12 @@ import { QueenDialog } from "./queen_dialog";
 
 export class Game {
     private app: Application;
-    public draw_card_command_to_server!: () => void;
-    public draw_card_command_from_server!: (card: Card) => void;
-    public play_card_command!: (card: Card) => void;
-    public start_pile_command!: (card: Card) => void;
+    public play_card_action!: (card: Card) => void;
+    public start_pile_action!: (card: Card) => void;
+    public draw_card_action!: (card: Card) => void;
+    public draw_card_command!: () => void;
+    public pass_command!: () => void;
+
     player_hand: PlayerHand;
     pile: Pile;
     deck?: Deck;
@@ -20,11 +22,11 @@ export class Game {
         this.app = app;
         // Create a player hand - place where user cards are stored
         this.player_hand = new PlayerHand();
-        this.draw_card_command_from_server = this.player_hand.draw_card.bind(this.player_hand);
+        this.draw_card_action = this.player_hand.draw_card.bind(this.player_hand);
 
         // Create a pile - place to which cards go
         this.pile = new Pile();
-        this.start_pile_command = this.pile.play_card.bind(this.pile);
+        this.start_pile_action = this.pile.play_card.bind(this.pile);
 
         this.dialog = new QueenDialog();
     }
@@ -32,7 +34,8 @@ export class Game {
     public async start_game() {
         // Create a deck - place where user can request drawing card
         this.deck = await Deck.create();
-        this.deck.deck_clicked_action = this.draw_card_command_to_server.bind(this);
+        this.deck.deck_clicked_action = this.draw_card_command.bind(this);
+        this.player_hand.pass_command = this.pass_command.bind(this);
         this.show()
     }
 

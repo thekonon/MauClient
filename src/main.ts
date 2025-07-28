@@ -86,8 +86,8 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   web_socket.add_player = loading_screen.add_player_to_list.bind(loading_screen);
 
   /* Game callbacks - server sends */
-  web_socket.start_pile = game.start_pile_command.bind(game);
-  web_socket.draw_a_card = game.draw_card_command_from_server.bind(game);
+  web_socket.start_pile = game.start_pile_action.bind(game);
+  web_socket.draw_a_card = game.draw_card_action.bind(game);
   web_socket.play_card = game.play_card.bind(game);
   
   web_socket.select_queen_color = game.show_queen_dialog.bind(game);
@@ -101,8 +101,9 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   }
 
   /* User callbacks - user want to send */
-  game.draw_card_command_to_server = web_socket.draw_card_request.bind(web_socket);
+  game.draw_card_command = web_socket.draw_card_request.bind(web_socket);
+  game.pass_command = web_socket.play_pass_command.bind(web_socket);
 
   // Bypapass for testing
-  testing(web_socket, loading_screen)
+  // testing(web_socket, loading_screen)
 })();

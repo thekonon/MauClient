@@ -49,8 +49,8 @@ export class PlayerHand extends Container {
     }
 
     public draw_card(card: Card) {
-        card.x = GameSettings.get_deck_top_x();
-        card.y = GameSettings.get_deck_top_y();
+        card.x = GameSettings.get_deck_top_x()-GameSettings.get_player_hand_top_x();
+        card.y = GameSettings.get_deck_top_y()-GameSettings.get_player_hand_top_y();
         card.height = GameSettings.card_height;
         card.width = GameSettings.card_width;
 
@@ -88,8 +88,8 @@ export class PlayerHand extends Container {
         if (n === undefined) {
             n = this.cards_length();
         }
-        const x = GameSettings.get_player_hand_top_x() + GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
-        const y = GameSettings.get_player_hand_top_y() + GameSettings.player_hand_padding;
+        const x =  GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
+        const y = GameSettings.player_hand_padding;
         return [x, y];
     }
 
