@@ -17,6 +17,13 @@ export class GameSettings {
     // Deck
     static deck_margin = 50;
 
+    // Queen dialog window
+    static dialog_window_pos = [100, 100];
+    static dialog_window_dim = [300, 300];
+    static dialog_window_radius = 15;
+    static dialog_window_padding = 15;
+    static dialog_window_color = 0x00ff00;
+
     static setScreenDimensions(height: number, width: number) {
         GameSettings.screen_height = height;
         GameSettings.screen_width = width;

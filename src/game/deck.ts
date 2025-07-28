@@ -6,11 +6,9 @@ export class Deck extends Container {
 
     private constructor() {
         super();
-        
     }
 
     static async create(): Promise<Deck> {
-        
         const path = `assets/default/back.png`;
         const texture = await Assets.load(path);
 

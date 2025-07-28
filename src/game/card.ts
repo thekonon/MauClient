@@ -1,35 +1,73 @@
-import { Assets, Sprite, Texture, Container } from "pixi.js";
+import { Assets, Sprite, Texture, Container, Graphics } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../game_settings";
 
 export class Card extends Container {
 
     // General settings of the card
-    type: string;       // C / D / H / S
-    value: string;      // 7/8/9/10/J/Q/K/A
-    texture: string;    // default / TODO
+    /* Types of card:
+    C - Clubs
+    D - Diamonds
+    H - Hearts
+    S - Spades
+    */
+    type: string;
+    /* Values of card
+    7
+    8
+    9
+    10
+    J - Jack
+    Q - Queen
+    K - King
+    A - Ace
+    */
+    value: string;
+    /* Textures:
+    - default
+    */
+    texture: string;
 
+    /* Animation properties */
+    /*  end_animation_point_x / y
+            - where card lands after calling play()
+        rotation
+            - ending angle of card  
+        animation duration [s]
+            - default duration of playing animation in sec
+    */
     end_animation_point_x: number;
     end_animation_point_y: number;
     rotation_angle: number;
     animation_duration: number;
-    
+
+    /* Methods needs to be defined as callbacks */
+    /*  play_card
+            this method is called after pressing on card,
+            play card request is sent to server
+    */
     public play_card: (type: string, value: string) => void;
-    public static async create(type: string, value: string, height: number = 100): Promise<Card> {
-        const game_settings = new GameSettings();
+    public card_sprite: Sprite;
+    static background_texture: any;
+
+    /* Card has to be created in async - therefore factory is used*/
+    public static async create(type: string, value: string): Promise<Card> {
         const texture = await Card.load_texture(type, value);
         const sprite = new Sprite(texture);
-        const scale = height / sprite.height;
+        const scale = GameSettings.card_height / sprite.height;
         sprite.scale.set(scale);
+        Card.background_texture = await Card.load_texture("back", "");
         return new Card(type, value, sprite);
     }
-    
+
     private constructor(type: string, value: string, sprite: Sprite, texture: string = "default") {
         super();
 
         this.type = type;
         this.value = value;
+        this.card_sprite = sprite;
         this.texture = texture;
+
 
         this.addChild(sprite);
 
@@ -46,6 +84,22 @@ export class Card extends Container {
         this.on("pointerdown", () => {
             this.play_card(this.type, this.value);
         });
+    }
+
+    public draw_dialog(): void {
+        const container = new Container();
+        const graphics = new Graphics();
+
+        graphics.roundRect(
+            -300,
+            -300,
+            300,
+            300,
+            GameSettings.player_hand_padding)
+            .fill(0x00ff00);
+
+        container.addChild(graphics)
+        this.addChild(container);
     }
 
 
@@ -70,7 +124,9 @@ export class Card extends Container {
         try {
             return await Assets.load(path);
         } catch {
-            return await Assets.load(`assets/default/default.png`);
+            return await Assets.load(`assets/default/back.png`);
         }
     }
+
+
 }

@@ -15,12 +15,14 @@ export class Pile extends Container {
         if (this.previous_card != null) {
             // Remove card that is no longer valid
             this.removeChild(this.previous_card);
-        } else {
+        } 
+        this.previous_card = this.current_card;
+        if (this.previous_card === null) {
             // First card start from deck
+            console.log("Setting card position to deck")
             card.x = GameSettings.get_deck_top_x();
             card.y = GameSettings.get_deck_top_y();
         }
-        this.previous_card = this.current_card;
         this.current_card = card;
         this.scale_card(this.current_card);
 

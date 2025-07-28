@@ -30,6 +30,7 @@ export class WebSocketHandle {
     public start_game!: () => void;
     public start_pile!: (card: Card) => void;
     public play_card!: (type: string, value: string) => void;
+    public select_queen_color!: () => void;
     ip: string;
     port: string;
 
@@ -47,6 +48,10 @@ export class WebSocketHandle {
 
     // Connectio data
 
+    // Previously played card
+    previous_card_type: string;
+    previous_card_value: string;
+
     constructor() {
         this.ip = "";
         this.port = "";
@@ -55,6 +60,9 @@ export class WebSocketHandle {
         this.url = ""
         this.user_name = ""
         this.user_id = ""
+
+        this.previous_card_type = "";
+        this.previous_card_value = "";
     }
 
     public set_ip_port(ip: string, port: string) {
@@ -118,27 +126,31 @@ export class WebSocketHandle {
 
     // Call this method when there is a draw card request
     public draw_card_request() {
-        const draw_command = '{"TYPE":"DRAW", "USER": "THEKONO"}';
+        const draw_command = '{"type":"DRAW"}';
         this.send(draw_command);
     }
 
-    public play_card_command(type: string, value: string) {
+    public play_card_command(type: string, value: string, next_color: string = "SPADES") {
         const message = JSON.stringify({
-            type: "PLAY_CARD",
+            type: "PLAY",
             card: {
                 type: this.cardShortToFullMap.get(value),
                 color: this.cardShortToFullMap.get(type)
             },
-            user: "THEKONO"
+            nextColor: next_color
         });
         this.send(message);
+        this.previous_card_type = type;
+        this.previous_card_value = value;
     }
 
     // Event hooks (can be overridden or assigned externally)
     public async onMessage(data: string): Promise<void> {
+        //{"body":{"name":"CardException","message":"Next color not specified, when played QUEEN.","timestamp":"2025-07-27T16:39:30.578998735Z"},"responseType":"ERROR"}
         try {
             const message = JSON.parse(data);
             // console.log("Type of msg: ", message.type);
+            /* Handle normal messages */
             switch (message.type) {
                 case "PLAYERS":
                     this.players_action(message);
@@ -148,6 +160,7 @@ export class WebSocketHandle {
                     break;
                 case "START_GAME":
                     // console.log("Starting game detected")
+                    this.game_started = true;
                     this.start_game_action();
                     break
                 case "START_PILE":
@@ -165,7 +178,7 @@ export class WebSocketHandle {
                         console.error("Can not draw when game is not started")
                     }
                     break;
-                case "PLAY_CARD ":
+                case "PLAY_CARD":
                     if (this.game_started) {
                         this.play_card_action(message);
                     }
@@ -173,13 +186,30 @@ export class WebSocketHandle {
                         console.error("Can not play card when game is not started")
                     }
                     break;
+                case "PLAYER_SHIFT":
+                    break;
+                case "HIDDEN_DRAW":
+                    break;
+                default:
+                    console.log("Other message");
+                    console.log(message.body.name)
+                    /* Handle error messages */
+                    switch (message.body.name) {
+                        case "CardException":
+                            if (message.body.message === "Next color not specified, when played QUEEN."){
+                                this.select_queen_color();
+                                console.log("Now dialog have to be displayed + prev card played")
+                            }
+                    }
             }
         } catch (err) {
             console.error("Invalid JSON or message format:", err);
         }
     }
     public play_card_action(message: any) {
+        console.log("message:", message)
         const card_info = message.card;
+        console.log(card_info)
         this.play_card(
             this.cardNameMap.get(card_info.color)!,
             this.cardNameMap.get(card_info.type)!
@@ -229,5 +259,28 @@ export class WebSocketHandle {
             card.play_card = this.play_card_command.bind(this)
             this.draw_a_card(card);
         }
+    }
+
+    private getRandomCardAndColor() {
+        const entries = Array.from(this.cardNameMap.keys());
+
+        // Separate type (ranks) and color (suits)
+        const types = entries.slice(0, 9);   // "ACE", "KING", ..., "SIX"
+        const colors = entries.slice(9);     // "HEARTS", "SPADES", "CLUBS", "DIAMONDS"
+
+        // Pick random type and color
+        const randomType = types[Math.floor(Math.random() * types.length)];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+        // Return the full message
+        return {
+            type: "DRAW",
+            cards: [
+                {
+                    type: randomType,
+                    color: randomColor
+                }
+            ]
+        };
     }
 }
