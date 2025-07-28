@@ -144,72 +144,79 @@ export class WebSocketHandle {
         this.previous_card_value = value;
     }
 
+    public play_pass_command() {
+        const message = JSON.stringify({
+            type: "PASS",
+        });
+        this.send(message);
+    }
+
     // Event hooks (can be overridden or assigned externally)
     public async onMessage(data: string): Promise<void> {
         //{"body":{"name":"CardException","message":"Next color not specified, when played QUEEN.","timestamp":"2025-07-27T16:39:30.578998735Z"},"responseType":"ERROR"}
         try {
             const message = JSON.parse(data);
-            // console.log("Type of msg: ", message.type);
-            /* Handle normal messages */
-            switch (message.type) {
-                case "PLAYERS":
-                    this.players_action(message);
+            switch (message.messageType) {
+                case "ACTION":
+                    this.handleAction(message.action);
                     break;
-                case "REGISTER_PLAYER":
-                    this.register_player_action(message);
-                    break;
-                case "START_GAME":
-                    // console.log("Starting game detected")
-                    this.game_started = true;
-                    this.start_game_action();
-                    break
-                case "START_PILE":
-                    if (this.game_started) {
-                        // console.log("Calling start pile action")
-                        this.start_pile_action(message);
-                    } else {
-                        console.error("Can not start pile when game is not started");
-                    }
-                    break;
-                case "DRAW":
-                    if (this.game_started) {
-                        this.draw_card_action(message);
-                    } else {
-                        console.error("Can not draw when game is not started")
-                    }
-                    break;
-                case "PLAY_CARD":
-                    if (this.game_started) {
-                        this.play_card_action(message);
-                    }
-                    else {
-                        console.error("Can not play card when game is not started")
-                    }
-                    break;
-                case "PLAYER_SHIFT":
-                    break;
-                case "HIDDEN_DRAW":
+                case "ERROR":
+                    console.error("Error detected, not implemented yet");
                     break;
                 default:
-                    console.log("Other message");
-                    console.log(message.body.name)
-                    /* Handle error messages */
-                    switch (message.body.name) {
-                        case "CardException":
-                            if (message.body.message === "Next color not specified, when played QUEEN."){
-                                this.select_queen_color();
-                                console.log("Now dialog have to be displayed + prev card played")
-                            }
-                    }
+                    console.error("Message type", message.messageType, "not defined yet");
             }
-        } catch (err) {
+        }
+        catch (err) {
             console.error("Invalid JSON or message format:", err);
         }
     }
+
+    private handleAction(message: any) {
+        switch (message.type) {
+            case "PLAYERS":
+                this.players_action(message);
+                break;
+            case "REGISTER_PLAYER":
+                this.register_player_action(message);
+                break;
+            case "START_GAME":
+                // console.log("Starting game detected")
+                this.game_started = true;
+                this.start_game_action();
+                break
+            case "START_PILE":
+                if (this.game_started) {
+                    // console.log("Calling start pile action")
+                    this.start_pile_action(message);
+                } else {
+                    console.error("Can not start pile when game is not started");
+                }
+                break;
+            case "DRAW":
+                if (this.game_started) {
+                    this.draw_card_action(message);
+                } else {
+                    console.error("Can not draw when game is not started")
+                }
+                break;
+            case "PLAY_CARD":
+                if (this.game_started) {
+                    this.play_card_action(message);
+                }
+                else {
+                    console.error("Can not play card when game is not started")
+                }
+                break;
+            case "PLAYER_SHIFT":
+                break;
+            case "HIDDEN_DRAW":
+                break;
+        }
+    }
+
     public play_card_action(message: any) {
-        console.log("message:", message)
         const card_info = message.card;
-        console.log(card_info)
         this.play_card(
             this.cardNameMap.get(card_info.color)!,
             this.cardNameMap.get(card_info.type)!
@@ -221,19 +228,16 @@ export class WebSocketHandle {
     }
 
     public register_player_action(message: any) {
-        // console.log("Player is beeing registered");
         const player = message.playerDto.username;
         this.add_player(player)
     }
 
     public players_action(message: any) {
         const players = message.players;
-        // console.log(players);
         this.update_player_list(players);
     }
 
     public async start_pile_action(message: any) {
-        // console.log("Starting pile");
         const card_info = message.card;
         const card = await Card.create(
             this.cardNameMap.get(card_info.color)!,
@@ -251,7 +255,6 @@ export class WebSocketHandle {
 
     public async draw_card_action(message: any) {
         for (const card_info of message.cards) {
-            // console.log("Drawing: ", card_info.type, card_info.color);
             const type = card_info.type;
             const color = card_info.color;
 
