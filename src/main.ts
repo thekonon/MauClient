@@ -104,5 +104,5 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   game.draw_card_command_to_server = web_socket.draw_card_request.bind(web_socket);
 
   // Bypapass for testing
-  // testing(web_socket, loading_screen)
+  testing(web_socket, loading_screen)
 })();
