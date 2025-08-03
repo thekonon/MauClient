@@ -8,6 +8,7 @@ export class LoadingScreen extends Container {
     connectedPlayers: string[];
 
     public on_register_player: ((playerName: string, ip: string, port: string) => void) | null = null;
+    public reconnectCommand: () => void = () => {alert("Reconnect button not implement yet")}
 
     constructor(app: Application) {
         super();
@@ -79,9 +80,14 @@ export class LoadingScreen extends Container {
                 <label for="playerName">PORT: </label>
                 <input type="text" id="PORT" class="form-input" value="8080">
             </div>
-            <button id="connectButton" class="connect-button">
-                Connect to lobby!
-            </button>
+            <div class="input-row">
+                <button id="connectButton" class="connect-button">
+                    Connect to lobby!
+                </button>
+                <button id="reconnectButton" class="connect-button">
+                    Try to reconnect!
+                </button>
+            </div>
 
             <div id="connectedPlayersListLabel">Connected Players:</div>
             <div id="connectedPlayersList">
@@ -115,6 +121,12 @@ export class LoadingScreen extends Container {
             }
             this.mainPlayer = playerName
             this.on_register_player?.(playerName, ip, port);
+            connectButton.disabled = true;
+        });
+
+        const reconnectButton = document.getElementById('reconnectButton') as HTMLButtonElement;
+        reconnectButton.addEventListener('click', () => {
+            this.reconnectCommand();
         });
     }
 
@@ -124,7 +136,7 @@ export class LoadingScreen extends Container {
         return listWithoutMainPlayer;
     }
 
-    public getMainPlayer(): string{
+    public getMainPlayer(): string {
         return this.mainPlayer;
     }
 
@@ -163,10 +175,10 @@ export class LoadingScreen extends Container {
         // Add each player as a line
         this.connectedPlayers.forEach(player => {
             const div = document.createElement("div");
-            if(player == this.mainPlayer){
+            if (player == this.mainPlayer) {
                 div.textContent = `🟢 ${player} - current user`;
             }
-            else{
+            else {
                 div.textContent = `🟢 ${player}`;
             }
             div.style.color = "black";
