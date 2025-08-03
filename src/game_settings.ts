@@ -119,7 +119,6 @@ export class GameSettings {
             return this.screen_width*(this.otherPlayerMarginsPercent/100)
         }
         else{
-            console.log(this.screen_width*(this.otherPlayerMarginsPercent/100))
             return (this.screen_width - this.getOtherPlayerWidth() - this.screen_width*(this.otherPlayerMarginsPercent/100))
         }
     }

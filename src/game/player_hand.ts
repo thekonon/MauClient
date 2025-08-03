@@ -8,6 +8,8 @@ export class PlayerHand extends Container {
     card_size: number;
     delta: number;
 
+    background!: Graphics;
+
     public pass_command!: () => void;
 
     public constructor() {
@@ -22,35 +24,47 @@ export class PlayerHand extends Container {
         this.x = GameSettings.get_player_hand_top_x()
         this.y = GameSettings.get_player_hand_top_y()
 
-        this.pass_command = ()=>{console.log("Pass command not defined yet")};
+        this.pass_command = () => { console.log("Pass command not defined yet") };
     }
 
-    public draw_hand(): void {
-        const graphics = new Graphics();
+    public draw_hand(backgroundColor = 0xde3249): void {
+        this.background = new Graphics();
         // place for card
-        graphics.roundRect(
+        this.background.roundRect(
             0,
             0,
             GameSettings.get_player_hand_width(),
             GameSettings.get_player_hand_height(),
             GameSettings.player_hand_padding)
-            .fill(0xde3249);
+            .fill(backgroundColor);
 
         // button for pass action
         const drawButton = this.createButton("PASS");
         // drawButton.interactive = true;
-        drawButton.on("pointerdown", ()=>{
+        drawButton.on("pointerdown", () => {
             console.log("Playing pass");
             this.pass_command();
         })
 
-        this.addChild(graphics);
+        this.addChild(this.background);
         this.addChild(drawButton);
     }
 
+    public updateBackgroundColor(newColor: number = 0xde3249) {
+        if (!this.background) return;
+        this.background.clear(); // Clear previous drawing
+        this.background.roundRect(
+            0,
+            0,
+            GameSettings.get_player_hand_width(),
+            GameSettings.get_player_hand_height(),
+            GameSettings.player_hand_padding
+        ).fill(newColor);
+    }
+
     public draw_card(card: Card) {
-        card.x = GameSettings.get_deck_top_x()-GameSettings.get_player_hand_top_x();
-        card.y = GameSettings.get_deck_top_y()-GameSettings.get_player_hand_top_y();
+        card.x = GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
+        card.y = GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
         card.height = GameSettings.card_height;
         card.width = GameSettings.card_width;
 
@@ -88,7 +102,7 @@ export class PlayerHand extends Container {
         if (n === undefined) {
             n = this.cards_length();
         }
-        const x =  GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
+        const x = GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
         const y = GameSettings.player_hand_padding;
         return [x, y];
     }
@@ -123,7 +137,7 @@ export class PlayerHand extends Container {
 
         button.eventMode = 'static';
         button.cursor = 'pointer';
-        
+
 
         button.on("pointerover", () => {
             drawButton(hover_color);

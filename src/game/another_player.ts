@@ -1,4 +1,4 @@
-import { Assets, Container, Sprite, TextStyle, Text } from "pixi.js";
+import { Assets, Container, Sprite, TextStyle, Text, Graphics } from "pixi.js";
 import { GameSettings } from "../game_settings";
 
 export class AnotherPlayer extends Container {
@@ -7,12 +7,14 @@ export class AnotherPlayer extends Container {
     sprite!: Sprite;
     private cardCount: number;
     private cardCountText!: Text;
+    private isActive: boolean = false;
+    auraContainer!: Graphics;
 
     constructor(playerName: string) {
         super();
         this.playerName = playerName;
         this.cardCount = 0;
-        console.log("Player registered:", playerName);
+        this.drawActivationAura()
     }
 
     public async drawPlayer() {
@@ -32,8 +34,34 @@ export class AnotherPlayer extends Container {
 
     public setCardCount(cardCount: number){
         this.cardCount = cardCount;
-        this.cardCountText.text = this.cardCount
-        
+        this.cardCountText.text = String(this.cardCount)
+    }
+
+    public addCardCound(cardCount: number){
+        this.cardCount += cardCount;
+        this.cardCountText.text = String(this.cardCount)
+    }
+
+    public activatePlayer(){
+        this.isActive = true;
+    }
+
+    public drawActivationAura(color: number = 0x00ff00){
+        this.auraContainer = new Graphics()
+        this.auraContainer.roundRect(
+            -10,
+            -10,
+            GameSettings.getOtherPlayerWidth()+20,
+            GameSettings.getOtherPlayerHeight()+20,
+            GameSettings.player_hand_padding)
+            .fill(color);
+        this.auraContainer.zIndex = -1;
+        this.addChild(this.auraContainer)
+    }
+
+    public clearActivationAura(){
+        if(!this.auraContainer){return}
+        this.auraContainer.clear();
     }
 
     private createText(): Container {

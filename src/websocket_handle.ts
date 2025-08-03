@@ -28,14 +28,15 @@ export class WebSocketHandle {
     public start_game!: () => void;
     public start_pile!: (card: Card) => void;
     public play_card!: (user: string, type: string, value: string) => Promise<void>;
-    public select_queen_color!: () => void;
+    public shiftPlayerAction: (userName: string) => void = (_) => {console.warn("ShiftPlayerAction not defined in WS")}
+    public hiddenDrawAction: (userName: string, cardCount: number) => void = (_, __) => {console.warn("hiddenDrawAction not defined in WS")}
     public ip: string;
     public port: string;
 
     // Websocket event
     public onOpen(): void { }
     public onClose(): void { }
-    public onError(error: Event): void { }
+    public onError(_: Event): void { }
 
     // Game state
     game_started: boolean;
@@ -82,7 +83,6 @@ export class WebSocketHandle {
     }
 
     private createSocket(): WebSocket {
-        // console.log("Trying to connect to: ", this.url)
         const socket = new WebSocket(this.url);
 
         socket.addEventListener("open", () => {
@@ -188,13 +188,11 @@ export class WebSocketHandle {
                 this.register_player_action(message);
                 break;
             case "START_GAME":
-                // console.log("Starting game detected")
                 this.game_started = true;
                 this.start_game_action();
                 break
             case "START_PILE":
                 if (this.game_started) {
-                    // console.log("Calling start pile action")
                     this.start_pile_action(message);
                 } else {
                     console.error("Can not start pile when game is not started");
@@ -216,8 +214,12 @@ export class WebSocketHandle {
                 }
                 break;
             case "PLAYER_SHIFT":
+                console.log("Shifting player")
+                this.shiftPlayer(message.playerDto.username)
                 break;
             case "HIDDEN_DRAW":
+                console.log("Someone took card, but secretly! Psst")
+                this.hiddenDraw(message.playerDto.username, message.count)
                 break;
         }
     }
@@ -266,11 +268,36 @@ export class WebSocketHandle {
         for (const card_info of message.cards) {
             const type = card_info.type;
             const color = card_info.color;
-            console.log("Drawing card")
 
             const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
-            card.play_card = (type: string, value: string, nextColor: string) => { this.play_card_command(type, value, nextColor)}
+            card.play_card = (type: string, value: string, nextColor: string) => { this.play_card_command(type, value, nextColor) }
             this.draw_a_card(card);
         }
+    }
+
+    private shiftPlayer(activePlayerName: string){
+        console.log("ShiftPlayer inner")
+        this.shiftPlayerAction(activePlayerName)
+    }
+
+    private hiddenDraw(playerName: string, count: number){
+        this.hiddenDrawAction(playerName, count)
+    }
+
+    private setUUID(uuid = "urmomgayUUID") {
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 7); // 7 days from now
+        document.cookie = `uuid=${uuid}; expires=${expirationDate.toUTCString()}; path=/`;
+    }
+
+    private getUUID(): string|null {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const [key, value] = cookie.trim().split('=');
+            if (key === 'uuid') {
+                return decodeURIComponent(value);
+            }
+        }
+        return null;
     }
 }

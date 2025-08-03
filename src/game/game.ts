@@ -13,6 +13,7 @@ export class Game {
     public draw_card_action!: (card: Card) => void;
     public draw_card_command!: () => void;
     public pass_command!: () => void;
+    //public shiftPlayerAction: (_userName: string) => void = (_) => {console.error("shiftPlayerAction not defined in game")}
 
     player_hand: PlayerHand;
     pile: Pile;
@@ -55,21 +56,46 @@ export class Game {
         });
     }
 
-    public async play_card(player: string, type: string, value: string) {
+    public async play_card(playerName: string, type: string, value: string) {
         // When there is request to play a card - find the right one and play it
-        var played_card: Card|null = null
-        if(player == this.mainPlayer){
+        var played_card: Card | null = null
+        if (playerName == this.mainPlayer) {
             played_card = this.player_hand.play_card(type, value);
         }
-        else{
-            console.log("player",player,"played card",type, value)
+        else {
             played_card = await Card.create(type, value)
+            this.otherPlayers.forEach(player => {
+                if (player.playerName === playerName) {
+                    player.addCardCound(-1);
+                }
+            });
         }
 
         // Played card goes to pile
         if (played_card) {
             this.pile.play_card(played_card);
         }
+    }
+
+    public shiftPlayerAction(playerName: string) {
+        this.otherPlayers[0].clearActivationAura()
+        if (playerName === this.mainPlayer) {
+            this.player_hand.updateBackgroundColor(0x00ff00)
+        }
+        else {
+            this.player_hand.updateBackgroundColor();
+            this.otherPlayers[0].drawActivationAura();
+        }
+    }
+
+    public hiddenDrawAction(playerName: string, cardCount: number) {
+        console.log("Game: ", playerName, cardCount)
+        this.otherPlayers.forEach(player => {
+            if (player.playerName === playerName) {
+                console.log("PLayer with right name found")
+                player.addCardCound(cardCount)
+            }
+        });
     }
 
     private show() {

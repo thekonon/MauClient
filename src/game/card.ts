@@ -1,4 +1,4 @@
-import { Assets, Sprite, Texture, Container, Graphics } from "pixi.js";
+import { Assets, Sprite, Texture, Container } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../game_settings";
 import { QueenDialog } from "./queen_dialog";
@@ -87,32 +87,14 @@ export class Card extends Container {
             if (this.value === "Q") {
                 console.log("Queen clickec")
                 const dialog = new QueenDialog();
+                dialog.zIndex = 999; // Hehe u know what i did here
                 this.parent.addChild(dialog)
                 console.log("Select color")
                 nextColor = await dialog.show(); // wait for user to choose
                 this.parent.removeChild(dialog)
-                this.play_card(this.type, this.value, nextColor);
-            }
-            else{
-                this.play_card(this.type, this.value, nextColor);
-            }
+            } 
+            this.play_card(this.type, this.value, nextColor);
         });
-    }
-
-    public draw_dialog(): void {
-        const container = new Container();
-        const graphics = new Graphics();
-
-        graphics.roundRect(
-            -300,
-            -300,
-            300,
-            300,
-            GameSettings.player_hand_padding)
-            .fill(0x00ff00);
-
-        container.addChild(graphics)
-        this.addChild(container);
     }
 
 
@@ -140,6 +122,4 @@ export class Card extends Container {
             return await Assets.load(`assets/default/back.png`);
         }
     }
-
-
 }

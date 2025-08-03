@@ -62,6 +62,8 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   web_socket.start_pile = game.start_pile_action.bind(game);
   web_socket.draw_a_card = game.draw_card_action.bind(game);
   web_socket.play_card = game.play_card.bind(game);
+  web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
+  web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game)
 
   web_socket.start_game = async () => {
     // When game stats, hide loading screen
@@ -79,5 +81,11 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   game.pass_command = web_socket.play_pass_command.bind(web_socket);
 
   // Bypapass for testing
-  // testing(web_socket, loading_screen)  
+  // testing(web_socket, loading_screen)
+
+  // await new Promise(res => setTimeout(res, 1000));
+  // game.otherPlayers[0].setCardCount(1);
+  // game.otherPlayers[1].setCardCount(22);
+  // game.otherPlayers[2].setCardCount(33);
+  // game.otherPlayers[3].setCardCount(99);
 })();
