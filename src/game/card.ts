@@ -1,6 +1,7 @@
 import { Assets, Sprite, Texture, Container, Graphics } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../game_settings";
+import { QueenDialog } from "./queen_dialog";
 
 export class Card extends Container {
 
@@ -81,7 +82,16 @@ export class Card extends Container {
         };
 
         this.interactive = true;
-        this.on("pointerdown", () => {
+        this.on("pointerdown", async () => {
+            if (this.value === "Q") {
+                console.log("Queen clickec")
+                const dialog = new QueenDialog();
+                this.parent.addChild(dialog)
+                console.log("Select color")
+                const selectedSuit = await dialog.show(); // wait for user to choose
+                console.log("Color selected:", selectedSuit);
+                this.parent.removeChild(dialog)
+            }
             this.play_card(this.type, this.value);
         });
     }
