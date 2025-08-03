@@ -123,23 +123,29 @@ export class WebSocketHandle {
             requestType: "MOVE",
             move: {
                 "moveType": "DRAW"
-            }});
+            }
+        });
         this.send(draw_command);
     }
 
     public play_card_command(type: string, value: string, nextColor: string = "") {
-        // TODO: Implement next color
+        const move: any = {
+            moveType: "PLAY",
+            card: {
+                color: this.cardShortToFullMap.get(type),
+                type: this.cardShortToFullMap.get(value),
+            },
+        };
+
+        if (nextColor !== "") {
+            move.nextColor = nextColor;
+        }
+
         const message = JSON.stringify({
             requestType: "MOVE",
-            move: {
-                "moveType": "PLAY",
-                "card": {
-                    "color": this.cardShortToFullMap.get(type),
-                    "type": this.cardShortToFullMap.get(value)
-                },
-            nextColor: "CLUBS"//nextColor
-            }});
-            //
+            move,
+        });
+
         this.send(message);
     }
 
@@ -148,7 +154,8 @@ export class WebSocketHandle {
             requestType: "MOVE",
             move: {
                 "moveType": "PASS"
-            }});
+            }
+        });
         this.send(pass_command);
     }
 
