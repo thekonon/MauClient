@@ -7,42 +7,15 @@ import { WebSocketHandle } from "./websocket_handle.ts";
 async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScreen){
   web_socket.game_started = true;
   loading_screen.on_register_player?.("thekonon", "localhost", "8080");
+  loading_screen.add_player_to_list("Pep")
+  loading_screen.add_player_to_list("Pep2")
+  loading_screen.add_player_to_list("Pep3")
+  loading_screen.add_player_to_list("Pep4")
   web_socket.start_game_action();
   var message = JSON.parse('{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}');
   web_socket.start_pile_action(message);
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
   web_socket.draw_card_action(message)
-
-  // // Wait for 1 second
-  // await new Promise(resolve => setTimeout(resolve, 1000));
-  // message = JSON.parse('{"type":"PLAY_CARD","card":{"type":"KING","color":"SPADES"}}');
-  // web_socket.play_card_action(message);
-
-  // // Play the card after delay
-  // await new Promise(resolve => setTimeout(resolve, 1000));
-  // message = JSON.parse('{"type":"PLAY_CARD","card":{"type":"QUEEN","color":"DIAMONDS"}}');
-  // web_socket.play_card_action(message);
-
-  // // Play the card after delay
-  // await new Promise(resolve => setTimeout(resolve, 1000));
-  // message = JSON.parse('{"type":"DRAW","cards":[{"type":"SEVEN","color":"DIAMONDS"},{"type":"SEVEN","color":"CLUBS"},{"type":"SEVEN","color":"SPADES"},{"type":"SEVEN","color":"HEARTS"}]}');
-  // web_socket.draw_card_action(message)
-
-  // const colors: string[] = ["CLUBS","DIAMONDS", "HEARTS", "SPADES"];
-
-  // await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // for (let i = 0; i < 4; i++) {
-  //   await new Promise(resolve => setTimeout(resolve, 500));
-  //     const message = {
-  //       type: "PLAY_CARD",
-  //       card: {
-  //           type: "SEVEN",
-  //           color: colors[i]
-  //       }
-  //   };
-  //   web_socket.play_card_action(message);
-  // }
 }
 
 (async () => {
@@ -106,5 +79,5 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   game.pass_command = web_socket.play_pass_command.bind(web_socket);
 
   // Bypapass for testing
-  // testing(web_socket, loading_screen)
+  // testing(web_socket, loading_screen)  
 })();

@@ -269,8 +269,7 @@ export class WebSocketHandle {
             console.log("Drawing card")
 
             const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
-            card.play_card = (type: string, value: string) => { this.play_card_command(type, value) }
-            //this.play_card_command.bind(this)
+            card.play_card = (type: string, value: string, nextColor: string) => { this.play_card_command(type, value, nextColor)}
             this.draw_a_card(card);
         }
     }

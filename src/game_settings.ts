@@ -24,6 +24,11 @@ export class GameSettings {
     static dialog_window_padding = 15;
     static dialog_window_color = 0x00ff00;
 
+    // Other players settings
+    static otherPlayerMarginsPercent = 1;
+    static otherPLayerGapPercent = 20;
+    static otherPlayerCardSizeScale = 1.2;
+
     static setScreenDimensions(height: number, width: number) {
         GameSettings.screen_height = height;
         GameSettings.screen_width = width;
@@ -99,5 +104,32 @@ export class GameSettings {
 
     static get_canvas_width(): number {
         return this.screen_width;
+    }
+
+    static getOtherPlayerWidth(): number{
+        return this.card_width*this.otherPlayerCardSizeScale
+    }
+
+    static getOtherPlayerHeight(): number{
+        return this.card_height*this.otherPlayerCardSizeScale
+    }
+
+    static getOtherPlayerX(index: number): number{
+        if(index < 2){
+            return this.screen_width*(this.otherPlayerMarginsPercent/100)
+        }
+        else{
+            console.log(this.screen_width*(this.otherPlayerMarginsPercent/100))
+            return (this.screen_width - this.getOtherPlayerWidth() - this.screen_width*(this.otherPlayerMarginsPercent/100))
+        }
+    }
+    static getOtherPlayerY(index: number): number{
+        if(index === 0 || index === 2)
+        {
+            return this.screen_width*this.otherPlayerMarginsPercent/100
+        }
+        else{
+            return this.getOtherPlayerY(0) + this.screen_width*this.otherPLayerGapPercent/100
+        }
     }
 }

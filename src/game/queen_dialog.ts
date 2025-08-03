@@ -12,7 +12,7 @@ export class QueenDialog extends Container {
     constructor() {
         super();
         this.rect_x = GameSettings.dialog_window_pos[0];
-        this.rect_y = GameSettings.dialog_window_pos[1] - 300;
+        this.rect_y = GameSettings.dialog_window_pos[1] - 600;
         this.rect_width = GameSettings.dialog_window_dim[0];
         this.rect_height = GameSettings.dialog_window_dim[1];
         this.edge_radius = GameSettings.dialog_window_radius;
@@ -33,7 +33,7 @@ export class QueenDialog extends Container {
 
             this.addChild(background);
 
-            const suits = ["Diamonds", "Hearts", "Clubs", "Spades"];
+            const suits = ["DIAMONDS", "HEARTS", "CLUBS", "SPADES"];
 
             suits.forEach((suit, index) => {
                 const btn = this.create_button(suit);

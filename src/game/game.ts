@@ -3,8 +3,8 @@ import { Card } from "./card";
 import { Deck } from "./deck";
 import { PlayerHand } from "./player_hand";
 import { Pile } from "./pile";
-import { QueenDialog } from "./queen_dialog";
 import { AnotherPlayer } from "./another_player";
+import { GameSettings } from "../game_settings";
 
 export class Game {
     private app: Application;
@@ -46,9 +46,11 @@ export class Game {
     }
 
     public register_players(playerNames: string[]) {
-        playerNames.forEach(playerName => {
+        playerNames.forEach((playerName, index) => {
             const newPlayer = new AnotherPlayer(playerName)
             newPlayer.drawPlayer();
+            newPlayer.x = GameSettings.getOtherPlayerX(index)
+            newPlayer.y = GameSettings.getOtherPlayerY(index)
             this.otherPlayers.push(newPlayer)
         });
     }
