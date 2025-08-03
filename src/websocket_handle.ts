@@ -1,8 +1,6 @@
 import { Card } from "./game/card.ts";
 
 export class WebSocketHandle {
-    private socket!: WebSocket;
-    private url: string;
     private readonly cardNameMap = new Map<string, string>([
         ["ACE", "A"],
         ["KING", "K"],
@@ -24,15 +22,15 @@ export class WebSocketHandle {
     );
 
     // Game actions
-    public draw_a_card!: (card: Card) => void;
+    public draw_a_card: (card: Card) => void = (_: Card) => { };
     public update_player_list!: (player_list: string[]) => void;
     public add_player!: (player: string) => void;
     public start_game!: () => void;
     public start_pile!: (card: Card) => void;
-    public play_card!: (type: string, value: string) => void;
+    public play_card!: (user: string, type: string, value: string) => Promise<void>;
     public select_queen_color!: () => void;
-    ip: string;
-    port: string;
+    public ip: string;
+    public port: string;
 
     // Websocket event
     public onOpen(): void { }
@@ -43,14 +41,12 @@ export class WebSocketHandle {
     game_started: boolean;
 
     // User data
-    user_name: string;
-    user_id: string;
+    userName: string;
+    userID: string;
 
     // Connectio data
-
-    // Previously played card
-    previous_card_type: string;
-    previous_card_value: string;
+    private socket!: WebSocket;
+    private url: string;
 
     constructor() {
         this.ip = "";
@@ -58,11 +54,8 @@ export class WebSocketHandle {
 
         this.game_started = false;
         this.url = ""
-        this.user_name = ""
-        this.user_id = ""
-
-        this.previous_card_type = "";
-        this.previous_card_value = "";
+        this.userName = ""
+        this.userID = ""
     }
 
     public set_ip_port(ip: string, port: string) {
@@ -71,11 +64,11 @@ export class WebSocketHandle {
     }
 
     public set_user(user_name: string) {
-        this.user_name = user_name;
+        this.userName = user_name;
     }
 
     public create_connection() {
-        if (this.user_name == "") {
+        if (this.userName == "") {
             throw new Error("UserName must be set first")
         }
         if (this.ip == "") {
@@ -84,7 +77,7 @@ export class WebSocketHandle {
         if (this.port == "") {
             throw new Error("UserName must be set first")
         }
-        this.url = `ws://${this.ip}:${this.port}/game?user=${this.user_name}`;
+        this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
         this.socket = this.createSocket();
     }
 
@@ -126,34 +119,41 @@ export class WebSocketHandle {
 
     // Call this method when there is a draw card request
     public draw_card_request() {
-        const draw_command = '{"type":"DRAW"}';
+        const draw_command = JSON.stringify({
+            requestType: "MOVE",
+            move: {
+                "moveType": "DRAW"
+            }});
         this.send(draw_command);
     }
 
-    public play_card_command(type: string, value: string, next_color: string = "SPADES") {
+    public play_card_command(type: string, value: string, nextColor: string = "") {
+        // TODO: Implement next color
         const message = JSON.stringify({
-            type: "PLAY",
-            card: {
-                type: this.cardShortToFullMap.get(value),
-                color: this.cardShortToFullMap.get(type)
-            },
-            nextColor: next_color
-        });
+            requestType: "MOVE",
+            move: {
+                "moveType": "PLAY",
+                "card": {
+                    "color": this.cardShortToFullMap.get(type),
+                    "type": this.cardShortToFullMap.get(value)
+                },
+            nextColor: "CLUBS"//nextColor
+            }});
+            //
         this.send(message);
-        this.previous_card_type = type;
-        this.previous_card_value = value;
     }
 
     public play_pass_command() {
-        const message = JSON.stringify({
-            type: "PASS",
-        });
-        this.send(message);
+        const pass_command = JSON.stringify({
+            requestType: "MOVE",
+            move: {
+                "moveType": "PASS"
+            }});
+        this.send(pass_command);
     }
 
     // Event hooks (can be overridden or assigned externally)
     public async onMessage(data: string): Promise<void> {
-        //{"body":{"name":"CardException","message":"Next color not specified, when played QUEEN.","timestamp":"2025-07-27T16:39:30.578998735Z"},"responseType":"ERROR"}
         try {
             const message = JSON.parse(data);
             switch (message.messageType) {
@@ -217,7 +217,9 @@ export class WebSocketHandle {
 
     public play_card_action(message: any) {
         const card_info = message.card;
+        const playerDto = message.playerDto;
         this.play_card(
+            playerDto.username,
             this.cardNameMap.get(card_info.color)!,
             this.cardNameMap.get(card_info.type)!
         );
@@ -260,31 +262,9 @@ export class WebSocketHandle {
             console.log("Drawing card")
 
             const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
-            card.play_card = this.play_card_command.bind(this)
+            card.play_card = (type: string, value: string) => { this.play_card_command(type, value) }
+            //this.play_card_command.bind(this)
             this.draw_a_card(card);
         }
-    }
-
-    private getRandomCardAndColor() {
-        const entries = Array.from(this.cardNameMap.keys());
-
-        // Separate type (ranks) and color (suits)
-        const types = entries.slice(0, 9);   // "ACE", "KING", ..., "SIX"
-        const colors = entries.slice(9);     // "HEARTS", "SPADES", "CLUBS", "DIAMONDS"
-
-        // Pick random type and color
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-        // Return the full message
-        return {
-            type: "DRAW",
-            cards: [
-                {
-                    type: randomType,
-                    color: randomColor
-                }
-            ]
-        };
     }
 }

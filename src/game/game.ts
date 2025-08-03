@@ -4,6 +4,7 @@ import { Deck } from "./deck";
 import { PlayerHand } from "./player_hand";
 import { Pile } from "./pile";
 import { QueenDialog } from "./queen_dialog";
+import { AnotherPlayer } from "./another_player";
 
 export class Game {
     private app: Application;
@@ -16,7 +17,11 @@ export class Game {
     player_hand: PlayerHand;
     pile: Pile;
     deck?: Deck;
-    dialog: QueenDialog;
+    otherPlayers: AnotherPlayer[];
+
+    /* Info about players */
+    mainPlayer: string;
+    // otherPlayers: string[];
 
     constructor(app: Application) {
         this.app = app;
@@ -28,7 +33,8 @@ export class Game {
         this.pile = new Pile();
         this.start_pile_action = this.pile.play_card.bind(this.pile);
 
-        this.dialog = new QueenDialog();
+        this.mainPlayer = "";
+        this.otherPlayers = [];
     }
 
     public async start_game() {
@@ -39,30 +45,38 @@ export class Game {
         this.show()
     }
 
-    public register_player(players: string[]){
-        players.forEach(player => {
-            // this.
+    public register_players(playerNames: string[]) {
+        playerNames.forEach(playerName => {
+            const newPlayer = new AnotherPlayer(playerName)
+            newPlayer.drawPlayer();
+            this.otherPlayers.push(newPlayer)
         });
     }
 
-    public play_card(type: string, value: string) {
+    public async play_card(player: string, type: string, value: string) {
         // When there is request to play a card - find the right one and play it
-        const played_card = this.player_hand.play_card(type, value);
+        var played_card: Card|null = null
+        if(player == this.mainPlayer){
+            played_card = this.player_hand.play_card(type, value);
+        }
+        else{
+            console.log("player",player,"played card",type, value)
+            played_card = await Card.create(type, value)
+        }
 
         // Played card goes to pile
         if (played_card) {
             this.pile.play_card(played_card);
         }
     }
-    public show_queen_dialog(){
-        this.dialog.show();
-    }
 
-    private show(){
-    // Add player hand and deck to app
-    this.app.stage.addChild(this.player_hand);
-    this.app.stage.addChild(this.deck!);
-    this.app.stage.addChild(this.pile)
-    this.app.stage.addChild(this.dialog);
-}
+    private show() {
+        // Add player hand and deck to app
+        this.app.stage.addChild(this.player_hand);
+        this.app.stage.addChild(this.deck!);
+        this.app.stage.addChild(this.pile)
+        this.otherPlayers.forEach(player => {
+            this.app.stage.addChild(player)
+        });
+    }
 }

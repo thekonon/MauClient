@@ -4,14 +4,16 @@ import { GameSettings } from "../game_settings";
 export class LoadingScreen extends Container {
     app: Application
 
-    connected_player: string[];
+    mainPlayer: string;
+    connectedPlayers: string[];
 
     public on_register_player: ((playerName: string, ip: string, port: string) => void) | null = null;
 
     constructor(app: Application) {
         super();
         this.app = app;
-        this.connected_player = [];
+        this.mainPlayer = ""
+        this.connectedPlayers = [];
     }
 
     public show() {
@@ -81,24 +83,23 @@ export class LoadingScreen extends Container {
                 Connect to lobby!
             </button>
 
-            <div>Connected Players:</div>
+            <div id="connectedPlayersListLabel">Connected Players:</div>
             <div id="connectedPlayersList">
                 <em>No players connected yet.</em>
             </div>
         `;
         document.body.appendChild(uiContainer);
 
-        // ✅ Add callback for Start Game button
         const connectButton = document.getElementById('connectButton') as HTMLButtonElement;
         connectButton.addEventListener('click', () => {
             const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
             const IPInput = document.getElementById('IP') as HTMLInputElement;
             const PORTInput = document.getElementById('PORT') as HTMLInputElement;
-            const player_name = playerNameInput.value.trim();
+            const playerName = playerNameInput.value.trim();
             const ip = IPInput.value.trim();
             const port = PORTInput.value.trim();
 
-            if (player_name === '') {
+            if (playerName === '') {
                 alert('Please enter a player name.');
                 return;
             }
@@ -112,27 +113,34 @@ export class LoadingScreen extends Container {
                 alert('Kindof strange port, don\'t you think?');
                 return;
             }
-
-            // console.log('Start Game button pressed. Player name:', player_name);
-            this.on_register_player?.(player_name, ip, port);
-            // ✅ Your custom logic here:
-            // this.start_game_with_name?.(playerName);  // Call your own method if exists
+            this.mainPlayer = playerName
+            this.on_register_player?.(playerName, ip, port);
         });
     }
 
+    public get_players_list(): string[] {
+        var listWithoutMainPlayer = this.connectedPlayers;
+        listWithoutMainPlayer = listWithoutMainPlayer.filter(item => item != this.getMainPlayer())
+        return listWithoutMainPlayer;
+    }
+
+    public getMainPlayer(): string{
+        return this.mainPlayer;
+    }
+
     public add_player_to_list(player: string) {
-        if (this.connected_player.length > 4) {
+        if (this.connectedPlayers.length > 4) {
             throw Error("This client supports maximum of 5 players");
         }
-        this.connected_player.push(player);
+        this.connectedPlayers.push(player);
         this.update_connected_player();
     }
 
-    public update_player_list(player_list: string[]) {
-        if (player_list.length > 5) {
+    public update_player_list(playerList: string[]) {
+        if (playerList.length > 5) {
             throw Error("This client supports maximum of 5 players");
         }
-        this.connected_player = player_list;
+        this.connectedPlayers = playerList;
         this.update_connected_player();
     }
 
@@ -147,24 +155,24 @@ export class LoadingScreen extends Container {
         // Clear current content
         container.innerHTML = "";
 
-        if (this.connected_player.length === 0) {
+        if (this.connectedPlayers.length === 0) {
             container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
             return;
         }
 
         // Add each player as a line
-        this.connected_player.forEach(player => {
+        this.connectedPlayers.forEach(player => {
             const div = document.createElement("div");
-            div.textContent = `🟢 ${player}`;
+            if(player == this.mainPlayer){
+                div.textContent = `🟢 ${player} - current user`;
+            }
+            else{
+                div.textContent = `🟢 ${player}`;
+            }
             div.style.color = "black";
-            div.style.marginBottom = "4px";
+            div.style.marginBottom = "5px";
             container.appendChild(div);
-
-            // console.log("Connected:", player); // Optional debug log
         });
-    }
-    public get_player_list(): string[] {
-        return this.connected_player;
     }
 
 }

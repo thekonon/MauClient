@@ -66,6 +66,8 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
 
   // Create loading screen - user is set here
   const loading_screen = new LoadingScreen(app);
+  loading_screen.show();
+
   // Create a game instance in advance
   const game = new Game(app);
   // Websocket with 
@@ -78,8 +80,6 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
     web_socket.create_connection()
   };
   
-  loading_screen.show();
-  
   /* These are messages that goes from server */
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list = loading_screen.update_player_list.bind(loading_screen);
@@ -89,12 +89,13 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   web_socket.start_pile = game.start_pile_action.bind(game);
   web_socket.draw_a_card = game.draw_card_action.bind(game);
   web_socket.play_card = game.play_card.bind(game);
-  
-  web_socket.select_queen_color = game.show_queen_dialog.bind(game);
 
   web_socket.start_game = async () => {
     // When game stats, hide loading screen
     loading_screen.hide();
+
+    game.mainPlayer = loading_screen.getMainPlayer();
+    game.register_players(loading_screen.get_players_list());
     
     // Start game
     await game.start_game();
