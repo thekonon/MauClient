@@ -8,7 +8,7 @@ export class LoadingScreen extends Container {
     connectedPlayers: string[];
 
     public on_register_player: ((playerName: string, ip: string, port: string) => void) | null = null;
-    public reconnectCommand: () => void = () => {alert("Reconnect button not implement yet")}
+    public reconnectCommand: () => void = () => { alert("Reconnect button not implement yet") }
 
     constructor(app: Application) {
         super();
@@ -98,35 +98,18 @@ export class LoadingScreen extends Container {
 
         const connectButton = document.getElementById('connectButton') as HTMLButtonElement;
         connectButton.addEventListener('click', () => {
-            const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
-            const IPInput = document.getElementById('IP') as HTMLInputElement;
-            const PORTInput = document.getElementById('PORT') as HTMLInputElement;
-            const playerName = playerNameInput.value.trim();
-            const ip = IPInput.value.trim();
-            const port = PORTInput.value.trim();
-
-            if (playerName === '') {
-                alert('Please enter a player name.');
-                return;
-            }
-
-            if (ip === '') {
-                alert('Kindof strange ip, don\'t you think?');
-                return;
-            }
-
-            if (port === '') {
-                alert('Kindof strange port, don\'t you think?');
-                return;
-            }
-            this.mainPlayer = playerName
-            this.on_register_player?.(playerName, ip, port);
-            connectButton.disabled = true;
+            this.registerPlayer()
         });
 
         const reconnectButton = document.getElementById('reconnectButton') as HTMLButtonElement;
         reconnectButton.addEventListener('click', () => {
             this.reconnectCommand();
+        });
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                this.registerPlayer()
+            }
         });
     }
 
@@ -154,6 +137,34 @@ export class LoadingScreen extends Container {
         }
         this.connectedPlayers = playerList;
         this.update_connected_player();
+    }
+
+    private registerPlayer() {
+        const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
+        const connectButton = document.getElementById('connectButton') as HTMLButtonElement;
+        const IPInput = document.getElementById('IP') as HTMLInputElement;
+        const PORTInput = document.getElementById('PORT') as HTMLInputElement;
+        const playerName = playerNameInput.value.trim();
+        const ip = IPInput.value.trim();
+        const port = PORTInput.value.trim();
+
+        if (playerName === '') {
+            alert('Please enter a player name.');
+            return;
+        }
+
+        if (ip === '') {
+            alert('Kindof strange ip, don\'t you think?');
+            return;
+        }
+
+        if (port === '') {
+            alert('Kindof strange port, don\'t you think?');
+            return;
+        }
+        this.mainPlayer = playerName
+        this.on_register_player?.(playerName, ip, port);
+        connectButton.disabled = true;
     }
 
     private update_connected_player() {

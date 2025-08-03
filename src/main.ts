@@ -41,8 +41,7 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   const loading_screen = new LoadingScreen(app);
   loading_screen.show();
 
-  // Create a game instance in advance
-  const game = new Game(app);
+
   // Websocket with 
   const web_socket = new WebSocketHandle();
   
@@ -59,6 +58,9 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   web_socket.add_player = loading_screen.add_player_to_list.bind(loading_screen);
 
   /* Game callbacks - server sends */
+
+  // Create a game instance
+  const game = new Game(app);
   web_socket.start_pile = game.start_pile_action.bind(game);
   web_socket.draw_a_card = game.draw_card_action.bind(game);
   web_socket.play_card = game.play_card.bind(game);

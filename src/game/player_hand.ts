@@ -39,8 +39,9 @@ export class PlayerHand extends Container {
             .fill(backgroundColor);
 
         // button for pass action
-        const drawButton = this.createButton("PASS");
-        // drawButton.interactive = true;
+        const drawButton = this.createButton("PASS (ACE / 7)");
+        drawButton.x = GameSettings.get_player_hand_top_x() + GameSettings.get_player_hand_width()*0.6;
+        drawButton.y = - 100;
         drawButton.on("pointerdown", () => {
             console.log("Playing pass");
             this.pass_command();
@@ -114,38 +115,33 @@ export class PlayerHand extends Container {
     private createButton(displayed_text: string = "Empty"): Container {
         const buttonContainer = new Container();
 
-        const rect_x = 100
-        const rect_y = -100
-        const rect_width = 300
-        const rect_height = 80
-        const edge_radius = 10
+        const width = 300 - GameSettings.dialog_window_padding * 2;
+        const height = 80;
+        const edge_radius = 10;
 
-        const y = rect_y + GameSettings.dialog_window_padding;
-        const x = rect_x + GameSettings.dialog_window_padding;
-        const width = rect_width - GameSettings.dialog_window_padding * 2;
-        const height = rect_height;
-
-        const button = new Graphics()
+        const button = new Graphics();
         const drawButton = (color: number) => {
             button.clear();
-            button.roundRect(x, y, width, height, edge_radius)
-                .fill(color);
+            button.roundRect(0, 0, width, height, edge_radius).fill(color);
         };
+
         const color = 0xff0000;
         const hover_color = 0x550000;
-        drawButton(color)
+        drawButton(color);
 
-        button.eventMode = 'static';
-        button.cursor = 'pointer';
+        // Make sure the container receives interaction events
+        buttonContainer.eventMode = 'static';
+        buttonContainer.cursor = 'pointer';
 
-
-        button.on("pointerover", () => {
+        // Hover effects
+        buttonContainer.on("pointerover", () => {
             drawButton(hover_color);
         });
-        button.on("pointerout", () => {
+        buttonContainer.on("pointerout", () => {
             drawButton(color);
         });
 
+        // Create and center text
         const style = new TextStyle({
             fontFamily: 'Arial',
             fontSize: 24,
@@ -157,14 +153,12 @@ export class PlayerHand extends Container {
             style,
         });
 
-        // Center text inside the button
-        text.x = x + width / 2 - text.width / 2;
-        text.y = y + height / 2 - text.height / 2;
+        text.x = width / 2 - text.width / 2;
+        text.y = height / 2 - text.height / 2;
 
+        // Add children in order
         buttonContainer.addChild(button);
         buttonContainer.addChild(text);
-
-        buttonContainer.interactive = true;
 
         return buttonContainer;
     }
