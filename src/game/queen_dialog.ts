@@ -33,10 +33,15 @@ export class QueenDialog extends Container {
 
             this.addChild(background);
 
-            const suits = ["DIAMONDS", "HEARTS", "CLUBS", "SPADES"];
+            const suits: [string, string][] = [
+                ["DIAMONDS", "♦"],
+                ["HEARTS", "♥"],
+                ["CLUBS", "♣"],
+                ["SPADES", "♠"]
+            ];
 
-            suits.forEach((suit, index) => {
-                const btn = this.create_button(suit);
+            suits.forEach(([suit, symbol], index) => {
+                const btn = this.create_button(suit, symbol);
                 btn.x = this.rect_x + GameSettings.dialog_window_padding;
                 btn.y = this.rect_y + index * (this.button_height + GameSettings.dialog_window_padding) + GameSettings.dialog_window_padding;
                 btn.interactive = true;
@@ -48,8 +53,7 @@ export class QueenDialog extends Container {
         });
     }
 
-
-    private create_button(displayed_text: string = "Empty"): Container {
+    private create_button(displayed_text: string = "Empty", symbol: string): Container {
         const buttonContainer = new Container();
 
         const width = this.rect_width - GameSettings.dialog_window_padding * 2;
@@ -59,20 +63,22 @@ export class QueenDialog extends Container {
         const drawButton = (color: number) => {
             button.clear();
             button.roundRect(0, 0, width, height, this.edge_radius / 2)
-                .fill(color); // Draw at (0,0) RELATIVE to container
+                .fill(color);
         };
 
         const color = 0xff0000;
         const hover_color = 0x550000;
         drawButton(color);
 
-        button.eventMode = 'static';
-        button.cursor = 'pointer';
+        // IMPORTANT: Make the *container* interactive.
+        buttonContainer.eventMode = 'static';
+        buttonContainer.cursor = 'pointer';
 
-        button.on("pointerover", () => {
+        // Hover events attached to container
+        buttonContainer.on("pointerover", () => {
             drawButton(hover_color);
         });
-        button.on("pointerout", () => {
+        buttonContainer.on("pointerout", () => {
             drawButton(color);
         });
 
@@ -83,14 +89,14 @@ export class QueenDialog extends Container {
         });
 
         const text = new Text({
-            text: displayed_text,
+            text: `${symbol} - ${displayed_text} - ${symbol}`,
             style,
         });
 
-        // Center text inside the button (which starts at 0,0 now)
         text.x = width / 2 - text.width / 2;
         text.y = height / 2 - text.height / 2;
 
+        // Add background and text
         buttonContainer.addChild(button);
         buttonContainer.addChild(text);
 
