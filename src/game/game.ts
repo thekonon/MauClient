@@ -75,17 +75,26 @@ export class Game {
         if (played_card) {
             this.pile.play_card(played_card);
         }
+
+        // If previous card was queen, display new color
+        if (value == "Q"){
+            // this.pile.display
+            console.log("Next color is: ",newColor)
+        }
     }
 
     public shiftPlayerAction(playerName: string) {
-        this.otherPlayers[0].clearActivationAura()
+        this.player_hand.updateBackgroundColor()
         if (playerName === this.mainPlayer) {
             this.player_hand.updateBackgroundColor(0x00ff00)
         }
-        else {
-            this.player_hand.updateBackgroundColor();
-            this.otherPlayers[0].drawActivationAura();
+        this.otherPlayers.forEach(player => {
+            player.clearActivationAura()
+            if (player.playerName === playerName){
+                player.drawActivationAura()
         }
+});
+        
     }
 
     public hiddenDrawAction(playerName: string, cardCount: number) {
