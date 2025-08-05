@@ -94,7 +94,7 @@ export class PlayerHand extends Container {
         for (let i = 0; i < this.cards_list.length; i++) {
             const card = this.cards_list[i];
             const new_location = this.get_new_card_location(i);
-            card.set_end_of_animation(new_location[0], new_location[1], 0);
+            card.setLocalEndOfAnimation(new_location[0], new_location[1], 0);
             card.play(0.1, 0);
         }
     }

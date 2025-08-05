@@ -18,15 +18,12 @@ export class Pile extends Container {
         } 
         this.previous_card = this.current_card;
         if (this.previous_card === null) {
-            // First card start from deck
-            console.log("Setting card position to deck")
             card.x = GameSettings.get_deck_top_x();
             card.y = GameSettings.get_deck_top_y();
         }
         this.current_card = card;
-        this.scale_card(this.current_card);
 
-        this.current_card.set_end_of_animation(
+        this.current_card.setLocalEndOfAnimation(
             GameSettings.get_deck_top_x() - GameSettings.card_height * 1.1,
             GameSettings.get_deck_top_y() + (GameSettings.card_height + GameSettings.card_width) / 2,
             Math.PI*4-Math.PI/2);
@@ -36,11 +33,5 @@ export class Pile extends Container {
 
     public displayNextColor(color: string){
         // TODO: add text that is displayed next to pile signaling which color is selected with queen
-        
-    }
-
-    private scale_card(card: Card) {
-        card.height = GameSettings.card_height;
-        card.width = GameSettings.card_width;
     }
 }

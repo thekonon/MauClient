@@ -1,5 +1,6 @@
 import { Assets, Container, Sprite, TextStyle, Text, Graphics } from "pixi.js";
 import { GameSettings } from "../game_settings";
+import { Card } from "./card";
 
 export class AnotherPlayer extends Container {
 
@@ -44,6 +45,11 @@ export class AnotherPlayer extends Container {
 
     public activatePlayer(){
         this.isActive = true;
+    }
+
+    public setPlayedCard(card: Card){
+        card.position = this.position
+        this.addChild(card)
     }
 
     public drawActivationAura(color: number = 0x00ff00){

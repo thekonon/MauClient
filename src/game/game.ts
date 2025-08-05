@@ -60,12 +60,16 @@ export class Game {
         // When there is request to play a card - find the right one and play it
         var played_card: Card | null = null
         if (playerName == this.mainPlayer) {
+            console.log("Main player plays")
             played_card = this.player_hand.play_card(type, value);
         }
         else {
+            console.log("Player",playerName,"plays")
             played_card = await Card.create(type, value)
+            
             this.otherPlayers.forEach(player => {
                 if (player.playerName === playerName) {
+                    if (played_card) player.addChild(played_card)
                     player.addCardCound(-1);
                 }
             });
@@ -73,6 +77,7 @@ export class Game {
 
         // Played card goes to pile
         if (played_card) {
+            played_card.changeContainer(this.pile)
             this.pile.play_card(played_card);
         }
 

@@ -1,4 +1,4 @@
-import { Assets, Sprite, Texture, Container } from "pixi.js";
+import { Assets, Sprite, Texture, Container, Point } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../game_settings";
 import { QueenDialog } from "./queen_dialog";
@@ -55,8 +55,7 @@ export class Card extends Container {
     public static async create(type: string, value: string): Promise<Card> {
         const texture = await Card.load_texture(type, value);
         const sprite = new Sprite(texture);
-        const scale = GameSettings.card_height / sprite.height;
-        sprite.scale.set(scale);
+
         Card.background_texture = await Card.load_texture("back", "");
         return new Card(type, value, sprite);
     }
@@ -69,9 +68,7 @@ export class Card extends Container {
         this.card_sprite = sprite;
         this.texture = texture;
 
-
-        this.addChild(sprite);
-
+        this.setDefaultSize();
         this.end_animation_point_x = 0;
         this.end_animation_point_y = 0;
         this.rotation_angle = 0;
@@ -85,33 +82,57 @@ export class Card extends Container {
         this.on("pointerdown", async () => {
             let nextColor = "";
             if (this.value === "Q") {
-                console.log("Queen clickec")
                 const dialog = new QueenDialog();
                 dialog.zIndex = 999; // Hehe u know what i did here
                 this.parent.addChild(dialog)
-                console.log("Select color")
                 nextColor = await dialog.show(); // wait for user to choose
                 this.parent.removeChild(dialog)
-            } 
+            }
             this.play_card_action(this.type, this.value, nextColor);
         });
+
+        this.addChild(sprite);
     }
 
-
-    public play(duration?: number, rotation?: number) {
+    public play(duration?: number, rotation?: number, onFinish: () => void = () => {}) {
         gsap.to(this, {
             x: this.end_animation_point_x,
             y: this.end_animation_point_y,
             rotation: rotation ?? this.rotation_angle,
             duration: duration ?? this.animation_duration,
+            onComplete: onFinish,
             ease: "power1.out"
         });
     }
 
-    public set_end_of_animation(x: number, y: number, rotation: number): void {
+    public changeContainer(newContainer: Container) {
+        if (this.parent) {
+            const globalPoint = this.toGlobal(new Point(this.x, this.y));
+            this.parent.removeChild(this);
+            this.position.copyFrom(newContainer.toLocal(globalPoint));
+            newContainer.addChild(this);
+        }else{
+            console.error("Can not change card container from empty one")
+        }
+    }
+
+    public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
+        const globalPoint = new Point(x, y);
+        const localPoint = this.toLocal(globalPoint);
+        this.end_animation_point_x = localPoint.x;
+        this.end_animation_point_y = localPoint.y;
+        this.rotation = rotation;
+    }
+
+    public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
         this.end_animation_point_x = x;
         this.end_animation_point_y = y;
         this.rotation_angle = rotation;
+    }
+
+    public setDefaultSize() {
+        this.card_sprite.width = GameSettings.card_width;
+        this.card_sprite.height = GameSettings.card_height;
     }
 
     private static async load_texture(type: string, value: string): Promise<Texture> {

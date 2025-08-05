@@ -28,7 +28,6 @@ export class LoadingScreen extends Container {
         this.app.stage.removeChild(this);
     }
 
-
     public draw_loading_screen() {
         // Draw background
         const topX = GameSettings.get_loading_screen_top_x();
