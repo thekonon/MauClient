@@ -46,15 +46,16 @@ export class Game {
         this.show()
     }
 
-    public register_players(playerNames: string[]) {
-        playerNames.forEach((playerName, index) => {
-            const newPlayer = new AnotherPlayer(playerName)
-            newPlayer.drawPlayer();
-            newPlayer.x = GameSettings.getOtherPlayerX(index)
-            newPlayer.y = GameSettings.getOtherPlayerY(index)
-            this.otherPlayers.push(newPlayer)
-        });
+public async register_players(playerNames: string[]) {
+    for (let index = 0; index < playerNames.length; index++) {
+        const playerName = playerNames[index];
+        const newPlayer = new AnotherPlayer(playerName);
+        await newPlayer.drawPlayer(); // ✅ Await properly
+        newPlayer.x = GameSettings.getOtherPlayerX(index);
+        newPlayer.y = GameSettings.getOtherPlayerY(index);
+        this.otherPlayers.push(newPlayer);
     }
+}
 
     public async play_card(playerName: string, type: string, value: string, newColor: string = "") {
         // When there is request to play a card - find the right one and play it
@@ -82,8 +83,8 @@ export class Game {
         }
 
         // If previous card was queen, display new color
-        if (value == "Q"){
-            // this.pile.display
+        if (played_card?.value == "Q"){
+            this.pile.displayNextColor(newColor)
             console.log("Next color is: ",newColor)
         }
     }

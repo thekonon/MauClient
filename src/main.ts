@@ -8,48 +8,48 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   loading_screen.on_register_player?.("thekonon", "localhost", "8080");
   loading_screen.mainPlayer = "thekonon"
   
-  await new Promise(res => setTimeout(res, 10));
+  await new Promise(res => setTimeout(res, 100));
   message = JSON.parse('{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep"}}');
   web_socket.register_player_action(message)
-  await new Promise(res => setTimeout(res, 10));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep2"}}');
   web_socket.register_player_action(message)
-  await new Promise(res => setTimeout(res, 10));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep3"}}');
   web_socket.register_player_action(message)
   await new Promise(res => setTimeout(res, 100));
   web_socket.start_game_action();
-  await new Promise(res => setTimeout(res, 50));
+  await new Promise(res => setTimeout(res, 100));
   var message = JSON.parse('{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}');
   web_socket.start_pile_action(message);
-  await new Promise(res => setTimeout(res, 10));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
   web_socket.drawCard(message)
   await new Promise(res => setTimeout(res, 1000));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"QUEEN","color":"DIAMONDS"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 500));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"NINE","color":"DIAMONDS"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 500));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep2","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep3","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep2","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
-  await new Promise(res => setTimeout(res, 600));
+  await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"pep3","active":true},"card":{"type":"KING","color":"SPADES"}}');
   web_socket.playCard(message)
 
@@ -109,7 +109,7 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
     loading_screen.hide();
 
     game.mainPlayer = loading_screen.getMainPlayer();
-    game.register_players(loading_screen.get_players_list());
+    await game.register_players(loading_screen.get_players_list());
     
     // Start game
     await game.start_game();
@@ -120,7 +120,7 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   game.pass_command = web_socket.play_pass_command.bind(web_socket);
 
   // Bypapass for testing
-  testing(web_socket, loading_screen)
+  // testing(web_socket, loading_screen)
 
   // await new Promise(res => setTimeout(res, 1000));
   // game.otherPlayers[0].setCardCount(1);
