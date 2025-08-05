@@ -34,6 +34,11 @@ export class Pile extends Container {
         this.current_card.play();
     }
 
+    public displayNextColor(color: string){
+        // TODO: add text that is displayed next to pile signaling which color is selected with queen
+        
+    }
+
     private scale_card(card: Card) {
         card.height = GameSettings.card_height;
         card.width = GameSettings.card_width;

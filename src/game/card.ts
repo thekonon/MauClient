@@ -47,7 +47,7 @@ export class Card extends Container {
             this method is called after pressing on card,
             play card request is sent to server
     */
-    public play_card: (type: string, value: string, _: string) => void;
+    public play_card_action: (type: string, value: string, _: string) => void;
     public card_sprite: Sprite;
     static background_texture: any;
 
@@ -77,7 +77,7 @@ export class Card extends Container {
         this.rotation_angle = 0;
         this.animation_duration = 1;
 
-        this.play_card = (_type: string, _value: string, _) => {
+        this.play_card_action = (_type: string, _value: string, _) => {
             console.log("Not defined");
         };
 
@@ -93,7 +93,7 @@ export class Card extends Container {
                 nextColor = await dialog.show(); // wait for user to choose
                 this.parent.removeChild(dialog)
             } 
-            this.play_card(this.type, this.value, nextColor);
+            this.play_card_action(this.type, this.value, nextColor);
         });
     }
 

@@ -15,7 +15,7 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   var message = JSON.parse('{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}');
   web_socket.start_pile_action(message);
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
-  web_socket.draw_card_action(message)
+  web_socket.drawCard(message)
 }
 
 (async () => {
@@ -62,8 +62,8 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   // Create a game instance
   const game = new Game(app);
   web_socket.start_pile = game.start_pile_action.bind(game);
-  web_socket.draw_a_card = game.draw_card_action.bind(game);
-  web_socket.play_card = game.play_card.bind(game);
+  web_socket.drawCardAction = game.draw_card_action.bind(game);
+  web_socket.playCardAction = game.play_card.bind(game);
   web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
   web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game)
 

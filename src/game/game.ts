@@ -56,7 +56,7 @@ export class Game {
         });
     }
 
-    public async play_card(playerName: string, type: string, value: string) {
+    public async play_card(playerName: string, type: string, value: string, newColor: string = "") {
         // When there is request to play a card - find the right one and play it
         var played_card: Card | null = null
         if (playerName == this.mainPlayer) {
@@ -92,8 +92,8 @@ export class Game {
             player.clearActivationAura()
             if (player.playerName === playerName){
                 player.drawActivationAura()
-        }
-});
+            }
+        });
         
     }
 

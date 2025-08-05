@@ -22,12 +22,12 @@ export class WebSocketHandle {
     );
 
     // Game actions
-    public draw_a_card: (card: Card) => void = (_: Card) => { };
+    public drawCardAction: (card: Card) => void = (_: Card) => { };
     public update_player_list!: (player_list: string[]) => void;
     public add_player!: (player: string) => void;
     public start_game!: () => void;
     public start_pile!: (card: Card) => void;
-    public play_card!: (user: string, type: string, value: string) => Promise<void>;
+    public playCardAction!: (user: string, type: string, value: string, newColor: string) => Promise<void>;
     public shiftPlayerAction: (userName: string) => void = (_) => {console.warn("ShiftPlayerAction not defined in WS")}
     public hiddenDrawAction: (userName: string, cardCount: number) => void = (_, __) => {console.warn("hiddenDrawAction not defined in WS")}
     public ip: string;
@@ -200,14 +200,14 @@ export class WebSocketHandle {
                 break;
             case "DRAW":
                 if (this.game_started) {
-                    this.draw_card_action(message);
+                    this.drawCard(message);
                 } else {
                     console.error("Can not draw when game is not started")
                 }
                 break;
             case "PLAY_CARD":
                 if (this.game_started) {
-                    this.play_card_action(message);
+                    this.playCard(message);
                 }
                 else {
                     console.error("Can not play card when game is not started")
@@ -224,13 +224,16 @@ export class WebSocketHandle {
         }
     }
 
-    public play_card_action(message: any) {
+    public playCard(message: any) {
         const card_info = message.card;
         const playerDto = message.playerDto;
-        this.play_card(
+        const nextColor = message.nextColor; // this field exists only sometimes, handle it
+        const chosenNextColor = nextColor ? this.cardNameMap.get(nextColor) ?? "" : "";
+        this.playCardAction(
             playerDto.username,
             this.cardNameMap.get(card_info.color)!,
-            this.cardNameMap.get(card_info.type)!
+            this.cardNameMap.get(card_info.type)!,
+            chosenNextColor
         );
     }
 
@@ -264,14 +267,14 @@ export class WebSocketHandle {
         this.start_pile(card);
     }
 
-    public async draw_card_action(message: any) {
+    public async drawCard(message: any) {
         for (const card_info of message.cards) {
             const type = card_info.type;
             const color = card_info.color;
 
             const card = await Card.create(this.cardNameMap.get(color)!, this.cardNameMap.get(type)!);
-            card.play_card = (type: string, value: string, nextColor: string) => { this.play_card_command(type, value, nextColor) }
-            this.draw_a_card(card);
+            card.play_card_action = (type: string, value: string, nextColor: string) => { this.play_card_command(type, value, nextColor) }
+            this.drawCardAction(card);
         }
     }
 
