@@ -25,8 +25,9 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
   web_socket.drawCard(message)
+  return
   await new Promise(res => setTimeout(res, 1000));
-  message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"QUEEN","color":"DIAMONDS"}}');
+  message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"QUEEN","color":"DIAMONDS"},"nextColor":"DIAMONDS"}');
   web_socket.playCard(message)
   await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"NINE","color":"DIAMONDS"}}');
@@ -126,5 +127,5 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   // game.otherPlayers[0].setCardCount(1);
   // game.otherPlayers[1].setCardCount(22);
   // game.otherPlayers[2].setCardCount(33);
-  // game.otherPlayers[3].setCardCount(99);
+  // // game.otherPlayers[3].setCardCount(99);
 })();

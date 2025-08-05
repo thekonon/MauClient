@@ -47,8 +47,18 @@ export class PlayerHand extends Container {
             this.pass_command();
         })
 
+                // button for pass action
+        const reorderCardsButton = this.createButton("REORDER CARDS");
+        reorderCardsButton.x = GameSettings.get_player_hand_top_x() + GameSettings.get_player_hand_width()*0.4;
+        reorderCardsButton.y = - 100;
+        reorderCardsButton.on("pointerdown", () => {
+            console.log("Reordering cards");
+            this.reorder_cards();
+        })
+
         this.addChild(this.background);
         this.addChild(drawButton);
+        this.addChild(reorderCardsButton);
     }
 
     public updateBackgroundColor(newColor: number = 0xde3249) {
@@ -81,7 +91,6 @@ export class PlayerHand extends Container {
             const card = this.cards_list[i];
             if (card.type === type && card.value === value) {
                 this.cards_list.splice(i, 1); // Properly remove from array
-                this.reorder_cards();
                 return card;
             }
         }

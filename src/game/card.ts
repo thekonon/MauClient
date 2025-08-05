@@ -1,4 +1,4 @@
-import { Assets, Sprite, Texture, Container, Point } from "pixi.js";
+import { Assets, Sprite, Texture, Container, Point, FederatedPointerEvent } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../game_settings";
 import { QueenDialog } from "./queen_dialog";
@@ -51,6 +51,11 @@ export class Card extends Container {
     public card_sprite: Sprite;
     static background_texture: any;
 
+    private isDragging = false;
+    private dragOffset = new Point();
+    private dragStartPosition = new Point();
+    private wasDragged = false;
+
     /* Card has to be created in async - therefore factory is used*/
     public static async create(type: string, value: string): Promise<Card> {
         const texture = await Card.load_texture(type, value);
@@ -79,22 +84,27 @@ export class Card extends Container {
         };
 
         this.interactive = true;
-        this.on("pointerdown", async () => {
-            let nextColor = "";
-            if (this.value === "Q") {
-                const dialog = new QueenDialog();
-                dialog.zIndex = 999; // Hehe u know what i did here
-                this.parent.addChild(dialog)
-                nextColor = await dialog.show(); // wait for user to choose
-                this.parent.removeChild(dialog)
-            }
-            this.play_card_action(this.type, this.value, nextColor);
-        });
+        // this.on("pointerdown", async () => {
+        //     let nextColor = "";
+        //     if (this.value === "Q") {
+        //         const dialog = new QueenDialog();
+        //         dialog.zIndex = 999; // Hehe u know what i did here
+        //         this.parent.addChild(dialog)
+        //         nextColor = await dialog.show(); // wait for user to choose
+        //         this.parent.removeChild(dialog)
+        //     }
+        //     this.play_card_action(this.type, this.value, nextColor);
+        // });
+
+        this.on("pointerdown", this.onDragStart, this);
+        this.on("pointerup", this.onDragEnd, this);
+        this.on("pointerupoutside", this.onDragEnd, this);
+        this.on("pointermove", this.onDragMove, this);
 
         this.addChild(sprite);
     }
 
-    public play(duration?: number, rotation?: number, onFinish: () => void = () => {}) {
+    public play(duration?: number, rotation?: number, onFinish: () => void = () => { }) {
         gsap.to(this, {
             x: this.end_animation_point_x,
             y: this.end_animation_point_y,
@@ -111,7 +121,7 @@ export class Card extends Container {
             this.parent.removeChild(this);
             this.position.copyFrom(newContainer.toLocal(globalPoint));
             newContainer.addChild(this);
-        }else{
+        } else {
             console.error("Can not change card container from empty one")
         }
     }
@@ -133,6 +143,59 @@ export class Card extends Container {
     public setDefaultSize() {
         this.card_sprite.width = GameSettings.card_width;
         this.card_sprite.height = GameSettings.card_height;
+    }
+
+    private onDragStart(event: FederatedPointerEvent): void {
+        this.isDragging = true;
+        this.wasDragged = false;
+        this.dragOffset = event.getLocalPosition(this);
+        this.dragStartPosition = event.getLocalPosition(this.parent);
+        this.zIndex = 1000;
+        this.alpha = 0.7;
+    }
+
+    private onDragMove(event: FederatedPointerEvent): void {
+        if (!this.isDragging) return;
+
+        const currentPosition = event.getLocalPosition(this.parent);
+        const dx = currentPosition.x - this.dragStartPosition.x;
+        const dy = currentPosition.y - this.dragStartPosition.y;
+
+        // Set as dragged if movement is beyond threshold
+        if (!this.wasDragged && Math.sqrt(dx * dx + dy * dy) > 5) {
+            this.wasDragged = true;
+        }
+
+        this.position.set(
+            currentPosition.x - this.dragOffset.x,
+            currentPosition.y - this.dragOffset.y
+        );
+    }
+
+    private onDragEnd(event: FederatedPointerEvent): void {
+        if (!this.isDragging) return;
+
+        this.isDragging = false;
+        this.alpha = 1;
+        this.zIndex = 0;
+
+        // Click vs Drag handling
+        if (!this.wasDragged) {
+            this.onCardClick();
+        } else {
+            // Drag finished — optional: snap back or drop logic here
+        }
+    }
+    private async onCardClick() {
+        let nextColor = "";
+        if (this.value === "Q") {
+            const dialog = new QueenDialog();
+            dialog.zIndex = 999;
+            this.parent.addChild(dialog);
+            nextColor = await dialog.show();
+            this.parent.removeChild(dialog);
+        }
+        this.play_card_action(this.type, this.value, nextColor);
     }
 
     private static async load_texture(type: string, value: string): Promise<Texture> {
