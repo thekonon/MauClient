@@ -22,7 +22,9 @@ export class Game {
 
     /* Info about players */
     mainPlayer: string;
-    // otherPlayers: string[];
+
+    private playersReady: boolean = false;
+    private pendingShiftPlayerName: string | null = null;
 
     constructor(app: Application) {
         this.app = app;
@@ -46,28 +48,33 @@ export class Game {
         this.show()
     }
 
-public async register_players(playerNames: string[]) {
-    for (let index = 0; index < playerNames.length; index++) {
-        const playerName = playerNames[index];
-        const newPlayer = new AnotherPlayer(playerName);
-        await newPlayer.drawPlayer(); // ✅ Await properly
-        newPlayer.x = GameSettings.getOtherPlayerX(index);
-        newPlayer.y = GameSettings.getOtherPlayerY(index);
-        this.otherPlayers.push(newPlayer);
+    public async register_players(playerNames: string[]) {
+        for (let index = 0; index < playerNames.length; index++) {
+            const playerName = playerNames[index];
+            const newPlayer = new AnotherPlayer(playerName);
+            await newPlayer.drawPlayer(); // ✅ Await properly
+            newPlayer.x = GameSettings.getOtherPlayerX(index);
+            newPlayer.y = GameSettings.getOtherPlayerY(index);
+            this.otherPlayers.push(newPlayer);
+        }
+        
+
+        this.playersReady = true;
+        // If shiftPlayer was requested too early, run it now
+        if (this.pendingShiftPlayerName) {
+            this.shiftPlayerAction(this.pendingShiftPlayerName);
+            this.pendingShiftPlayerName = null;
+        }
     }
-}
 
     public async play_card(playerName: string, type: string, value: string, newColor: string = "") {
         // When there is request to play a card - find the right one and play it
         var played_card: Card | null = null
         if (playerName == this.mainPlayer) {
-            console.log("Main player plays")
             played_card = this.player_hand.play_card(type, value);
         }
         else {
-            console.log("Player",playerName,"plays")
             played_card = await Card.create(type, value)
-            
             this.otherPlayers.forEach(player => {
                 if (player.playerName === playerName) {
                     if (played_card) player.addChild(played_card)
@@ -83,24 +90,35 @@ public async register_players(playerNames: string[]) {
         }
 
         // If previous card was queen, display new color
-        if (played_card?.value == "Q"){
+        if (played_card?.value == "Q") {
             this.pile.displayNextColor(newColor)
-            console.log("Next color is: ",newColor)
+            console.log("Next color is: ", newColor)
         }
     }
 
     public shiftPlayerAction(playerName: string) {
-        this.player_hand.updateBackgroundColor()
-        if (playerName === this.mainPlayer) {
-            this.player_hand.updateBackgroundColor(0x00ff00)
+        if (!this.playersReady) {
+            console.warn("Players not ready yet, delaying shiftPlayer to:", playerName);
+            this.pendingShiftPlayerName = playerName;
+            return;
         }
+        console.log("Game: shiftPlayer")
+        this.player_hand.updateBackgroundColor()
         this.otherPlayers.forEach(player => {
             player.clearActivationAura()
-            if (player.playerName === playerName){
-                player.drawActivationAura()
-            }
         });
-        
+        if (playerName === this.mainPlayer) {
+            console.log("Activation mainPlayerAura")
+            this.player_hand.updateBackgroundColor(0x00ff00)
+        } else {
+            this.otherPlayers.forEach(player => {
+                if (player.playerName === playerName) {
+                    console.log("Activation sidePlayerAura")
+                    player.drawActivationAura()
+                }
+            })
+        };
+
     }
 
     public hiddenDrawAction(playerName: string, cardCount: number) {
