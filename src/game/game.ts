@@ -22,7 +22,7 @@ export class Game {
 
     /* Info about players */
     mainPlayer: string;
-    readyGame?: Promise<unknown>;
+    readyPlayers?: Promise<unknown>;
 
     constructor(app: Application) {
         this.app = app;
@@ -40,12 +40,12 @@ export class Game {
 
     public async start_game() {
         // Create a deck - place where user can request drawing card
-        if(this.readyGame === undefined){
+        if(this.readyPlayers === undefined){
             console.error("Report this bug to Pepa thanks")
             return
         }
         console.log("GAME: startGame awaing")
-        await this.readyGame;
+        await this.readyPlayers;
         this.deck = await Deck.create();
         this.deck.deck_clicked_action = this.draw_card_command.bind(this);
         this.player_hand.pass_command = this.pass_command.bind(this);
@@ -54,7 +54,7 @@ export class Game {
 
     public register_players(playerNames: string[]) {
         console.log("GAME: register player")
-        this.readyGame = new Promise(async (resolve, _) => {
+        this.readyPlayers = new Promise(async (resolve, _) => {
             for (let index = 0; index < playerNames.length; index++) {
                 const playerName = playerNames[index];
                 const newPlayer = new AnotherPlayer(playerName);
@@ -99,12 +99,12 @@ export class Game {
 
     public async shiftPlayerAction(playerName: string) {
         console.log("GAME: shiftPlayerAction")
-        if(this.readyGame === undefined){
+        if(this.readyPlayers === undefined){
             console.error("Report this bug to Pepa thanks")
             return
         }
         console.log("GAME: shiftPlayerAction awaing")
-        await this.readyGame;
+        await this.readyPlayers;
         console.log("GAME: LETZ GOOO")
         console.log("Game: shiftPlayer")
         this.player_hand.updateBackgroundColor()
