@@ -221,6 +221,27 @@ export class WebSocketHandle {
                 console.log("Someone took card, but secretly! Psst")
                 this.hiddenDraw(message.playerDto.username, message.count)
                 break;
+            case "PLAYER_RANK":
+                console.log("PLayer won!");
+                break
+            case "WIN":
+                console.log("You won")
+                console.warn("Not implemented")
+                break;
+            case "LOSE":
+                console.log("You lost")
+                console.warn("Not implemented")
+                break;
+            case "END_GAME":
+                console.log("Game ended")
+                console.warn("Not implemented")
+                break;
+            case "REMOVE_PLAYER":
+                console.log("Removing player")
+                console.warn("Not implemented")
+                break;
+            default:
+                console.log("Unknown command!:", message.type)
         }
     }
 
