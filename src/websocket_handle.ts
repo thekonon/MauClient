@@ -214,7 +214,6 @@ export class WebSocketHandle {
                 }
                 break;
             case "PLAYER_SHIFT":
-                console.log("Shifting player")
                 this.shiftPlayer(message.playerDto.username)
                 break;
             case "HIDDEN_DRAW":
@@ -300,7 +299,6 @@ export class WebSocketHandle {
     }
 
     private shiftPlayer(activePlayerName: string){
-        console.log("ShiftPlayer inner")
         this.shiftPlayerAction(activePlayerName)
     }
 

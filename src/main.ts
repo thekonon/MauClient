@@ -24,8 +24,8 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
   web_socket.start_pile_action(message);
   await new Promise(res => setTimeout(res, 50));
   message = JSON.parse('{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}');
-  web_socket.drawCard(message)
-  return
+  web_socket.drawCard(message);
+  return;
   await new Promise(res => setTimeout(res, 1000));
   message = JSON.parse('{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"QUEEN","color":"DIAMONDS"},"nextColor":"DIAMONDS"}');
   web_socket.playCard(message)
@@ -110,7 +110,7 @@ async function testing(web_socket: WebSocketHandle, loading_screen: LoadingScree
     loading_screen.hide();
 
     game.mainPlayer = loading_screen.getMainPlayer();
-    await game.register_players(loading_screen.get_players_list());
+    game.register_players(loading_screen.get_players_list());
     
     // Start game
     await game.start_game();

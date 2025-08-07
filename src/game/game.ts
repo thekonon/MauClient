@@ -22,9 +22,7 @@ export class Game {
 
     /* Info about players */
     mainPlayer: string;
-
-    private playersReady: boolean = false;
-    private pendingShiftPlayerName: string | null = null;
+    readyGame?: Promise<unknown>;
 
     constructor(app: Application) {
         this.app = app;
@@ -42,29 +40,32 @@ export class Game {
 
     public async start_game() {
         // Create a deck - place where user can request drawing card
+        if(this.readyGame === undefined){
+            console.error("Report this bug to Pepa thanks")
+            return
+        }
+        console.log("GAME: startGame awaing")
+        await this.readyGame;
         this.deck = await Deck.create();
         this.deck.deck_clicked_action = this.draw_card_command.bind(this);
         this.player_hand.pass_command = this.pass_command.bind(this);
         this.show()
     }
 
-    public async register_players(playerNames: string[]) {
-        for (let index = 0; index < playerNames.length; index++) {
-            const playerName = playerNames[index];
-            const newPlayer = new AnotherPlayer(playerName);
-            await newPlayer.drawPlayer(); // ✅ Await properly
-            newPlayer.x = GameSettings.getOtherPlayerX(index);
-            newPlayer.y = GameSettings.getOtherPlayerY(index);
-            this.otherPlayers.push(newPlayer);
-        }
-        
-
-        this.playersReady = true;
-        // If shiftPlayer was requested too early, run it now
-        if (this.pendingShiftPlayerName) {
-            this.shiftPlayerAction(this.pendingShiftPlayerName);
-            this.pendingShiftPlayerName = null;
-        }
+    public register_players(playerNames: string[]) {
+        console.log("GAME: register player")
+        this.readyGame = new Promise(async (resolve, _) => {
+            for (let index = 0; index < playerNames.length; index++) {
+                const playerName = playerNames[index];
+                const newPlayer = new AnotherPlayer(playerName);
+                await newPlayer.drawPlayer(); // ✅ Await properly
+                newPlayer.x = GameSettings.getOtherPlayerX(index);
+                newPlayer.y = GameSettings.getOtherPlayerY(index);
+                this.otherPlayers.push(newPlayer);
+            }
+            console.log("GAME: resolving register player")
+            resolve(true)
+        })
     }
 
     public async play_card(playerName: string, type: string, value: string, newColor: string = "") {
@@ -96,12 +97,15 @@ export class Game {
         }
     }
 
-    public shiftPlayerAction(playerName: string) {
-        if (!this.playersReady) {
-            console.warn("Players not ready yet, delaying shiftPlayer to:", playerName);
-            this.pendingShiftPlayerName = playerName;
-            return;
+    public async shiftPlayerAction(playerName: string) {
+        console.log("GAME: shiftPlayerAction")
+        if(this.readyGame === undefined){
+            console.error("Report this bug to Pepa thanks")
+            return
         }
+        console.log("GAME: shiftPlayerAction awaing")
+        await this.readyGame;
+        console.log("GAME: LETZ GOOO")
         console.log("Game: shiftPlayer")
         this.player_hand.updateBackgroundColor()
         this.otherPlayers.forEach(player => {
