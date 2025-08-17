@@ -357,6 +357,7 @@ export class WebSocketHandle {
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
+      "pythonGen",
     );
 
     card.end_animation_point_x = card.position.x;
@@ -377,6 +378,7 @@ export class WebSocketHandle {
       const card = await Card.create(
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
+        "pythonGen",
       );
       card.playCardCommand = (
         type: string,

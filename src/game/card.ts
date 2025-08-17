@@ -63,11 +63,11 @@ export class Card extends Container {
   private wasDragged = false;
 
   /* Card has to be created in async - therefore factory is used*/
-  public static async create(type: string, value: string): Promise<Card> {
-    const texture = await Card.load_texture(type, value);
+  public static async create(type: string, value: string, texture_name: string = "default"): Promise<Card> {
+    const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
 
-    Card.background_texture = await Card.load_texture("back", "");
+    Card.background_texture = await Card.load_texture("back", "", texture_name);
     return new Card(type, value, sprite);
   }
 
@@ -216,8 +216,9 @@ export class Card extends Container {
   private static async load_texture(
     type: string,
     value: string,
+    texture: string
   ): Promise<Texture> {
-    const path = `assets/default/${type}${value}.png`;
+    const path = `assets/${texture}/${type}${value}.png`;
     try {
       return await Assets.load(path);
     } catch {
