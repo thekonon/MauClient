@@ -10,7 +10,7 @@ export class LoadingScreen extends Container {
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
-  public reconnectCommand: () => void = () => {
+  public reconnectCommand: (_:string, __: string) => void = (_:string, __: string) => {
     alert("Reconnect button not implement yet");
   };
 
@@ -83,7 +83,7 @@ export class LoadingScreen extends Container {
       "reconnectButton",
     ) as HTMLButtonElement;
     reconnectButton.addEventListener("click", () => {
-      this.reconnectCommand();
+      this.reconnectPlayer();
     });
 
     window.addEventListener("keydown", (e) => {
@@ -147,6 +147,24 @@ export class LoadingScreen extends Container {
     }
     this.mainPlayer = playerName;
     this.on_register_player?.(playerName, ip, port);
+  }
+
+  private reconnectPlayer(){
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.reconnectCommand(ip, port);
   }
 
   private updateConnectedPlayers() {

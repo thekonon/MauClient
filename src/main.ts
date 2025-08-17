@@ -94,6 +94,12 @@ async function testing(
     web_socket.createConnection();
   };
 
+  loading_screen.reconnectCommand = (ip: string,
+    port: string) => {
+    web_socket.setIPPort(ip, port);
+    web_socket.reconnect();
+  }
+
   /* These are messages that goes from server */
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list =
