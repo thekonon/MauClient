@@ -187,7 +187,7 @@ export class Card extends Container {
     );
   }
 
-  private onDragEnd(event: FederatedPointerEvent): void {
+  private onDragEnd(_: FederatedPointerEvent): void {
     if (!this.isDragging) return;
 
     this.isDragging = false;
