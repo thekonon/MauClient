@@ -7,141 +7,144 @@ import { AnotherPlayer } from "./another_player";
 import { GameSettings } from "../game_settings";
 
 export class Game {
-    private app: Application;
-    public play_card_action!: (card: Card) => void;
-    public start_pile_action!: (card: Card) => void;
-    public draw_card_action!: (card: Card) => void;
-    public draw_card_command!: () => void;
-    public pass_command!: () => void;
-    //public shiftPlayerAction: (_userName: string) => void = (_) => {console.error("shiftPlayerAction not defined in game")}
+  private app: Application;
+  public play_card_action!: (card: Card) => void;
+  public start_pile_action!: (card: Card) => void;
+  public draw_card_action!: (card: Card) => void;
+  public draw_card_command!: () => void;
+  public pass_command!: () => void;
+  //public shiftPlayerAction: (_userName: string) => void = (_) => {console.error("shiftPlayerAction not defined in game")}
 
-    player_hand: PlayerHand;
-    pile: Pile;
-    deck?: Deck;
-    otherPlayers: AnotherPlayer[];
+  player_hand: PlayerHand;
+  pile: Pile;
+  deck?: Deck;
+  otherPlayers: AnotherPlayer[];
 
-    /* Info about players */
-    mainPlayer: string;
-    readyPlayers?: Promise<unknown>;
+  /* Info about players */
+  mainPlayer: string;
+  readyPlayers?: Promise<unknown>;
 
-    constructor(app: Application) {
-        this.app = app;
-        // Create a player hand - place where user cards are stored
-        this.player_hand = new PlayerHand();
-        this.draw_card_action = this.player_hand.draw_card.bind(this.player_hand);
+  constructor(app: Application) {
+    this.app = app;
+    // Create a player hand - place where user cards are stored
+    this.player_hand = new PlayerHand();
+    this.draw_card_action = this.player_hand.draw_card.bind(this.player_hand);
 
-        // Create a pile - place to which cards go
-        this.pile = new Pile();
-        this.start_pile_action = this.pile.play_card.bind(this.pile);
+    // Create a pile - place to which cards go
+    this.pile = new Pile();
+    this.start_pile_action = this.pile.play_card.bind(this.pile);
 
-        this.mainPlayer = "";
-        this.otherPlayers = [];
+    this.mainPlayer = "";
+    this.otherPlayers = [];
+  }
+
+  public async start_game() {
+    // Create a deck - place where user can request drawing card
+    if (this.readyPlayers === undefined) {
+      console.error("Report this bug to Pepa thanks");
+      return;
     }
+    console.log("GAME: startGame awaing");
+    await this.readyPlayers;
+    this.deck = await Deck.create();
+    this.deck.deck_clicked_action = this.draw_card_command.bind(this);
+    this.player_hand.pass_command = this.pass_command.bind(this);
+    this.show();
+  }
 
-    public async start_game() {
-        // Create a deck - place where user can request drawing card
-        if(this.readyPlayers === undefined){
-            console.error("Report this bug to Pepa thanks")
-            return
+  public register_players(playerNames: string[]) {
+    console.log("GAME: register player");
+    this.readyPlayers = new Promise(async (resolve, _) => {
+      for (let index = 0; index < playerNames.length; index++) {
+        const playerName = playerNames[index];
+        const newPlayer = new AnotherPlayer(playerName);
+        await newPlayer.drawPlayer(); // ✅ Await properly
+        newPlayer.x = GameSettings.getOtherPlayerX(index);
+        newPlayer.y = GameSettings.getOtherPlayerY(index);
+        this.otherPlayers.push(newPlayer);
+      }
+      console.log("GAME: resolving register player");
+      resolve(true);
+    });
+  }
+
+  public async play_card(
+    playerName: string,
+    type: string,
+    value: string,
+    newColor: string = "",
+  ) {
+    // When there is request to play a card - find the right one and play it
+    var played_card: Card | null = null;
+    if (playerName == this.mainPlayer) {
+      played_card = this.player_hand.play_card(type, value);
+    } else {
+      played_card = await Card.create(type, value);
+      this.otherPlayers.forEach((player) => {
+        if (player.playerName === playerName) {
+          if (played_card) player.addChild(played_card);
+          player.addCardCound(-1);
         }
-        console.log("GAME: startGame awaing")
-        await this.readyPlayers;
-        this.deck = await Deck.create();
-        this.deck.deck_clicked_action = this.draw_card_command.bind(this);
-        this.player_hand.pass_command = this.pass_command.bind(this);
-        this.show()
+      });
     }
 
-    public register_players(playerNames: string[]) {
-        console.log("GAME: register player")
-        this.readyPlayers = new Promise(async (resolve, _) => {
-            for (let index = 0; index < playerNames.length; index++) {
-                const playerName = playerNames[index];
-                const newPlayer = new AnotherPlayer(playerName);
-                await newPlayer.drawPlayer(); // ✅ Await properly
-                newPlayer.x = GameSettings.getOtherPlayerX(index);
-                newPlayer.y = GameSettings.getOtherPlayerY(index);
-                this.otherPlayers.push(newPlayer);
-            }
-            console.log("GAME: resolving register player")
-            resolve(true)
-        })
+    // Played card goes to pile
+    if (played_card) {
+      played_card.changeContainer(this.pile);
+      this.pile.play_card(played_card);
     }
 
-    public async play_card(playerName: string, type: string, value: string, newColor: string = "") {
-        // When there is request to play a card - find the right one and play it
-        var played_card: Card | null = null
-        if (playerName == this.mainPlayer) {
-            played_card = this.player_hand.play_card(type, value);
+    // If previous card was queen, display new color
+    if (played_card?.value == "Q") {
+      this.pile.displayNextColor(newColor);
+      console.log("Next color is: ", newColor);
+    }
+  }
+
+  public async shiftPlayerAction(playerName: string) {
+    console.log("GAME: shiftPlayerAction");
+    if (this.readyPlayers === undefined) {
+      console.error("Report this bug to Pepa thanks");
+      return;
+    }
+    console.log("GAME: shiftPlayerAction awaing");
+    await this.readyPlayers;
+    console.log("GAME: LETZ GOOO");
+    console.log("Game: shiftPlayer");
+    this.player_hand.updateBackgroundColor();
+    this.otherPlayers.forEach((player) => {
+      player.clearActivationAura();
+    });
+    if (playerName === this.mainPlayer) {
+      console.log("Activation mainPlayerAura");
+      this.player_hand.updateBackgroundColor(0x00ff00);
+    } else {
+      this.otherPlayers.forEach((player) => {
+        if (player.playerName === playerName) {
+          console.log("Activation sidePlayerAura");
+          player.drawActivationAura();
         }
-        else {
-            played_card = await Card.create(type, value)
-            this.otherPlayers.forEach(player => {
-                if (player.playerName === playerName) {
-                    if (played_card) player.addChild(played_card)
-                    player.addCardCound(-1);
-                }
-            });
-        }
-
-        // Played card goes to pile
-        if (played_card) {
-            played_card.changeContainer(this.pile)
-            this.pile.play_card(played_card);
-        }
-
-        // If previous card was queen, display new color
-        if (played_card?.value == "Q") {
-            this.pile.displayNextColor(newColor)
-            console.log("Next color is: ", newColor)
-        }
+      });
     }
+  }
 
-    public async shiftPlayerAction(playerName: string) {
-        console.log("GAME: shiftPlayerAction")
-        if(this.readyPlayers === undefined){
-            console.error("Report this bug to Pepa thanks")
-            return
-        }
-        console.log("GAME: shiftPlayerAction awaing")
-        await this.readyPlayers;
-        console.log("GAME: LETZ GOOO")
-        console.log("Game: shiftPlayer")
-        this.player_hand.updateBackgroundColor()
-        this.otherPlayers.forEach(player => {
-            player.clearActivationAura()
-        });
-        if (playerName === this.mainPlayer) {
-            console.log("Activation mainPlayerAura")
-            this.player_hand.updateBackgroundColor(0x00ff00)
-        } else {
-            this.otherPlayers.forEach(player => {
-                if (player.playerName === playerName) {
-                    console.log("Activation sidePlayerAura")
-                    player.drawActivationAura()
-                }
-            })
-        };
+  public hiddenDrawAction(playerName: string, cardCount: number) {
+    console.log("Game: ", playerName, cardCount);
+    this.otherPlayers.forEach((player) => {
+      if (player.playerName === playerName) {
+        console.log("PLayer with right name found");
+        player.addCardCound(cardCount);
+      }
+    });
+  }
 
-    }
-
-    public hiddenDrawAction(playerName: string, cardCount: number) {
-        console.log("Game: ", playerName, cardCount)
-        this.otherPlayers.forEach(player => {
-            if (player.playerName === playerName) {
-                console.log("PLayer with right name found")
-                player.addCardCound(cardCount)
-            }
-        });
-    }
-
-    private show() {
-        // Add player hand and deck to app
-        this.app.stage.addChild(this.player_hand);
-        this.app.stage.addChild(this.deck!);
-        this.app.stage.addChild(this.pile)
-        this.otherPlayers.forEach(player => {
-            this.app.stage.addChild(player)
-        });
-    }
+  private show() {
+    // Add player hand and deck to app
+    this.app.stage.addChild(this.player_hand);
+    this.app.stage.addChild(this.deck!);
+    this.app.stage.addChild(this.pile);
+    this.otherPlayers.forEach((player) => {
+      this.app.stage.addChild(player);
+    });
+  }
 }
