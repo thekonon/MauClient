@@ -33,71 +33,42 @@ export class LoadingScreen extends Container {
   }
 
   public draw_loading_screen() {
-    // Draw background
-    const topX = GameSettings.get_loading_screen_top_x();
-    const topY = GameSettings.get_loading_screen_top_y();
-    const width = GameSettings.get_loading_screen_width();
-    const height = GameSettings.get_loading_screen_height();
-
-    const background = new Graphics();
-    background
-      .roundRect(
-        topX,
-        topY,
-        width,
-        height,
-        GameSettings.loading_screen_round_edge,
-      )
-      .fill(0xde3249);
-    this.addChild(background);
-
-    // Draw text
-    const style = new TextStyle({
-      fontFamily: "Impact",
-      fontSize: 100,
-      fontWeight: "bold",
-    });
-    const text = new Text({ text: "MňauMňauGame", style });
-    text.position.x = GameSettings.get_mid_x() - text.getSize().width / 2;
-    text.position.y = topY + 5;
-    this.addChild(text);
-
     // Form styled to match PIXI background
     const uiContainer = document.createElement("div");
     uiContainer.id = "loginMenu";
     uiContainer.classList.add("login-menu");
 
-    uiContainer.style.left = `${topX}px`;
-    uiContainer.style.top = `${topY}px`;
-    uiContainer.style.width = `${width}px`;
-    uiContainer.style.height = `${height}px`;
-
     uiContainer.innerHTML = `
-            <div class="input-row">
-                <label for="playerName">Player Name:</label>
-                <input type="text" id="playerName" class="form-input">
-            </div>
-            <div class="input-row">
-                <label for="playerName" >IP: </label>
-                <input type="text" id="IP" class="form-input" value="localhost">
-            </div>
-            <div class="input-row">
-                <label for="playerName">PORT: </label>
-                <input type="text" id="PORT" class="form-input" value="8080">
-            </div>
-            <div class="input-row">
-                <button id="connectButton" class="connect-button">
-                    Connect to lobby!
-                </button>
-                <button id="reconnectButton" class="connect-button">
-                    Try to reconnect!
-                </button>
-            </div>
+    <div class="container">
+    <div class = "form">
+    <div class="title">MňauMňauGame</div>
+        <div class="form-group">
+          <label for="playerName">Player Name:</label>
+          <input type="text" id="playerName" name="playerName">
+        </div>
 
-            <div id="connectedPlayersListLabel">Connected Players:</div>
-            <div id="connectedPlayersList">
-                <em>No players connected yet.</em>
-            </div>
+        <div class="form-group">
+          <label for="ip">IP:</label>
+          <input type="text" id="IP" name="ip" value="${window.location.hostname}">
+        </div>
+
+        <div class="form-group">
+          <label for="port">PORT:</label>
+          <input type="text" id="PORT" name="port" value="8080">
+        </div>
+
+        <div class="buttons">
+          <button class="btn" id="connectButton">Connect to lobby!</button>
+          <button class="btn" id="reconnectButton">Try to reconnect!</button>
+        </div>
+      </div>
+      <div class = "players">
+        <div class="connected-title">Connected Players:</div>
+        <div class="players-box" id="connectedPlayersList">
+          No players connected yet.
+        </div>
+      </div>
+    </div>
         `;
     document.body.appendChild(uiContainer);
 
@@ -188,7 +159,6 @@ export class LoadingScreen extends Container {
 
     // Clear current content
     container.innerHTML = "";
-
     if (this.connectedPlayers.length === 0) {
       container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
       return;
@@ -213,7 +183,11 @@ export class LoadingScreen extends Container {
   private disableConnectButton(): void {
     const connectButton = document.getElementById(
       "connectButton",
-    ) as HTMLButtonElement;
-    connectButton.disabled = true;
+    ) as HTMLButtonElement | null;
+
+    if (connectButton) {
+      connectButton.disabled = true;
+      connectButton.classList.add("disabled"); // so CSS can style it
+    }
   }
 }

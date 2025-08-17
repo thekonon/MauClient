@@ -16,7 +16,7 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"PLAYERS","players":["aa"]}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"bb","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"cc","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"asdasasdasdasdasdasdasdasdasddasdasdcc","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
   ];
@@ -43,6 +43,7 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 100));
   }
+  return
   for (const msgStr of startGameMsgs) {
     web_socket.onMessage(msgStr);
   }
@@ -50,7 +51,6 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
   }
-  return
   for (const msgStr of endMsgs) {
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
@@ -139,5 +139,5 @@ async function testing(
   game.passCommand = web_socket.playPassCommand.bind(web_socket);
 
   // Bypapass for testing
-  testing(web_socket, loading_screen)
+  // testing(web_socket, loading_screen)
 })();
