@@ -1,5 +1,5 @@
 import { Assets, Container, Sprite } from "pixi.js";
-import { GameSettings } from "../game_settings";
+import { GameSettings } from "../gameSettings";
 
 export class Deck extends Container {
   sprite!: Sprite;

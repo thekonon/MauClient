@@ -1,5 +1,5 @@
 import { Container, TextStyle, Text, Point } from "pixi.js";
-import { GameSettings } from "../game_settings";
+import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
 
 export class Pile extends Container {

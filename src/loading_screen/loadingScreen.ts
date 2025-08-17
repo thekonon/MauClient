@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
-import { GameSettings } from "../game_settings";
+import { GameSettings } from "../gameSettings";
 
 export class LoadingScreen extends Container {
   app: Application;

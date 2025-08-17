@@ -1,10 +1,10 @@
 import { Application } from "pixi.js";
 import { Card } from "./card";
 import { Deck } from "./deck";
-import { PlayerHand } from "./player_hand";
+import { PlayerHand } from "./playerHand";
 import { Pile } from "./pile";
-import { AnotherPlayer } from "./another_player";
-import { GameSettings } from "../game_settings";
+import { AnotherPlayer } from "./anotherPlayer";
+import { GameSettings } from "../gameSettings";
 
 export class Game {
   private app: Application;

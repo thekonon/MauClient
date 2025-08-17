@@ -7,8 +7,8 @@ import {
   FederatedPointerEvent,
 } from "pixi.js";
 import { gsap } from "gsap";
-import { GameSettings } from "../game_settings";
-import { QueenDialog } from "./queen_dialog";
+import { GameSettings } from "../gameSettings";
+import { QueenDialog } from "./queenDialog";
 
 export class Card extends Container {
   // General settings of the card

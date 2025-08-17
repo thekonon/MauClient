@@ -1,5 +1,5 @@
 import { Assets, Container, Sprite, TextStyle, Text, Graphics } from "pixi.js";
-import { GameSettings } from "../game_settings";
+import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
 
 export class AnotherPlayer extends Container {

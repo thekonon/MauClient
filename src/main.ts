@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
-import { GameSettings } from "./game_settings.ts";
+import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
-import { LoadingScreen } from "./loading_screen/loading_screen.ts";
+import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocket_handle.ts";
 
 async function testing(
@@ -12,7 +12,7 @@ async function testing(
   loading_screen.mainPlayer = "thekonon";
 
   await new Promise((res) => setTimeout(res, 100));
-  message = JSON.parse(
+  let message = JSON.parse(
     '{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep"}}',
   );
   web_socket.register_player_action(message);
@@ -29,7 +29,7 @@ async function testing(
   await new Promise((res) => setTimeout(res, 100));
   web_socket.start_game_action();
   await new Promise((res) => setTimeout(res, 100));
-  let message = JSON.parse(
+  message = JSON.parse(
     '{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}',
   );
   web_socket.start_pile_action(message);
