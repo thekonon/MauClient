@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { Card } from "./card";
 import { Deck } from "./deck";
 import { PlayerHand } from "./playerHand";
@@ -6,7 +6,7 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 
-export class Game {
+export class Game extends Container {
   private app: Application;
   public startPileAction!: (card: Card) => void;
   public drawCardAction!: (card: Card) => void;
@@ -23,6 +23,8 @@ export class Game {
   readyPlayers?: Promise<unknown>;
 
   constructor(app: Application) {
+    super();
+
     this.app = app;
     // Create a player hand - place where user cards are stored
     this.playerHand = new PlayerHand();
@@ -111,44 +113,49 @@ export class Game {
       console.error("Report this bug to Pepa thanks");
       return;
     }
-    console.log("GAME: shiftPlayerAction awaing");
     await this.readyPlayers;
-    console.log("GAME: LETZ GOOO");
-    console.log("Game: shiftPlayer");
     this.playerHand.updateBackgroundColor();
     this.otherPlayers.forEach((player) => {
       player.clearActivationAura();
     });
     if (playerName === this.mainPlayer) {
-      console.log("Activation mainPlayerAura");
       this.playerHand.updateBackgroundColor(0x00ff00);
     } else {
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
-          console.log("Activation sidePlayerAura");
           player.drawActivationAura();
         }
       });
     }
   }
 
-  public hiddenDrawAction(playerName: string, cardCount: number) {
+  public async hiddenDrawAction(playerName: string, cardCount: number) {
     console.log("Game: ", playerName, cardCount);
+    await this.readyPlayers;
     this.otherPlayers.forEach((player) => {
+      console.log("looping", player.playerName);
       if (player.playerName === playerName) {
         console.log("PLayer with right name found");
         player.addCardCound(cardCount);
       }
     });
   }
-
-  private show() {
+  public show() {
     // Add player hand and deck to app
-    this.app.stage.addChild(this.playerHand);
-    this.app.stage.addChild(this.deck!);
-    this.app.stage.addChild(this.pile);
+    this.addAllChildren();
+    this.app.stage.addChild(this);
+  }
+
+  public hide(): void {
+    this.app.stage.removeChild(this);
+  }
+
+  private addAllChildren(): void {
+    this.addChild(this.playerHand);
+    this.addChild(this.deck!);
+    this.addChild(this.pile);
     this.otherPlayers.forEach((player) => {
-      this.app.stage.addChild(player);
+      this.addChild(player);
     });
   }
 }

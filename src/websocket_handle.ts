@@ -88,6 +88,8 @@ export class WebSocketHandle {
   ) => {
     console.warn("hiddenDrawAction not defined in WS");
   };
+  public gameEndAction: () => void = () => { console.warn("gameEndAction not implemented yet")}
+  public rankPlayerAction: (_: string[]) => void = (_:string[]) => { console.warn("rankPlayerAction not implemented yet")}
   public ip: string;
   public port: string;
 
@@ -271,7 +273,11 @@ export class WebSocketHandle {
         console.log("Someone took card, but secretly! Psst");
         this.hiddenDraw(msg.playerDto.username, msg.count);
       },
-      PLAYER_RANK: () => console.log("Player won!"),
+      PLAYER_RANK: (msg) => {
+        if (!msg.players)
+          return console.error("Players was not specified in RANK action");
+        this.rankPlayerAction(msg.players);
+      },
       WIN: () => {
         console.log("You won");
         console.warn("Not implemented");
@@ -282,6 +288,7 @@ export class WebSocketHandle {
       },
       END_GAME: () => {
         console.log("Game ended");
+        this.gameEndAction()
         console.warn("Not implemented");
       },
       REMOVE_PLAYER: () => {

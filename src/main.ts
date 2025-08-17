@@ -3,87 +3,42 @@ import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
 import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocket_handle.ts";
+import { EndScreen } from "./endScreen/endScreen.ts";
 
 async function testing(
   web_socket: WebSocketHandle,
   loading_screen: LoadingScreen,
 ) {
-  loading_screen.on_register_player?.("thekonon", "localhost", "8080");
-  loading_screen.mainPlayer = "thekonon";
+  loading_screen.on_register_player?.("aa", "localhost", "8080");
+  loading_screen.mainPlayer = "aa";
 
-  await new Promise((res) => setTimeout(res, 100));
-  let message = JSON.parse(
-    '{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep"}}',
-  );
-  web_socket.register_player_action(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep2"}}',
-  );
-  web_socket.register_player_action(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K1XMN8YMM4TG3NB068EPHZVZ","username":"pep3"}}',
-  );
-  web_socket.register_player_action(message);
-  await new Promise((res) => setTimeout(res, 100));
-  web_socket.start_game_action();
-  await new Promise((res) => setTimeout(res, 100));
-  message = JSON.parse(
-    '{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}',
-  );
-  web_socket.start_pile_action(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"DRAW","cards":[{"type":"QUEEN","color":"DIAMONDS"},{"type":"NINE","color":"DIAMONDS"},{"type":"KING","color":"SPADES"},{"type":"NINE","color":"CLUBS"}]}',
-  );
-  web_socket.drawCard(message);
-  return;
-  await new Promise((res) => setTimeout(res, 1000));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"QUEEN","color":"DIAMONDS"},"nextColor":"DIAMONDS"}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"NINE","color":"DIAMONDS"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"thekonon","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep2","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep3","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep2","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
-  await new Promise((res) => setTimeout(res, 50));
-  message = JSON.parse(
-    '{"type":"PLAY_CARD","playerDto":{"username":"pep3","active":true},"card":{"type":"KING","color":"SPADES"}}',
-  );
-  web_socket.playCard(message);
+  const messages = [
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYERS","players":["aa"]}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"bb","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"cc","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
+    '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
+    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"bb","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"cc","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"dd","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"ee","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"PLAY_CARD","playerDto":{"username":"aa","active":true},"card":{"type":"SEVEN","color":"DIAMONDS"}}}',
+    '{"messageType":"ACTION","action":{"type":"WIN","playerDto":{"username":"a","active":false}}}',
+    '{"messageType":"ACTION","action":{"type":"END_GAME"}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_RANK","players":["player 1","Pepa","Lol"]}}',
+  ];
+
+  for (const msgStr of messages) {
+    web_socket.onMessage(msgStr);
+
+    // delay between messages
+    await new Promise((res) => setTimeout(res, 500));
+  }
 }
 
 (async () => {
@@ -133,6 +88,11 @@ async function testing(
 
   // Create a game instance
   const game = new Game(app);
+
+  // Create a endScreen instance 
+  const endScreen = new EndScreen(app);
+
+  // Bind callbacks
   web_socket.start_pile = game.startPileAction.bind(game);
   web_socket.drawCardAction = game.drawCardAction.bind(game);
   web_socket.playCardAction = game.playCard.bind(game);
@@ -147,8 +107,16 @@ async function testing(
     game.register_players(loading_screen.get_players_list());
 
     // Start game
-    await game.startGame();
+    game.startGame();
   };
+
+  web_socket.gameEndAction = async () => {
+    await new Promise((res) => setTimeout(res, 1000));
+    game.hide();
+    endScreen.show();
+  }
+
+  web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
 
   /* User callbacks - user want to send */
   game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
@@ -156,10 +124,4 @@ async function testing(
 
   // Bypapass for testing
   // testing(web_socket, loading_screen)
-
-  // await new Promise(res => setTimeout(res, 1000));
-  // game.otherPlayers[0].setCardCount(1);
-  // game.otherPlayers[1].setCardCount(22);
-  // game.otherPlayers[2].setCardCount(33);
-  // // game.otherPlayers[3].setCardCount(99);
 })();
