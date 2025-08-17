@@ -27,13 +27,17 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"cc","active":true},"count":4}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"dd","active":true},"count":4}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"ee","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"PLAY_CARD","playerDto":{"username":"aa","active":true},"card":{"type":"SEVEN","color":"DIAMONDS"}}}',
+    '{"messageType":"ACTION","action":{"type":"WIN","playerDto":{"username":"a","active":false}}}',
+    '{"messageType":"ACTION","action":{"type":"END_GAME"}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_RANK","players":["player 1","Pepa","Lol"]}}',
   ];
 
   for (const msgStr of messages) {
     web_socket.onMessage(msgStr);
 
     // delay between messages
-    await new Promise((res) => setTimeout(res, 300));
+    await new Promise((res) => setTimeout(res, 500));
   }
 }
 
@@ -84,6 +88,11 @@ async function testing(
 
   // Create a game instance
   const game = new Game(app);
+
+  // Create a endScreen instance 
+  const endScreen = new EndScreen(app);
+
+  // Bind callbacks
   web_socket.start_pile = game.startPileAction.bind(game);
   web_socket.drawCardAction = game.drawCardAction.bind(game);
   web_socket.playCardAction = game.playCard.bind(game);
@@ -101,14 +110,18 @@ async function testing(
     game.startGame();
   };
 
+  web_socket.gameEndAction = async () => {
+    await new Promise((res) => setTimeout(res, 1000));
+    game.hide();
+    endScreen.show();
+  }
+
+  web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
+
   /* User callbacks - user want to send */
   game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
   game.passCommand = web_socket.playPassCommand.bind(web_socket);
 
   // Bypapass for testing
   // testing(web_socket, loading_screen)
-
-  loading_screen.hide();
-  const endScreen = new EndScreen(app);
-  endScreen.show();
 })();
