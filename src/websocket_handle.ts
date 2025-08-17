@@ -117,16 +117,16 @@ export class WebSocketHandle {
     this.userID = "";
   }
 
-  public set_ip_port(ip: string, port: string) {
+  public setIPPort(ip: string, port: string) {
     this.ip = ip;
     this.port = port;
   }
 
-  public set_user(user_name: string) {
+  public setUser(user_name: string) {
     this.userName = user_name;
   }
 
-  public create_connection() {
+  public createConnection() {
     if (this.userName == "") {
       throw new Error("UserName must be set first");
     }
@@ -176,7 +176,7 @@ export class WebSocketHandle {
   }
 
   // Call this method when there is a draw card request
-  public draw_card_request() {
+  public drawCardCommand() {
     const draw_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -186,7 +186,7 @@ export class WebSocketHandle {
     this.send(draw_command);
   }
 
-  public play_card_command(
+  public playCardCommand(
     type: string,
     value: string,
     nextColor: string = "",
@@ -211,7 +211,7 @@ export class WebSocketHandle {
     this.send(message);
   }
 
-  public play_pass_command() {
+  public playPassCommand() {
     const pass_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -344,6 +344,7 @@ export class WebSocketHandle {
   }
 
   public async start_pile_action(message: GameAction) {
+    // TODO: move this to pile
     if (!message.card) return console.error("Card was not specified");
     const card_info = message.card;
     const card = await Card.create(
@@ -370,12 +371,12 @@ export class WebSocketHandle {
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
       );
-      card.play_card_action = (
+      card.playCardCommand = (
         type: string,
         value: string,
         nextColor: string,
       ) => {
-        this.play_card_command(type, value, nextColor);
+        this.playCardCommand(type, value, nextColor);
       };
       this.drawCardAction(card);
     }

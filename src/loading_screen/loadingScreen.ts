@@ -24,7 +24,7 @@ export class LoadingScreen extends Container {
   public show() {
     this.app.stage.addChild(this);
     this.draw_loading_screen();
-    this.update_connected_player();
+    this.updateConnectedPlayers();
   }
 
   public hide() {
@@ -134,29 +134,26 @@ export class LoadingScreen extends Container {
     return this.mainPlayer;
   }
 
-  public add_player_to_list(player: string) {
+  public addPlayerToList(player: string) {
     if (this.connectedPlayers.length > 4) {
       throw Error("This client supports maximum of 5 players");
     }
     this.connectedPlayers.push(player);
-    this.update_connected_player();
+    this.updateConnectedPlayers();
   }
 
-  public update_player_list(playerList: string[]) {
+  public updatePlayerList(playerList: string[]) {
     if (playerList.length > 5) {
       throw Error("This client supports maximum of 5 players");
     }
     this.connectedPlayers = playerList;
-    this.update_connected_player();
+    this.updateConnectedPlayers();
   }
 
   private registerPlayer() {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const connectButton = document.getElementById(
-      "connectButton",
-    ) as HTMLButtonElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
@@ -179,10 +176,9 @@ export class LoadingScreen extends Container {
     }
     this.mainPlayer = playerName;
     this.on_register_player?.(playerName, ip, port);
-    connectButton.disabled = true;
   }
 
-  private update_connected_player() {
+  private updateConnectedPlayers() {
     const container = document.getElementById("connectedPlayersList");
 
     if (!container) {
@@ -197,6 +193,9 @@ export class LoadingScreen extends Container {
       container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
       return;
     }
+    else{
+      this.disableConnectButton();
+    }
 
     // Add each player as a line
     this.connectedPlayers.forEach((player) => {
@@ -210,5 +209,12 @@ export class LoadingScreen extends Container {
       div.style.marginBottom = "5px";
       container.appendChild(div);
     });
+  }
+
+  private disableConnectButton(): void {
+    const connectButton = document.getElementById(
+      "connectButton",
+    ) as HTMLButtonElement;
+    connectButton.disabled = true;
   }
 }

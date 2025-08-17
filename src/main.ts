@@ -118,17 +118,17 @@ async function testing(
     ip: string,
     port: string,
   ) => {
-    web_socket.set_user(playerName);
-    web_socket.set_ip_port(ip, port);
-    web_socket.create_connection();
+    web_socket.setUser(playerName);
+    web_socket.setIPPort(ip, port);
+    web_socket.createConnection();
   };
 
   /* These are messages that goes from server */
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list =
-    loading_screen.update_player_list.bind(loading_screen);
+    loading_screen.updatePlayerList.bind(loading_screen);
   web_socket.add_player =
-    loading_screen.add_player_to_list.bind(loading_screen);
+    loading_screen.addPlayerToList.bind(loading_screen);
 
   /* Game callbacks - server sends */
 
@@ -152,8 +152,8 @@ async function testing(
   };
 
   /* User callbacks - user want to send */
-  game.draw_card_command = web_socket.draw_card_request.bind(web_socket);
-  game.pass_command = web_socket.play_pass_command.bind(web_socket);
+  game.draw_card_command = web_socket.drawCardCommand.bind(web_socket);
+  game.pass_command = web_socket.playPassCommand.bind(web_socket);
 
   // Bypapass for testing
   // testing(web_socket, loading_screen)
