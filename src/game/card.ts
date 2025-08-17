@@ -55,7 +55,7 @@ export class Card extends Container {
     */
   public play_card_action: (type: string, value: string, _: string) => void;
   public card_sprite: Sprite;
-  static background_texture: any;
+  static background_texture: Texture;
 
   private isDragging = false;
   private dragOffset = new Point();
@@ -90,7 +90,7 @@ export class Card extends Container {
     this.rotation_angle = 0;
     this.animation_duration = 1;
 
-    this.play_card_action = (_type: string, _value: string, _) => {
+    this.play_card_action = (_: string, __: string, ___) => {
       console.log("Not defined");
     };
 
