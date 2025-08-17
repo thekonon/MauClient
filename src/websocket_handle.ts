@@ -88,8 +88,12 @@ export class WebSocketHandle {
   ) => {
     console.warn("hiddenDrawAction not defined in WS");
   };
-  public gameEndAction: () => void = () => { console.warn("gameEndAction not implemented yet")}
-  public rankPlayerAction: (_: string[]) => void = (_:string[]) => { console.warn("rankPlayerAction not implemented yet")}
+  public gameEndAction: () => void = () => {
+    console.warn("gameEndAction not implemented yet");
+  };
+  public rankPlayerAction: (_: string[]) => void = (_: string[]) => {
+    console.warn("rankPlayerAction not implemented yet");
+  };
   public ip: string;
   public port: string;
 
@@ -288,7 +292,7 @@ export class WebSocketHandle {
       },
       END_GAME: () => {
         console.log("Game ended");
-        this.gameEndAction()
+        this.gameEndAction();
         console.warn("Not implemented");
       },
       REMOVE_PLAYER: () => {

@@ -89,7 +89,7 @@ async function testing(
   // Create a game instance
   const game = new Game(app);
 
-  // Create a endScreen instance 
+  // Create a endScreen instance
   const endScreen = new EndScreen(app);
 
   // Bind callbacks
@@ -114,7 +114,7 @@ async function testing(
     await new Promise((res) => setTimeout(res, 1000));
     game.hide();
     endScreen.show();
-  }
+  };
 
   web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
 
