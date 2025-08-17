@@ -44,7 +44,6 @@ export class Game extends Container {
       console.error("Report this bug to Pepa thanks");
       return;
     }
-    console.log("GAME: startGame awaing");
     await this.readyPlayers;
     this.deck = await Deck.create();
     this.deck.deck_clicked_action = this.drawCardCommand.bind(this);
@@ -53,7 +52,6 @@ export class Game extends Container {
   }
 
   public register_players(playerNames: string[]) {
-    console.log("GAME: register player");
     this.readyPlayers = new Promise((resolve, reject) => {
       (async () => {
         try {
@@ -65,7 +63,6 @@ export class Game extends Container {
             newPlayer.y = GameSettings.getOtherPlayerY(index);
             this.otherPlayers.push(newPlayer);
           }
-          console.log("GAME: resolving register player");
           resolve(true);
         } catch (err) {
           reject(err);
@@ -103,12 +100,10 @@ export class Game extends Container {
     // If previous card was queen, display new color
     if (played_card?.value == "Q") {
       this.pile.displayNextColor(newColor);
-      console.log("Next color is: ", newColor);
     }
   }
 
   public async shiftPlayerAction(playerName: string) {
-    console.log("GAME: shiftPlayerAction");
     if (this.readyPlayers === undefined) {
       console.error("Report this bug to Pepa thanks");
       return;
@@ -130,12 +125,9 @@ export class Game extends Container {
   }
 
   public async hiddenDrawAction(playerName: string, cardCount: number) {
-    console.log("Game: ", playerName, cardCount);
     await this.readyPlayers;
     this.otherPlayers.forEach((player) => {
-      console.log("looping", player.playerName);
       if (player.playerName === playerName) {
-        console.log("PLayer with right name found");
         player.addCardCound(cardCount);
       }
     });
