@@ -134,9 +134,9 @@ async function testing(
 
   // Create a game instance
   const game = new Game(app);
-  web_socket.start_pile = game.start_pile_action.bind(game);
-  web_socket.drawCardAction = game.draw_card_action.bind(game);
-  web_socket.playCardAction = game.play_card.bind(game);
+  web_socket.start_pile = game.startPileAction.bind(game);
+  web_socket.drawCardAction = game.drawCardAction.bind(game);
+  web_socket.playCardAction = game.playCard.bind(game);
   web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
   web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
 
@@ -148,12 +148,12 @@ async function testing(
     game.register_players(loading_screen.get_players_list());
 
     // Start game
-    await game.start_game();
+    await game.startGame();
   };
 
   /* User callbacks - user want to send */
-  game.draw_card_command = web_socket.drawCardCommand.bind(web_socket);
-  game.pass_command = web_socket.playPassCommand.bind(web_socket);
+  game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
+  game.passCommand = web_socket.playPassCommand.bind(web_socket);
 
   // Bypapass for testing
   // testing(web_socket, loading_screen)

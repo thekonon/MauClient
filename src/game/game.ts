@@ -8,14 +8,12 @@ import { GameSettings } from "../gameSettings";
 
 export class Game {
   private app: Application;
-  public play_card_action!: (card: Card) => void;
-  public start_pile_action!: (card: Card) => void;
-  public draw_card_action!: (card: Card) => void;
-  public draw_card_command!: () => void;
-  public pass_command!: () => void;
-  //public shiftPlayerAction: (_userName: string) => void = (_) => {console.error("shiftPlayerAction not defined in game")}
+  public startPileAction!: (card: Card) => void;
+  public drawCardAction!: (card: Card) => void;
+  public drawCardCommand!: () => void;
+  public passCommand!: () => void;
 
-  player_hand: PlayerHand;
+  playerHand: PlayerHand;
   pile: Pile;
   deck?: Deck;
   otherPlayers: AnotherPlayer[];
@@ -27,18 +25,18 @@ export class Game {
   constructor(app: Application) {
     this.app = app;
     // Create a player hand - place where user cards are stored
-    this.player_hand = new PlayerHand();
-    this.draw_card_action = this.player_hand.draw_card.bind(this.player_hand);
+    this.playerHand = new PlayerHand();
+    this.drawCardAction = this.playerHand.draw_card.bind(this.playerHand);
 
     // Create a pile - place to which cards go
     this.pile = new Pile();
-    this.start_pile_action = this.pile.play_card.bind(this.pile);
+    this.startPileAction = this.pile.playCard.bind(this.pile);
 
     this.mainPlayer = "";
     this.otherPlayers = [];
   }
 
-  public async start_game() {
+  public async startGame() {
     // Create a deck - place where user can request drawing card
     if (this.readyPlayers === undefined) {
       console.error("Report this bug to Pepa thanks");
@@ -47,8 +45,8 @@ export class Game {
     console.log("GAME: startGame awaing");
     await this.readyPlayers;
     this.deck = await Deck.create();
-    this.deck.deck_clicked_action = this.draw_card_command.bind(this);
-    this.player_hand.pass_command = this.pass_command.bind(this);
+    this.deck.deck_clicked_action = this.drawCardCommand.bind(this);
+    this.playerHand.pass_command = this.passCommand.bind(this);
     this.show();
   }
 
@@ -74,7 +72,7 @@ export class Game {
     });
   }
 
-  public async play_card(
+  public async playCard(
     playerName: string,
     type: string,
     value: string,
@@ -83,7 +81,7 @@ export class Game {
     // When there is request to play a card - find the right one and play it
     let played_card: Card | null = null;
     if (playerName == this.mainPlayer) {
-      played_card = this.player_hand.play_card(type, value);
+      played_card = this.playerHand.playCard(type, value);
     } else {
       played_card = await Card.create(type, value);
       this.otherPlayers.forEach((player) => {
@@ -97,7 +95,7 @@ export class Game {
     // Played card goes to pile
     if (played_card) {
       played_card.changeContainer(this.pile);
-      this.pile.play_card(played_card);
+      this.pile.playCard(played_card);
     }
 
     // If previous card was queen, display new color
@@ -117,13 +115,13 @@ export class Game {
     await this.readyPlayers;
     console.log("GAME: LETZ GOOO");
     console.log("Game: shiftPlayer");
-    this.player_hand.updateBackgroundColor();
+    this.playerHand.updateBackgroundColor();
     this.otherPlayers.forEach((player) => {
       player.clearActivationAura();
     });
     if (playerName === this.mainPlayer) {
       console.log("Activation mainPlayerAura");
-      this.player_hand.updateBackgroundColor(0x00ff00);
+      this.playerHand.updateBackgroundColor(0x00ff00);
     } else {
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
@@ -146,7 +144,7 @@ export class Game {
 
   private show() {
     // Add player hand and deck to app
-    this.app.stage.addChild(this.player_hand);
+    this.app.stage.addChild(this.playerHand);
     this.app.stage.addChild(this.deck!);
     this.app.stage.addChild(this.pile);
     this.otherPlayers.forEach((player) => {

@@ -11,7 +11,7 @@ export class Pile extends Container {
     this.displayNextColor("NotSelected");
   }
 
-  public play_card(card: Card) {
+  public playCard(card: Card) {
     // Add card to queue
     this.card_queue.push(card);
 

@@ -99,7 +99,7 @@ export class PlayerHand extends Container {
     card.play();
   }
 
-  public play_card(type: string, value: string): Card | null {
+  public playCard(type: string, value: string): Card | null {
     for (let i = 0; i < this.cards_list.length; i++) {
       const card = this.cards_list[i];
       if (card.type === type && card.value === value) {
