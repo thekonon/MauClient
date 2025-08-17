@@ -86,7 +86,7 @@ export class Game extends Container {
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
           if (played_card) player.addChild(played_card);
-          player.addCardCound(-1);
+          player.addCardCount(-1);
         }
       });
     }
@@ -126,11 +126,32 @@ export class Game extends Container {
 
   public async hiddenDrawAction(playerName: string, cardCount: number) {
     await this.readyPlayers;
-    this.otherPlayers.forEach((player) => {
-      if (player.playerName === playerName) {
-        player.addCardCound(cardCount);
-      }
-    });
+
+    // Find the target player
+    const player = this.otherPlayers.find(p => p.playerName === playerName);
+    if (!player) return;
+
+    // Update their card count
+    player.addCardCount(cardCount);
+
+    // Create cards
+    const cards: Card[] = [];
+    for (let i = 0; i < cardCount; i++) {
+      const card = await Card.create("", "back");
+      card.position.x = GameSettings.get_deck_top_x();
+      card.position.y = GameSettings.get_deck_top_y();
+      card.zIndex = -1;
+      this.addChild(card)
+      cards.push(card);
+    }
+
+    // Animate cards to player
+    for (const card of cards) {
+      card.end_animation_point_x = player.x;
+      card.end_animation_point_y = player.y;
+      card.play(1, -Math.PI*2, () => {this.removeChild(card)});
+      await new Promise(res => setTimeout(res, 100));
+    }
   }
   public show() {
     // Add player hand and deck to app
