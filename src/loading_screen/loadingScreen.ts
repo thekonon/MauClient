@@ -192,8 +192,7 @@ export class LoadingScreen extends Container {
     if (this.connectedPlayers.length === 0) {
       container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
       return;
-    }
-    else{
+    } else {
       this.disableConnectButton();
     }
 

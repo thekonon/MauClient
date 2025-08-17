@@ -186,11 +186,7 @@ export class WebSocketHandle {
     this.send(draw_command);
   }
 
-  public playCardCommand(
-    type: string,
-    value: string,
-    nextColor: string = "",
-  ) {
+  public playCardCommand(type: string, value: string, nextColor: string = "") {
     const move: Move = {
       moveType: "PLAY",
       card: {

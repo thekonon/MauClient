@@ -127,8 +127,7 @@ async function testing(
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
-  web_socket.add_player =
-    loading_screen.addPlayerToList.bind(loading_screen);
+  web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
 
   /* Game callbacks - server sends */
 
