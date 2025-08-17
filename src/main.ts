@@ -50,6 +50,7 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
   }
+  return
   for (const msgStr of endMsgs) {
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));

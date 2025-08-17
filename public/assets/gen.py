@@ -174,8 +174,8 @@ def generate_card(number, shape_function=draw_heart, name = "", color = (200,0,0
     print(f"Card saved as '{filename}'")
 
 def generate_face_card(letter, shape_function=draw_heart, name="", color=(200,0,0,255)):
-
-    symbol_shift = (symbol_shift[0]+50, symbol_shift[1])
+    
+    local_symbol_shift = (symbol_shift[0]+50, symbol_shift[1])
     # Create transparent card
     img = Image.new("RGBA", (card_width, card_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -192,13 +192,13 @@ def generate_face_card(letter, shape_function=draw_heart, name="", color=(200,0,
 
     # Top-left letter and shape
     draw.text((40, 40), letter, font=font, fill=color)
-    shape_function(draw, *symbol_shift, 40)
+    shape_function(draw, *local_symbol_shift, 40)
 
     # Bottom-right letter and shape (rotated)
     temp = Image.new("RGBA", (card_width, card_height), (0,0,0,0))
     temp_draw = ImageDraw.Draw(temp)
     temp_draw.text((40, 40), letter, font=font, fill=color)
-    shape_function(temp_draw, *symbol_shift, 40)
+    shape_function(temp_draw, *local_symbol_shift, 40)
     rotated = temp.rotate(180)
     img.alpha_composite(rotated)
 

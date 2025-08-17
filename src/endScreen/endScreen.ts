@@ -84,7 +84,10 @@ export class EndScreen extends Container {
     await this.textureLoaded;
     this.sprite = new Sprite(this.texture);
     this.sprite.anchor.set(0.5);
+    this.sprite.scale.set(GameSettings.screen_width * 0.51 / this.sprite.width)
     this.x = GameSettings.get_mid_x();
     this.y = GameSettings.get_mid_y();
+    console.log(this.sprite.width / GameSettings.screen_width)
+    console.log(this.sprite.height / GameSettings.screen_height)
   }
 }
