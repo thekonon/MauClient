@@ -123,7 +123,7 @@ export class LoadingScreen extends Container {
   }
 
   public get_players_list(): string[] {
-    var listWithoutMainPlayer = this.connectedPlayers;
+    let listWithoutMainPlayer = this.connectedPlayers;
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
       (item) => item != this.getMainPlayer(),
     );

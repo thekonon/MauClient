@@ -29,7 +29,7 @@ async function testing(
   await new Promise((res) => setTimeout(res, 100));
   web_socket.start_game_action();
   await new Promise((res) => setTimeout(res, 100));
-  var message = JSON.parse(
+  let message = JSON.parse(
     '{"type":"START_PILE","card":{"type":"JACK","color":"DIAMONDS"}}',
   );
   web_socket.start_pile_action(message);
