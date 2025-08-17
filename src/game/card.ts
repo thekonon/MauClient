@@ -90,7 +90,7 @@ export class Card extends Container {
     this.rotation_angle = 0;
     this.animation_duration = 1;
 
-    this.play_card_action = (_: string, __: string, ___) => {
+    this.play_card_action = (_type: string, _value: string, _nextcard) => {
       console.log("Not defined");
     };
 
