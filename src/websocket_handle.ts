@@ -1,5 +1,51 @@
 import { Card } from "./game/card.ts";
 
+interface Move {
+  moveType: "PLAY";
+  card: {
+    color: string | undefined;
+    type: string | undefined;
+  };
+  nextColor?: string;
+}
+
+export interface ServerMessage {
+  messageType: "ACTION" | "ERROR" | string; // expand as needed
+  action?: GameAction; // present when messageType === "ACTION"
+  error?: string; // you can add more for ERROR, etc.
+}
+
+// The "inner" action payload
+export interface GameAction {
+  type:
+    | "PLAYERS"
+    | "REGISTER_PLAYER"
+    | "START_GAME"
+    | "START_PILE"
+    | "DRAW"
+    | "PLAY_CARD"
+    | "PLAYER_SHIFT"
+    | "HIDDEN_DRAW"
+    | "PLAYER_RANK"
+    | "WIN"
+    | "LOSE"
+    | "END_GAME"
+    | "REMOVE_PLAYER"
+    | string;
+
+  players?: string[];
+  playerDto?: { username: string };
+
+  card?: {
+    color: string;
+    type: string;
+  };
+
+  cards?: { color: string; type: string }[];
+
+  count?: number;
+  nextColor?: string;
+}
 export class WebSocketHandle {
   private readonly cardNameMap = new Map<string, string>([
     ["ACE", "A"],
@@ -145,7 +191,7 @@ export class WebSocketHandle {
     value: string,
     nextColor: string = "",
   ) {
-    const move: any = {
+    const move: Move = {
       moveType: "PLAY",
       card: {
         color: this.cardShortToFullMap.get(type),
@@ -194,79 +240,85 @@ export class WebSocketHandle {
     }
   }
 
-  private handleAction(message: any) {
-    switch (message.type) {
-      case "PLAYERS":
-        this.players_action(message);
-        break;
-      case "REGISTER_PLAYER":
-        this.register_player_action(message);
-        break;
-      case "START_GAME":
+  private handleAction(message: GameAction) {
+    const handlers: Record<string, (msg: GameAction) => void> = {
+      PLAYERS: (msg) => this.players_action(msg),
+      REGISTER_PLAYER: (msg) => this.register_player_action(msg),
+      START_GAME: (_) => {
         this.game_started = true;
         this.start_game_action();
-        break;
-      case "START_PILE":
-        if (this.game_started) {
-          this.start_pile_action(message);
-        } else {
-          console.error("Can not start pile when game is not started");
-        }
-        break;
-      case "DRAW":
-        if (this.game_started) {
-          this.drawCard(message);
-        } else {
-          console.error("Can not draw when game is not started");
-        }
-        break;
-      case "PLAY_CARD":
-        if (this.game_started) {
-          this.playCard(message);
-        } else {
-          console.error("Can not play card when game is not started");
-        }
-        break;
-      case "PLAYER_SHIFT":
-        this.shiftPlayer(message.playerDto.username);
-        break;
-      case "HIDDEN_DRAW":
+      },
+      START_PILE: (msg) => {
+        if (!this.game_started)
+          return console.error("Cannot start pile when game is not started");
+        this.start_pile_action(msg);
+      },
+      DRAW: (msg) => {
+        if (!this.game_started)
+          return console.error("Cannot draw when game is not started");
+        this.drawCard(msg);
+      },
+      PLAY_CARD: (msg) => {
+        if (!this.game_started)
+          return console.error("Cannot play card when game is not started");
+        this.playCard(msg);
+      },
+      PLAYER_SHIFT: (msg) => {
+        if (!msg.playerDto)
+          return console.error("Player DTO was not specified");
+        this.shiftPlayer(msg.playerDto.username);
+      },
+      HIDDEN_DRAW: (msg) => {
+        if (!msg.playerDto)
+          return console.error("Player DTO was not specified");
+        if (!msg.count) return console.error("Card count was not specified");
         console.log("Someone took card, but secretly! Psst");
-        this.hiddenDraw(message.playerDto.username, message.count);
-        break;
-      case "PLAYER_RANK":
-        console.log("PLayer won!");
-        break;
-      case "WIN":
+        this.hiddenDraw(msg.playerDto.username, msg.count);
+      },
+      PLAYER_RANK: () => console.log("Player won!"),
+      WIN: () => {
         console.log("You won");
         console.warn("Not implemented");
-        break;
-      case "LOSE":
+      },
+      LOSE: () => {
         console.log("You lost");
         console.warn("Not implemented");
-        break;
-      case "END_GAME":
+      },
+      END_GAME: () => {
         console.log("Game ended");
         console.warn("Not implemented");
-        break;
-      case "REMOVE_PLAYER":
+      },
+      REMOVE_PLAYER: () => {
         console.log("Removing player");
         console.warn("Not implemented");
-        break;
-      default:
-        console.log("Unknown command!:", message.type);
+      },
+    };
+
+    const handler = handlers[message.type];
+    if (handler) {
+      handler(message);
+    } else {
+      console.log("Unknown command!:", message.type);
     }
   }
 
-  public playCard(message: any) {
+  public playCard(message: GameAction) {
+    if (!message.playerDto) {
+      console.error("Player DTO was not specified");
+      return;
+    }
+    if (!message.card) {
+      console.error("Card info was not specified");
+      return;
+    }
+
     const card_info = message.card;
-    const playerDto = message.playerDto;
-    const nextColor = message.nextColor; // this field exists only sometimes, handle it
-    const chosenNextColor = nextColor
-      ? (this.cardNameMap.get(nextColor) ?? "")
+    const chosenNextColor = message.nextColor
+      ? (this.cardNameMap.get(message.nextColor) ?? "")
       : "";
+
     this.playCardAction(
-      playerDto.username,
+      message.playerDto.username,
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
       chosenNextColor,
@@ -277,17 +329,22 @@ export class WebSocketHandle {
     this.start_game();
   }
 
-  public register_player_action(message: any) {
+  public register_player_action(message: GameAction) {
+    if (!message.playerDto)
+      return console.error("Player DTO was not specified");
     const player = message.playerDto.username;
     this.add_player(player);
   }
 
-  public players_action(message: any) {
+  public players_action(message: GameAction) {
+    if (!message.players)
+      return console.error("Players field was not specified");
     const players = message.players;
     this.update_player_list(players);
   }
 
-  public async start_pile_action(message: any) {
+  public async start_pile_action(message: GameAction) {
+    if (!message.card) return console.error("Card was not specified");
     const card_info = message.card;
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
@@ -303,7 +360,8 @@ export class WebSocketHandle {
     this.start_pile(card);
   }
 
-  public async drawCard(message: any) {
+  public async drawCard(message: GameAction) {
+    if (!message.cards) return console.error("Cards was not specified");
     for (const card_info of message.cards) {
       const type = card_info.type;
       const color = card_info.color;
