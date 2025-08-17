@@ -1,4 +1,4 @@
-import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
+import { Application, Assets, Container, Sprite, TextStyle, Texture, Text } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 
 export class EndScreen extends Container {
@@ -7,30 +7,65 @@ export class EndScreen extends Container {
   texture!: Texture;
   textureLoaded?: Promise<unknown>;
 
+  winners: string[];
+
   constructor(app: Application) {
     super();
     this.draw();
     this.app = app;
+    this.winners = [];
   }
 
   public async show() {
-    console.log("Showing endScreen");
-    console.log("awainting endScreen");
     await this.textureLoaded;
-    console.log("awainting done endScreen");
+    console.log("adding sprite")
     this.addChild(this.sprite);
     this.app.stage.addChild(this);
+  }
+
+  public async setWinners(winners: string[]) {
+    await this.textureLoaded; // This ensures sprite is ready
+    this.winners = winners;
+    const positions = [
+        { x: -this.sprite.width * 0.075, y: -this.sprite.height * 0.58 },
+        { x: -this.sprite.width * 0.3,   y: -this.sprite.height * 0.25 },
+        { x: this.sprite.width * 0.15,   y: -this.sprite.height * 0.05 },
+    ];
+
+    // Only create texts for the number of winners
+    winners.forEach((winner, index) => {
+        if (index >= 3) return; // Limit to max 5
+        const pos = positions[index];
+        const text = createText(winner, pos.x, pos.y);
+        this.addChild(text);
+    });
+
+    function createText(playerName: string, x: number, y: number) {
+      const style = new TextStyle({
+        fontFamily: "Impact",
+        fontSize: 30,
+        fill: "#000000",
+      });
+
+      const text = new Text({
+        text: playerName,
+        style,
+      });
+
+      text.x = x;
+      text.y = y;
+      text.zIndex = 1;
+      return text;
+    }
   }
 
   private async draw() {
     this.textureLoaded = new Promise((resolve, reject) => {
       (async () => {
         try {
-          console.log("Trying to load texture");
           this.texture = await Assets.load(
             "assets/other/endScreen/winners.png",
           );
-          console.log("Loading finished");
           resolve(true);
         } catch (err) {
           console.log("loading failed");
@@ -39,7 +74,9 @@ export class EndScreen extends Container {
       })();
     });
     await this.textureLoaded;
-    console.log("Creating sprite");
     this.sprite = new Sprite(this.texture);
+    this.sprite.anchor.set(0.5);
+    this.x = GameSettings.get_mid_x();
+    this.y = GameSettings.get_mid_y();
   }
 }
