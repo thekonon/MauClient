@@ -23,7 +23,7 @@ export class Game extends Container {
   readyPlayers?: Promise<unknown>;
 
   constructor(app: Application) {
-    super()
+    super();
 
     this.app = app;
     // Create a player hand - place where user cards are stored
@@ -133,7 +133,7 @@ export class Game extends Container {
     console.log("Game: ", playerName, cardCount);
     await this.readyPlayers;
     this.otherPlayers.forEach((player) => {
-      console.log("looping", player.playerName)
+      console.log("looping", player.playerName);
       if (player.playerName === playerName) {
         console.log("PLayer with right name found");
         player.addCardCound(cardCount);
@@ -146,11 +146,11 @@ export class Game extends Container {
     this.app.stage.addChild(this);
   }
 
-  public hide(): void{
+  public hide(): void {
     this.app.stage.removeChild(this);
   }
 
-  private addAllChildren(): void{
+  private addAllChildren(): void {
     this.addChild(this.playerHand);
     this.addChild(this.deck!);
     this.addChild(this.pile);
@@ -158,5 +158,4 @@ export class Game extends Container {
       this.addChild(player);
     });
   }
-
 }
