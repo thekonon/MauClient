@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { Card } from "./card";
 import { Deck } from "./deck";
 import { PlayerHand } from "./playerHand";
@@ -6,7 +6,7 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 
-export class Game {
+export class Game extends Container {
   private app: Application;
   public startPileAction!: (card: Card) => void;
   public drawCardAction!: (card: Card) => void;
@@ -23,6 +23,8 @@ export class Game {
   readyPlayers?: Promise<unknown>;
 
   constructor(app: Application) {
+    super()
+
     this.app = app;
     // Create a player hand - place where user cards are stored
     this.playerHand = new PlayerHand();
@@ -141,14 +143,23 @@ export class Game {
       }
     });
   }
-
-  private show() {
+  public show() {
     // Add player hand and deck to app
-    this.app.stage.addChild(this.playerHand);
-    this.app.stage.addChild(this.deck!);
-    this.app.stage.addChild(this.pile);
+    this.addAllChildren();
+    this.app.stage.addChild(this);
+  }
+
+  public hide(): void{
+    this.app.stage.removeChild(this);
+  }
+
+  private addAllChildren(): void{
+    this.addChild(this.playerHand);
+    this.addChild(this.deck!);
+    this.addChild(this.pile);
     this.otherPlayers.forEach((player) => {
-      this.app.stage.addChild(player);
+      this.addChild(player);
     });
   }
+
 }
