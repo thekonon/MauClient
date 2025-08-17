@@ -54,17 +54,23 @@ export class Game {
 
   public register_players(playerNames: string[]) {
     console.log("GAME: register player");
-    this.readyPlayers = new Promise(async (resolve, _) => {
-      for (let index = 0; index < playerNames.length; index++) {
-        const playerName = playerNames[index];
-        const newPlayer = new AnotherPlayer(playerName);
-        await newPlayer.drawPlayer(); // ✅ Await properly
-        newPlayer.x = GameSettings.getOtherPlayerX(index);
-        newPlayer.y = GameSettings.getOtherPlayerY(index);
-        this.otherPlayers.push(newPlayer);
-      }
-      console.log("GAME: resolving register player");
-      resolve(true);
+    this.readyPlayers = new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          for (let index = 0; index < playerNames.length; index++) {
+            const playerName = playerNames[index];
+            const newPlayer = new AnotherPlayer(playerName);
+            await newPlayer.drawPlayer(); // ✅ Await properly
+            newPlayer.x = GameSettings.getOtherPlayerX(index);
+            newPlayer.y = GameSettings.getOtherPlayerY(index);
+            this.otherPlayers.push(newPlayer);
+          }
+          console.log("GAME: resolving register player");
+          resolve(true);
+        } catch (err) {
+          reject(err);
+        }
+      })();
     });
   }
 
@@ -75,7 +81,7 @@ export class Game {
     newColor: string = "",
   ) {
     // When there is request to play a card - find the right one and play it
-    var played_card: Card | null = null;
+    let played_card: Card | null = null;
     if (playerName == this.mainPlayer) {
       played_card = this.player_hand.play_card(type, value);
     } else {
