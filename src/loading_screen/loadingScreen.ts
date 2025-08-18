@@ -116,6 +116,11 @@ export class LoadingScreen extends Container {
     this.updateConnectedPlayers();
   }
 
+  public removePlayerFromList(player: string){
+    this.connectedPlayers = this.connectedPlayers.filter(p => p !== player);
+    this.updateConnectedPlayers()
+  }
+
   public updatePlayerList(playerList: string[]) {
     if (playerList.length > 5) {
       throw Error("This client supports maximum of 5 players");

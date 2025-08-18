@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, localUniformMSDFBit } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
 import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
@@ -104,6 +104,7 @@ async function testing(
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
   web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
+  web_socket.removePlayerAction = loading_screen.removePlayerFromList.bind(loading_screen);
 
   /* Game callbacks - server sends */
 
