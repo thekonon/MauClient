@@ -18,23 +18,23 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-  | "PLAYERS"
-  | "REGISTER_PLAYER"
-  | "START_GAME"
-  | "START_PILE"
-  | "DRAW"
-  | "PLAY_CARD"
-  | "PLAYER_SHIFT"
-  | "HIDDEN_DRAW"
-  | "PLAYER_RANK"
-  | "WIN"
-  | "LOSE"
-  | "END_GAME"
-  | "REMOVE_PLAYER"
-  | string;
+    | "PLAYERS"
+    | "REGISTER_PLAYER"
+    | "START_GAME"
+    | "START_PILE"
+    | "DRAW"
+    | "PLAY_CARD"
+    | "PLAYER_SHIFT"
+    | "HIDDEN_DRAW"
+    | "PLAYER_RANK"
+    | "WIN"
+    | "LOSE"
+    | "END_GAME"
+    | "REMOVE_PLAYER"
+    | string;
 
   players?: string[];
-  playerDto?: { username: string, playerId: string };
+  playerDto?: { username: string; playerId: string };
 
   card?: {
     color: string;
@@ -68,9 +68,12 @@ export class WebSocketHandle {
   );
 
   // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => { };
+  public drawCardAction: (card: Card) => void = (_: Card) => {};
   public update_player_list!: (player_list: string[]) => void;
   public add_player!: (player: string) => void;
+  public removePlayerAction: (player: string) => void = (_: string) => {
+    console.warn("removePlayerAction not implemented");
+  };
   public start_game!: () => void;
   public start_pile!: (card: Card) => void;
   public playCardAction!: (
@@ -98,9 +101,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void { }
-  public onClose(): void { }
-  public onError(_: Event): void { }
+  public onOpen(): void {}
+  public onClose(): void {}
+  public onError(_: Event): void {}
 
   // Game state
   game_started: boolean;
@@ -148,16 +151,16 @@ export class WebSocketHandle {
 
   public reconnect() {
     if (this.ip == "") {
-      alert("IP must be set first")
+      alert("IP must be set first");
       throw new Error("IP must be set first");
     }
     if (this.port == "") {
-      alert("PORT must be set first")
+      alert("PORT must be set first");
       throw new Error("PORT must be set first");
     }
-    let UUID = this.getUUID();
+    const UUID = this.getUUID();
     if (UUID === null) {
-      alert("No user UUID is saved")
+      alert("No user UUID is saved");
     }
     this.url = `ws://${this.ip}:${this.port}/game?playerId=${UUID}`;
   }
@@ -311,9 +314,12 @@ export class WebSocketHandle {
         this.gameEndAction();
         console.warn("Not implemented");
       },
-      REMOVE_PLAYER: () => {
+      REMOVE_PLAYER: (msg) => {
+        if (!msg.playerDto)
+          return console.error("Player DTO was not specified");
         console.log("Removing player");
         console.warn("Not implemented");
+        this.removePlayerAction(msg.playerDto.username);
       },
     };
 
@@ -356,7 +362,7 @@ export class WebSocketHandle {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
     if (message.playerDto.username === this.userName) {
-      this.saveUUID(message.playerDto.playerId)
+      this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
     this.add_player(player);
@@ -423,12 +429,11 @@ export class WebSocketHandle {
   }
 
   private getUUID(): string | null {
-    let uuid = localStorage.getItem("UUID");
+    const uuid = localStorage.getItem("UUID");
     if (!uuid) {
-      return null
-    }
-    else {
-      console.log("UUID restored!", uuid)
+      return null;
+    } else {
+      console.log("UUID restored!", uuid);
       return uuid;
     }
   }

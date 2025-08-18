@@ -24,7 +24,7 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
     '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
     '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true}}}',
-  ]
+  ];
   const midMsgs = [
     '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"bb","active":true},"count":4}}',
@@ -43,7 +43,7 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 100));
   }
-  return
+  return;
   for (const msgStr of startGameMsgs) {
     web_socket.onMessage(msgStr);
   }
@@ -94,11 +94,10 @@ async function testing(
     web_socket.createConnection();
   };
 
-  loading_screen.reconnectCommand = (ip: string,
-    port: string) => {
+  loading_screen.reconnectCommand = (ip: string, port: string) => {
     web_socket.setIPPort(ip, port);
     web_socket.reconnect();
-  }
+  };
 
   /* These are messages that goes from server */
   /* Loading screen callbacks - server sends */

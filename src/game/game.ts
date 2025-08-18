@@ -128,7 +128,7 @@ export class Game extends Container {
     await this.readyPlayers;
 
     // Find the target player
-    const player = this.otherPlayers.find(p => p.playerName === playerName);
+    const player = this.otherPlayers.find((p) => p.playerName === playerName);
     if (!player) return;
 
     // Update their card count
@@ -141,7 +141,7 @@ export class Game extends Container {
       card.position.x = GameSettings.get_deck_top_x();
       card.position.y = GameSettings.get_deck_top_y();
       card.zIndex = -1;
-      this.addChild(card)
+      this.addChild(card);
       cards.push(card);
     }
 
@@ -149,8 +149,10 @@ export class Game extends Container {
     for (const card of cards) {
       card.end_animation_point_x = player.x;
       card.end_animation_point_y = player.y;
-      card.play(1, -Math.PI*2, () => {this.removeChild(card)});
-      await new Promise(res => setTimeout(res, 100));
+      card.play(1, -Math.PI * 2, () => {
+        this.removeChild(card);
+      });
+      await new Promise((res) => setTimeout(res, 100));
     }
   }
   public show() {

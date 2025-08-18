@@ -10,7 +10,10 @@ export class LoadingScreen extends Container {
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
-  public reconnectCommand: (_:string, __: string) => void = (_:string, __: string) => {
+  public reconnectCommand: (_: string, __: string) => void = (
+    _: string,
+    __: string,
+  ) => {
     alert("Reconnect button not implement yet");
   };
 
@@ -149,7 +152,7 @@ export class LoadingScreen extends Container {
     this.on_register_player?.(playerName, ip, port);
   }
 
-  private reconnectPlayer(){
+  private reconnectPlayer() {
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const ip = IPInput.value.trim();
