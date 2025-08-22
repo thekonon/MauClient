@@ -43,7 +43,7 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 100));
   }
-  return;
+  // return;
   for (const msgStr of startGameMsgs) {
     web_socket.onMessage(msgStr);
   }

@@ -2,7 +2,7 @@ body,
 html {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Optional, to prevent scrollbars */
+  /*overflow: hidden; /* Optional, to prevent scrollbars */
 }
 
 canvas {
@@ -14,79 +14,128 @@ canvas {
 
 /* Your login form container */
 #loginMenu {
-  position: absolute;       /* absolute inside pixi-container */
+  position: absolute;
+  /* absolute inside pixi-container */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;              /* ensures it's above the canvas */
+  z-index: 1;
+  /* ensures it's above the canvas */
 }
 
-/* The rest is same */
 .container {
-  background-color: #d62f42; /* red card */
-  border-radius: 20px;
-  padding: 100px;
+  padding: 3%;
   text-align: center;
   width: 100%;
-  box-sizing: border-box;
   display: flex;
-  justify-content: space-between; /* pushes left + right apart */
+  justify-content: space-between;
   align-items: flex-start;
+
+  border-radius: 20px;
+  border: 3px black dashed;
+  background: linear-gradient(135deg, #ff0000, #870000);
+
+  animation: glowBorder 2s linear infinite;
+}
+
+@keyframes glowBorder {
+  0% { box-shadow: 0 0 1000px #ff0080, 0 0 50px #ff0080; }
+  50% { box-shadow: 0 0 1000px #00ffe0, 0 0 60px #00ffe0; }
+  100% { box-shadow: 0 0 1000px #ff0080, 0 0 50px #ff0080; }
 }
 
 .title {
-  font-size: 48px;
+  font-size: xx-large;
   font-weight: bold;
-  margin-bottom: 40px;
   font-family: Impact;
+  margin-bottom: 2%;
+
+  background: #cd041c;
+
+  background: linear-gradient(45deg, #ff0000, #0015f6);
+  background-size: 200% 200%;
+  border-radius: 10px;
+  border: 2px dashed black;
+  padding: 5%;
+  animation: gradientShift 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
 .form {
-  flex: 1;
-}
+  padding: 1%;
 
-.players {
-  flex: 1;
-  margin-left: 40px; /* add spacing */
+  /* border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid; */
 }
 
 .form-group {
-  margin: 15px 0;
+  margin: 1%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
   font-weight: bold;
+
+  /* border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid; */
+
+  gap: 1%;
+
+  /* flex: 0 3; */
 }
 
 .form-group label {
-  width: 120px;
+  width: 100%;
   text-align: right;
-  margin-right: 10px;
+  align-content: center;
+
+  /* border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid; */
 }
 
-.form-group input {
+.form-group input,
+select {
   padding: 8px;
   font-size: 16px;
-  width: 200px;
+  width: 100%;
+  border-radius: 10px;
 }
+
 
 .buttons {
   margin: 20px 0;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .btn {
-  background-color: #34a853;
+  background: linear-gradient(135deg, #34a853, #2c7a3f);
   color: white;
   padding: 10px 20px;
-  border: none;
-  margin: 5px;
   cursor: pointer;
   font-size: 16px;
-  border-radius: 4px;
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: black;
+  margin: 0.5%;
 }
 
 .btn:hover {
-  background-color: #2c8c47;
+  background: linear-gradient(135deg, #2c7a3f, #1e512d);
 }
 
 button:disabled,
@@ -95,18 +144,39 @@ button.disabled {
   cursor: not-allowed;
 }
 
-.connected-title {
+.players {
+  display: flex;
+  flex-direction: column;
+  padding: 1%;
+  gap: 1%;
+
+  border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+}
+
+.players-connected-title {
   font-weight: bold;
-  margin-top: 20px;
-  margin-bottom: 10px;
+
+  border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+
 }
 
 .players-box {
   background: white;
   border-radius: 6px;
-  padding: 20px;
+  /* margin: 100%; */
   text-align: left;
   font-style: italic;
   color: #555;
-  height: 500%;
+  padding: 5%;
+
+  border-radius: 10px;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
 }

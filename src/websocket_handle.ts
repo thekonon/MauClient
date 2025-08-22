@@ -163,6 +163,7 @@ export class WebSocketHandle {
       alert("No user UUID is saved");
     }
     this.url = `ws://${this.ip}:${this.port}/game?playerId=${UUID}`;
+    this.socket = this.createSocket();
   }
 
   private createSocket(): WebSocket {

@@ -43,32 +43,42 @@ export class LoadingScreen extends Container {
 
     uiContainer.innerHTML = `
     <div class="container">
-    <div class = "form">
-    <div class="title">MňauMňauGame</div>
-        <div class="form-group">
-          <label for="playerName">Player Name:</label>
-          <input type="text" id="playerName" name="playerName">
-        </div>
+      <div class = "form">
+        <div class="title">MňauMňauGame</div>
+          <div class="form-group">
+            <label for="playerName">Player Name:</label>
+            <input type="text" id="playerName" name="playerName">
+          </div>
 
-        <div class="form-group">
-          <label for="ip">IP:</label>
-          <input type="text" id="IP" name="ip" value="${window.location.hostname}">
-        </div>
+          <div class="form-group">
+            <label for="ip">IP:</label>
+            <input type="text" id="IP" name="ip" value="${window.location.hostname}">
+          </div>
 
-        <div class="form-group">
-          <label for="port">PORT:</label>
-          <input type="text" id="PORT" name="port" value="8080">
-        </div>
+          <div class="form-group">
+            <label for="port">PORT:</label>
+            <input type="text" id="PORT" name="port" value="8080">
+          </div>
 
-        <div class="buttons">
-          <button class="btn" id="connectButton">Connect to lobby!</button>
-          <button class="btn" id="reconnectButton">Try to reconnect!</button>
+          <div class="form-group">
+            <label for="port">Lobies:</label>
+            <select name="cars" id="cars">
+              <option value="volvo">SELECT</option>
+              <option value="saab">Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
+          </div>
+
+          <div class="buttons">
+            <button class="btn" id="connectButton">Connect to lobby!</button>
+            <button class="btn" id="reconnectButton">Try to reconnect!</button>
+          </div>
         </div>
-      </div>
-      <div class = "players">
-        <div class="connected-title">Connected Players:</div>
-        <div class="players-box" id="connectedPlayersList">
-          No players connected yet.
+        <div class = "players">
+          <div class="players-connected-title">Connected Players:</div>
+          <div class="players-box" id="connectedPlayersList">
+            No players connected yet.
         </div>
       </div>
     </div>
