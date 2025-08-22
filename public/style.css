@@ -39,9 +39,21 @@ canvas {
 }
 
 @keyframes glowBorder {
-  0% { box-shadow: 0 0 1000px #ff0080, 0 0 50px #ff0080; }
-  50% { box-shadow: 0 0 1000px #00ffe0, 0 0 60px #00ffe0; }
-  100% { box-shadow: 0 0 1000px #ff0080, 0 0 50px #ff0080; }
+  0% {
+    box-shadow:
+      0 0 1000px #ff0080,
+      0 0 50px #ff0080;
+  }
+  50% {
+    box-shadow:
+      0 0 1000px #00ffe0,
+      0 0 60px #00ffe0;
+  }
+  100% {
+    box-shadow:
+      0 0 1000px #ff0080,
+      0 0 50px #ff0080;
+  }
 }
 
 .title {
@@ -114,7 +126,6 @@ select {
   border-radius: 10px;
 }
 
-
 .buttons {
   margin: 20px 0;
   display: flex;
@@ -163,7 +174,6 @@ button.disabled {
   border-color: black;
   border-width: 2px;
   border-style: solid;
-
 }
 
 .players-box {

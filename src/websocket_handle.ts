@@ -35,7 +35,7 @@ export interface GameAction {
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
-  expireAtMs?: string;
+  expireAtMs?: number;
   playerRank?: string[];
 
   card?: {
@@ -290,9 +290,9 @@ export class WebSocketHandle {
       PLAYER_SHIFT: (msg) => {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
-        if (!msg.expireAtMs)
+        if (!msg.expireAtMs || msg.expireAtMs === -1)
           return console.error("Report this to Pepa, i got no expiration time");
-        this.shiftPlayer(msg.playerDto.username);
+        this.shiftPlayer(msg.playerDto.username, msg.expireAtMs);
       },
       HIDDEN_DRAW: (msg) => {
         if (!msg.playerDto)
@@ -304,7 +304,7 @@ export class WebSocketHandle {
       PLAYER_RANK: (msg) => {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
-        console.log("One of the playes ended")
+        console.log("One of the playes ended");
       },
       WIN: () => {
         console.log("You won");

@@ -1,120 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MňauMňauGame</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #2b9abf; /* blue background */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MňauMňauGame</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #2b9abf; /* blue background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
 
-    .container {
-      background-color: #d62f42; /* red card */
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      width: 600px;
-      box-sizing: border-box;
-    }
+      .container {
+        background-color: #d62f42; /* red card */
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        width: 600px;
+        box-sizing: border-box;
+      }
 
-    .title {
-      font-size: 48px;
-      font-weight: bold;
-      
-      margin-bottom: 40px;
-    }
+      .title {
+        font-size: 48px;
+        font-weight: bold;
 
-    .form-group {
-      margin: 15px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-    }
+        margin-bottom: 40px;
+      }
 
-    .form-group label {
-      width: 120px;
-      text-align: right;
-      margin-right: 10px;
-    }
+      .form-group {
+        margin: 15px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+      }
 
-    .form-group input {
-      padding: 8px;
-      font-size: 16px;
-      width: 200px;
-    }
+      .form-group label {
+        width: 120px;
+        text-align: right;
+        margin-right: 10px;
+      }
 
-    .buttons {
-      margin: 20px 0;
-    }
+      .form-group input {
+        padding: 8px;
+        font-size: 16px;
+        width: 200px;
+      }
 
-    .btn {
-      background-color: #34a853;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      margin: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 4px;
-    }
+      .buttons {
+        margin: 20px 0;
+      }
 
-    .btn:hover {
-      background-color: #2c8c47;
-    }
+      .btn {
+        background-color: #34a853;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        margin: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 4px;
+      }
 
-    .connected-title {
-      font-weight: bold;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
+      .btn:hover {
+        background-color: #2c8c47;
+      }
 
-    .players-box {
-      background: white;
-      border-radius: 6px;
-      padding: 20px;
-      text-align: left;
-      font-style: italic;
-      color: #555;
-      min-height: 60px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="title">MňauMňauGame</div>
+      .connected-title {
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
 
-    <div class="form-group">
-      <label for="playerName">Player Name:</label>
-      <input type="text" id="playerName" name="playerName">
+      .players-box {
+        background: white;
+        border-radius: 6px;
+        padding: 20px;
+        text-align: left;
+        font-style: italic;
+        color: #555;
+        min-height: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">MňauMňauGame</div>
+
+      <div class="form-group">
+        <label for="playerName">Player Name:</label>
+        <input type="text" id="playerName" name="playerName" />
+      </div>
+
+      <div class="form-group">
+        <label for="ip">IP:</label>
+        <input type="text" id="ip" name="ip" value="localhost" />
+      </div>
+
+      <div class="form-group">
+        <label for="port">PORT:</label>
+        <input type="text" id="port" name="port" value="8080" />
+      </div>
+
+      <div class="buttons">
+        <button class="btn">Connect to lobby!</button>
+        <button class="btn">Try to reconnect!</button>
+      </div>
+
+      <div class="connected-title">Connected Players:</div>
+      <div class="players-box">No players connected yet.</div>
     </div>
-
-    <div class="form-group">
-      <label for="ip">IP:</label>
-      <input type="text" id="ip" name="ip" value="localhost">
-    </div>
-
-    <div class="form-group">
-      <label for="port">PORT:</label>
-      <input type="text" id="port" name="port" value="8080">
-    </div>
-
-    <div class="buttons">
-      <button class="btn">Connect to lobby!</button>
-      <button class="btn">Try to reconnect!</button>
-    </div>
-
-    <div class="connected-title">Connected Players:</div>
-    <div class="players-box">
-      No players connected yet.
-    </div>
-  </div>
-</body>
+  </body>
 </html>
