@@ -21,6 +21,7 @@ export class Game extends Container {
   /* Info about players */
   mainPlayer: string;
   readyPlayers?: Promise<unknown>;
+  intervalId?: number;
 
   constructor(app: Application) {
     super();
@@ -103,12 +104,30 @@ export class Game extends Container {
     }
   }
 
-  public async shiftPlayerAction(playerName: string) {
+  public async shiftPlayerAction(playerName: string, expireAtMs: number) {
     if (this.readyPlayers === undefined) {
       console.error("Report this bug to Pepa thanks");
       return;
     }
     await this.readyPlayers;
+
+    // Get current timestamp in milliseconds
+    // Periodic task every 0.1s
+    if (this.intervalId !== undefined) {
+      clearInterval(this.intervalId);
+    }
+    this.intervalId = setInterval(() => {
+      const remainingTime: string = this.expires(expireAtMs);
+
+      this.playerHand.updateRemainingTime(remainingTime);
+      // Stop interval when time is up
+      if (Date.now() >= expireAtMs) {
+        clearInterval(this.intervalId);
+        console.log("Time expired!");
+      }
+    }, 100); // 100 ms = 0.1s
+
+
     this.playerHand.updateBackgroundColor();
     this.otherPlayers.forEach((player) => {
       player.clearActivationAura();
@@ -123,6 +142,8 @@ export class Game extends Container {
       });
     }
   }
+
+
 
   public async hiddenDrawAction(playerName: string, cardCount: number) {
     await this.readyPlayers;
@@ -163,6 +184,22 @@ export class Game extends Container {
 
   public hide(): void {
     this.app.stage.removeChild(this);
+  }
+
+  private expires(expireAtMs: number) {
+    const now = Date.now();
+    let remainingMs = expireAtMs - now;
+
+    // Make sure it doesn't go negative
+    remainingMs = remainingMs > 0 ? remainingMs : 0;
+
+    // Convert to minutes, seconds, milliseconds
+    const minutes = Math.floor(remainingMs / 1000 / 60);
+    const seconds = Math.floor((remainingMs / 1000) % 60);
+    const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
+
+    // Format as mm:ss:ms
+    return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
   }
 
   private addAllChildren(): void {

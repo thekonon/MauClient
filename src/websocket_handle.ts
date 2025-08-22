@@ -30,8 +30,7 @@ export interface GameAction {
     | "WIN"
     | "LOSE"
     | "END_GAME"
-    | "REMOVE_PLAYER"
-    | string;
+    | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -84,7 +83,7 @@ export class WebSocketHandle {
     value: string,
     newColor: string,
   ) => Promise<void>;
-  public shiftPlayerAction: (userName: string) => void = (_) => {
+  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (_, __) => {
     console.warn("ShiftPlayerAction not defined in WS");
   };
   public hiddenDrawAction: (userName: string, cardCount: number) => void = (
@@ -424,8 +423,8 @@ export class WebSocketHandle {
     }
   }
 
-  private shiftPlayer(activePlayerName: string) {
-    this.shiftPlayerAction(activePlayerName);
+  private shiftPlayer(activePlayerName: string, expireAtMs: number) {
+    this.shiftPlayerAction(activePlayerName, expireAtMs);
   }
 
   private hiddenDraw(playerName: string, count: number) {
