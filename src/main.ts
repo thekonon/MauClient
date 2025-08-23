@@ -61,12 +61,6 @@ async function testing(
   // Create a new application
   const app = new Application();
 
-  // Add CSS
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.type = "text/css";
-  link.href = "style.css";
-
   // Initialize the application
   await app.init({ background: "#1099bb", resizeTo: window });
 
@@ -75,10 +69,11 @@ async function testing(
 
   // Create file with all  the graphics settings
   GameSettings.setScreenDimensions(app.screen.height, app.screen.width);
+  // document.getElementById("loginMenu")!.style.display = "none";
 
   // Create loading screen - user is set here
   const loading_screen = new LoadingScreen(app);
-  loading_screen.show();
+  // loading_screen.show();
 
   // Websocket with
   const web_socket = new WebSocketHandle();

@@ -1,0 +1,74 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  /*overflow: hidden; /* Optional, to prevent scrollbars */
+}
+
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Your login form container */
+#loginMenu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.login-menu {
+  padding: 1em;
+  /*Debug*/
+  border: 2px black solid;
+}
+
+.container {
+  display: flex;
+  /*Debug*/
+  border: 2px black solid;
+}
+
+/* Login form */
+.form {
+  display: flex;
+  flex-direction: column;
+
+  width: fit-content;       /* form grows as wide as needed */
+  box-sizing: border-box;
+
+  border: 2px black solid;
+}
+
+.form .title{
+  border: 2px black solid;
+}
+
+.form .form-group{
+  display: flex;
+  justify-content: center;
+
+  border: 2px black solid;
+}
+
+.form .form-group label{
+  padding: 1em;
+  white-space: nowrap;
+  flex: 1 0 0;
+  border: 2px black solid;
+}
+
+.form .form-group input,
+.form .form-group select{
+  flex: 4 0 0;
+  border: 2px black solid;
+}
+
+/* Display connected players */
+.players {
+  border: 2px black solid;
+}
