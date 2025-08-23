@@ -23,52 +23,152 @@ canvas {
 
 .login-menu {
   padding: 1em;
-  /*Debug*/
-  border: 2px black solid;
 }
 
 .container {
   display: flex;
-  /*Debug*/
-  border: 2px black solid;
-}
-
-/* Login form */
-.form {
-  display: flex;
-  flex-direction: column;
-
-  width: fit-content;       /* form grows as wide as needed */
-  box-sizing: border-box;
-
-  border: 2px black solid;
-}
-
-.form .title{
-  border: 2px black solid;
-}
-
-.form .form-group{
-  display: flex;
   justify-content: center;
+  width: fit-content;
 
-  border: 2px black solid;
+  background: linear-gradient(135deg, #de3249, #a53838);
+  border-radius: 1em;
+  border-top: 0.3em solid black;
+  padding: 1em;
+}
+.form {
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+
+  column-gap: 0.5rem;
+  row-gap: 0;
+  min-width: max-content;
+
+  /* border: 2px black solid; */
 }
 
-.form .form-group label{
-  padding: 1em;
+.form .title {
+  grid-column: 1 / -1;
+  text-align: center;
   white-space: nowrap;
-  flex: 1 0 0;
-  border: 2px black solid;
+
+  font-size: 6rem;
+  font-family: Impact;
+  background: linear-gradient(120deg, #921b2d, #c13247, #32c143);
+  background-size: 300% 100%;   /* make it wider than element */
+  border-radius: .6em;
+  padding: .17em;
+  margin: 0.15em;
+
+  border-top: 0.06em solid black;
+
+  /* animation */
+  animation: gradientMove 5s linear infinite;
+}
+
+@keyframes gradientMove {
+  0%,100% {
+    background-position: 0% 50%;
+    border-radius: 0em;
+  }
+  50% {
+    background-position: 100% 50%;
+    border-radius: 0.5em;
+  }
+}
+
+.form .form-group {
+  display: contents;
+}
+
+.form .form-group label {
+  white-space: nowrap;
+  text-align: right;
+
+  font-size: 1.5rem;
+  font-family: Impact;
+  font-weight: bold;
+  font-style: normal;
+  
 }
 
 .form .form-group input,
-.form .form-group select{
-  flex: 4 0 0;
+.form .form-group select {
+  min-width: 10em;
+  border: 1px solid black;
+} 
+
+input.max-reached {
+  border-color: red;
+  background-color: #ff0000;
+}
+
+.form .form-group input:focus,
+.form .form-group select:focus {
+  border: 3px solid red; /* reasonable thickness */
+  outline: none;         /* remove default browser outline */
+  box-shadow: 0 0 8px rgba(0, 255, 34, 0.5); /* glowing effect */
+}
+/* Buttons spanning both columns */
+.form .buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-around;
+
   border: 2px black solid;
 }
 
-/* Display connected players */
-.players {
+.form .buttons .btn {
+  font-size: 1rem;
+
+  border: 0.2em solid red;
+  border-radius: 1.5em;
+
+
+  width:100%;
+  padding: 1em;
+  margin: 0.3em;
+}
+
+.container .players {
+  display: flex;
+  flex-direction: column;
+
   border: 2px black solid;
+}
+
+.container .players .players-connected-title {
+  border: 2px black solid;
+}
+
+.container .players .players-box {
+  flex: 1 0 0;
+  padding: 0.2em;
+  font-size: 1rem;
+  min-width: 15em;
+  background-color: aliceblue;
+
+  border: 2px black solid;
+  /* debug */
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 5px solid transparent;
+  /* empty border */
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .form .title {
+    font-size: 3em;
+  }
+}
+
+@media (min-width: 1200px) {
+  .form .title {
+    font-size: 7em;
+  }
 }
