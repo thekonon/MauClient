@@ -208,7 +208,7 @@ input.max-reached {
   0%,
   100% {
     background-position: 0% 50%;
-    border-radius: 0em;
+    border-radius: 0.1em;
   }
 
   50% {
