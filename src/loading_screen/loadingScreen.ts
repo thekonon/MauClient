@@ -1,9 +1,4 @@
-import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
-import { GameSettings } from "../gameSettings";
-
-export class LoadingScreen extends Container {
-  app: Application;
-
+export class LoadingScreen {
   mainPlayer: string;
   connectedPlayers: string[];
 
@@ -17,74 +12,46 @@ export class LoadingScreen extends Container {
     alert("Reconnect button not implement yet");
   };
 
-  constructor(app: Application) {
-    super();
-    this.app = app;
+  constructor() {
     this.mainPlayer = "";
     this.connectedPlayers = [];
+    this.addEvents()
   }
 
   public show() {
-    this.app.stage.addChild(this);
-    this.draw_loading_screen();
+    this.createFallingCards(30);
+    const loginMenu = document.getElementById("loginMenu");
+    if (loginMenu) {
+      loginMenu.style.display = "block";
+    }
     this.updateConnectedPlayers();
   }
 
   public hide() {
-    document.getElementById("loginMenu")?.remove();
-    this.app.stage.removeChild(this);
+    this.removeFallingCards();
+    const loginMenu = document.getElementById("loginMenu");
+    if (loginMenu) {
+      loginMenu.style.display = "none";
+    }
   }
 
-  public draw_loading_screen() {
-    // Form styled to match PIXI background
-    const uiContainer = document.createElement("div");
-    uiContainer.id = "loginMenu";
-    uiContainer.classList.add("login-menu");
+  public addEvents() {
+    const input = document.getElementById("playerName") as HTMLInputElement | null;
+    const ip = document.getElementById("IP") as HTMLInputElement | null;
 
-    uiContainer.innerHTML = `
-    <div class="container">
-      <div class = "form">
-        <div class="title">MňauMňauGame</div>
-          <div class="form-group">
-            <label for="playerName">Player Name:</label>
-            <input type="text" id="playerName" name="playerName">
-          </div>
-
-          <div class="form-group">
-            <label for="ip">IP:</label>
-            <input type="text" id="IP" name="ip" value="${window.location.hostname}">
-          </div>
-
-          <div class="form-group">
-            <label for="port">PORT:</label>
-            <input type="text" id="PORT" name="port" value="8080">
-          </div>
-
-          <div class="form-group">
-            <label for="port">Lobies:</label>
-            <select name="cars" id="cars">
-              <option value="volvo">SELECT</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
-            </select>
-          </div>
-
-          <div class="buttons">
-            <button class="btn" id="connectButton">Connect to lobby!</button>
-            <button class="btn" id="reconnectButton">Try to reconnect!</button>
-          </div>
-        </div>
-        <div class = "players">
-          <div class="players-connected-title">Connected Players:</div>
-          <div class="players-box" id="connectedPlayersList">
-            No players connected yet.
-        </div>
-      </div>
-    </div>
-        `;
-    document.body.appendChild(uiContainer);
-
+    if (input) {
+      input.addEventListener("input", () => {
+        if (input.value.length >= input.maxLength) {
+          console.log("Max reached")
+          input.classList.add("max-reached");
+        } else {
+          input.classList.remove("max-reached");
+        }
+      });
+    }
+    if (ip) {
+      ip.value = window.location.hostname; // now works
+    }
     const connectButton = document.getElementById(
       "connectButton",
     ) as HTMLButtonElement;
@@ -225,5 +192,38 @@ export class LoadingScreen extends Container {
       connectButton.disabled = true;
       connectButton.classList.add("disabled"); // so CSS can style it
     }
+  }
+
+  private createFallingCards(count: number) {
+    for (let i = 0; i < count; i++) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      // Random size
+      const width = Math.random() * 40 + 30; // 30-70px
+      const height = width * 1.4; // typical card ratio
+      card.style.width = `${width}px`;
+      card.style.height = `${height}px`;
+
+      // Random horizontal position
+      card.style.left = `${Math.random() * 100}vw`;
+
+      // Random color (optional)
+      const colors = ['#fff', '#f5f5dc', '#f0e68c', '#ffe4e1'];
+      card.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+      // Random animation duration and delay
+      const duration = Math.random() * 5 + 4; // 4-9s
+      const delay = Math.random() * 5; // 0-5s
+      card.style.animation = `fall ${duration}s linear infinite`;
+      card.style.animationDelay = `${delay}s`;
+
+      document.body.appendChild(card);
+    }
+  }
+
+  private removeFallingCards() {
+    const cards = document.querySelectorAll('.card'); // find all elements with class 'card'
+    cards.forEach(card => card.remove()); // remove each element
   }
 }

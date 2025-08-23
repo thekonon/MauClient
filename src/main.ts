@@ -58,24 +58,9 @@ async function testing(
 }
 
 (async () => {
-  // Create a new application
-  const app = new Application();
 
-  // Initialize the application
-  await app.init({ background: "#1099bb", resizeTo: window });
-
-  // Append the application canvas to the document body
-  document.getElementById("pixi-container")!.appendChild(app.canvas);
-
-  // Create file with all  the graphics settings
-  GameSettings.setScreenDimensions(app.screen.height, app.screen.width);
-  // document.getElementById("loginMenu")!.style.display = "none";
-
-  // Create loading screen - user is set here
-  const loading_screen = new LoadingScreen(app);
-  // loading_screen.show();
-
-  // Websocket with
+  const loading_screen = new LoadingScreen();
+  loading_screen.show()
   const web_socket = new WebSocketHandle();
 
   // Create websocket connection after providing a name under which is user connected to WS
@@ -105,6 +90,10 @@ async function testing(
   /* Game callbacks - server sends */
 
   // Create a game instance
+  const app = new Application();
+  await app.init({ background: "#1099bb", resizeTo: window });
+  document.getElementById("pixi-container")!.appendChild(app.canvas);
+  GameSettings.setScreenDimensions(app.screen.height, app.screen.width);
   const game = new Game(app);
 
   // Create a endScreen instance
