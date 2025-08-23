@@ -30,11 +30,12 @@ export interface GameAction {
     | "WIN"
     | "LOSE"
     | "END_GAME"
-    | "REMOVE_PLAYER"
-    | string;
+    | "REMOVE_PLAYER";
 
   players?: string[];
-  playerDto?: { username: string };
+  playerDto?: { username: string; playerId: string };
+  expireAtMs?: number;
+  playerRank?: string[];
 
   card?: {
     color: string;
@@ -71,6 +72,9 @@ export class WebSocketHandle {
   public drawCardAction: (card: Card) => void = (_: Card) => {};
   public update_player_list!: (player_list: string[]) => void;
   public add_player!: (player: string) => void;
+  public removePlayerAction: (player: string) => void = (_: string) => {
+    console.warn("removePlayerAction not implemented");
+  };
   public start_game!: () => void;
   public start_pile!: (card: Card) => void;
   public playCardAction!: (
@@ -79,7 +83,7 @@ export class WebSocketHandle {
     value: string,
     newColor: string,
   ) => Promise<void>;
-  public shiftPlayerAction: (userName: string) => void = (_) => {
+  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (_, __) => {
     console.warn("ShiftPlayerAction not defined in WS");
   };
   public hiddenDrawAction: (userName: string, cardCount: number) => void = (
@@ -88,8 +92,12 @@ export class WebSocketHandle {
   ) => {
     console.warn("hiddenDrawAction not defined in WS");
   };
-  public gameEndAction: () => void = () => { console.warn("gameEndAction not implemented yet")}
-  public rankPlayerAction: (_: string[]) => void = (_:string[]) => { console.warn("rankPlayerAction not implemented yet")}
+  public gameEndAction: () => void = () => {
+    console.warn("gameEndAction not implemented yet");
+  };
+  public rankPlayerAction: (_: string[]) => void = (_: string[]) => {
+    console.warn("rankPlayerAction not implemented yet");
+  };
   public ip: string;
   public port: string;
 
@@ -133,12 +141,29 @@ export class WebSocketHandle {
       throw new Error("UserName must be set first");
     }
     if (this.ip == "") {
-      throw new Error("UserName must be set first");
+      throw new Error("IP must be set first");
     }
     if (this.port == "") {
-      throw new Error("UserName must be set first");
+      throw new Error("Port must be set first");
     }
     this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
+    this.socket = this.createSocket();
+  }
+
+  public reconnect() {
+    if (this.ip == "") {
+      alert("IP must be set first");
+      throw new Error("IP must be set first");
+    }
+    if (this.port == "") {
+      alert("PORT must be set first");
+      throw new Error("PORT must be set first");
+    }
+    const UUID = this.getUUID();
+    if (UUID === null) {
+      alert("No user UUID is saved");
+    }
+    this.url = `ws://${this.ip}:${this.port}/game?playerId=${UUID}`;
     this.socket = this.createSocket();
   }
 
@@ -264,7 +289,9 @@ export class WebSocketHandle {
       PLAYER_SHIFT: (msg) => {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
-        this.shiftPlayer(msg.playerDto.username);
+        if (!msg.expireAtMs || msg.expireAtMs === -1)
+          return console.error("Report this to Pepa, i got no expiration time");
+        this.shiftPlayer(msg.playerDto.username, msg.expireAtMs);
       },
       HIDDEN_DRAW: (msg) => {
         if (!msg.playerDto)
@@ -276,7 +303,7 @@ export class WebSocketHandle {
       PLAYER_RANK: (msg) => {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
-        this.rankPlayerAction(msg.players);
+        console.log("One of the playes ended");
       },
       WIN: () => {
         console.log("You won");
@@ -286,14 +313,20 @@ export class WebSocketHandle {
         console.log("You lost");
         console.warn("Not implemented");
       },
-      END_GAME: () => {
+      END_GAME: (msg) => {
+        if (!msg.playerRank)
+          return console.error("Players was not specified in RANK action");
         console.log("Game ended");
-        this.gameEndAction()
+        this.rankPlayerAction(msg.playerRank);
+        this.gameEndAction();
         console.warn("Not implemented");
       },
-      REMOVE_PLAYER: () => {
+      REMOVE_PLAYER: (msg) => {
+        if (!msg.playerDto)
+          return console.error("Player DTO was not specified");
         console.log("Removing player");
         console.warn("Not implemented");
+        this.removePlayerAction(msg.playerDto.username);
       },
     };
 
@@ -335,6 +368,9 @@ export class WebSocketHandle {
   public register_player_action(message: GameAction) {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
+    if (message.playerDto.username === this.userName) {
+      this.saveUUID(message.playerDto.playerId);
+    }
     const player = message.playerDto.username;
     this.add_player(player);
   }
@@ -353,6 +389,7 @@ export class WebSocketHandle {
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
+      "pythonGen",
     );
 
     card.end_animation_point_x = card.position.x;
@@ -373,6 +410,7 @@ export class WebSocketHandle {
       const card = await Card.create(
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
+        "pythonGen",
       );
       card.playCardCommand = (
         type: string,
@@ -385,28 +423,25 @@ export class WebSocketHandle {
     }
   }
 
-  private shiftPlayer(activePlayerName: string) {
-    this.shiftPlayerAction(activePlayerName);
+  private shiftPlayer(activePlayerName: string, expireAtMs: number) {
+    this.shiftPlayerAction(activePlayerName, expireAtMs);
   }
 
   private hiddenDraw(playerName: string, count: number) {
     this.hiddenDrawAction(playerName, count);
   }
 
-  private setUUID(uuid = "urmomgayUUID") {
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + 7); // 7 days from now
-    document.cookie = `uuid=${uuid}; expires=${expirationDate.toUTCString()}; path=/`;
+  private saveUUID(uuid: string) {
+    localStorage.setItem("UUID", uuid);
   }
 
   private getUUID(): string | null {
-    const cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-      const [key, value] = cookie.trim().split("=");
-      if (key === "uuid") {
-        return decodeURIComponent(value);
-      }
+    const uuid = localStorage.getItem("UUID");
+    if (!uuid) {
+      return null;
+    } else {
+      console.log("UUID restored!", uuid);
+      return uuid;
     }
-    return null;
   }
 }

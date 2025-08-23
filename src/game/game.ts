@@ -21,6 +21,7 @@ export class Game extends Container {
   /* Info about players */
   mainPlayer: string;
   readyPlayers?: Promise<unknown>;
+  intervalId?: number;
 
   constructor(app: Application) {
     super();
@@ -44,7 +45,6 @@ export class Game extends Container {
       console.error("Report this bug to Pepa thanks");
       return;
     }
-    console.log("GAME: startGame awaing");
     await this.readyPlayers;
     this.deck = await Deck.create();
     this.deck.deck_clicked_action = this.drawCardCommand.bind(this);
@@ -53,7 +53,6 @@ export class Game extends Container {
   }
 
   public register_players(playerNames: string[]) {
-    console.log("GAME: register player");
     this.readyPlayers = new Promise((resolve, reject) => {
       (async () => {
         try {
@@ -65,7 +64,6 @@ export class Game extends Container {
             newPlayer.y = GameSettings.getOtherPlayerY(index);
             this.otherPlayers.push(newPlayer);
           }
-          console.log("GAME: resolving register player");
           resolve(true);
         } catch (err) {
           reject(err);
@@ -85,11 +83,11 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value);
+      played_card = await Card.create(type, value, "pythonGen");
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
           if (played_card) player.addChild(played_card);
-          player.addCardCound(-1);
+          player.addCardCount(-1);
         }
       });
     }
@@ -103,17 +101,33 @@ export class Game extends Container {
     // If previous card was queen, display new color
     if (played_card?.value == "Q") {
       this.pile.displayNextColor(newColor);
-      console.log("Next color is: ", newColor);
     }
   }
 
-  public async shiftPlayerAction(playerName: string) {
-    console.log("GAME: shiftPlayerAction");
+  public async shiftPlayerAction(playerName: string, expireAtMs: number) {
     if (this.readyPlayers === undefined) {
       console.error("Report this bug to Pepa thanks");
       return;
     }
     await this.readyPlayers;
+
+    // Get current timestamp in milliseconds
+    // Periodic task every 0.1s
+    if (this.intervalId !== undefined) {
+      clearInterval(this.intervalId);
+    }
+    this.intervalId = setInterval(() => {
+      const remainingTime: string = this.expires(expireAtMs);
+
+      this.playerHand.updateRemainingTime(remainingTime);
+      // Stop interval when time is up
+      if (Date.now() >= expireAtMs) {
+        clearInterval(this.intervalId);
+        console.log("Time expired!");
+      }
+    }, 100); // 100 ms = 0.1s
+
+
     this.playerHand.updateBackgroundColor();
     this.otherPlayers.forEach((player) => {
       player.clearActivationAura();
@@ -129,16 +143,38 @@ export class Game extends Container {
     }
   }
 
+
+
   public async hiddenDrawAction(playerName: string, cardCount: number) {
-    console.log("Game: ", playerName, cardCount);
     await this.readyPlayers;
-    this.otherPlayers.forEach((player) => {
-      console.log("looping", player.playerName);
-      if (player.playerName === playerName) {
-        console.log("PLayer with right name found");
-        player.addCardCound(cardCount);
-      }
-    });
+
+    // Find the target player
+    const player = this.otherPlayers.find((p) => p.playerName === playerName);
+    if (!player) return;
+
+    // Update their card count
+    player.addCardCount(cardCount);
+
+    // Create cards
+    const cards: Card[] = [];
+    for (let i = 0; i < cardCount; i++) {
+      const card = await Card.create("", "back", "pythonGen");
+      card.position.x = GameSettings.get_deck_top_x();
+      card.position.y = GameSettings.get_deck_top_y();
+      card.zIndex = -1;
+      this.addChild(card);
+      cards.push(card);
+    }
+
+    // Animate cards to player
+    for (const card of cards) {
+      card.end_animation_point_x = player.x;
+      card.end_animation_point_y = player.y;
+      card.play(1, -Math.PI * 2, () => {
+        this.removeChild(card);
+      });
+      await new Promise((res) => setTimeout(res, 100));
+    }
   }
   public show() {
     // Add player hand and deck to app
@@ -148,6 +184,22 @@ export class Game extends Container {
 
   public hide(): void {
     this.app.stage.removeChild(this);
+  }
+
+  private expires(expireAtMs: number) {
+    const now = Date.now();
+    let remainingMs = expireAtMs - now;
+
+    // Make sure it doesn't go negative
+    remainingMs = remainingMs > 0 ? remainingMs : 0;
+
+    // Convert to minutes, seconds, milliseconds
+    const minutes = Math.floor(remainingMs / 1000 / 60);
+    const seconds = Math.floor((remainingMs / 1000) % 60);
+    const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
+
+    // Format as mm:ss:ms
+    return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
   }
 
   private addAllChildren(): void {

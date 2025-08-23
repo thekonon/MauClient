@@ -1,4 +1,12 @@
-import { Application, Assets, Container, Sprite, TextStyle, Texture, Text } from "pixi.js";
+import {
+  Application,
+  Assets,
+  Container,
+  Sprite,
+  TextStyle,
+  Texture,
+  Text,
+} from "pixi.js";
 import { GameSettings } from "../gameSettings";
 
 export class EndScreen extends Container {
@@ -18,7 +26,7 @@ export class EndScreen extends Container {
 
   public async show() {
     await this.textureLoaded;
-    console.log("adding sprite")
+    console.log("adding sprite");
     this.addChild(this.sprite);
     this.app.stage.addChild(this);
   }
@@ -27,17 +35,17 @@ export class EndScreen extends Container {
     await this.textureLoaded; // This ensures sprite is ready
     this.winners = winners;
     const positions = [
-        { x: -this.sprite.width * 0.075, y: -this.sprite.height * 0.58 },
-        { x: -this.sprite.width * 0.3,   y: -this.sprite.height * 0.25 },
-        { x: this.sprite.width * 0.15,   y: -this.sprite.height * 0.05 },
+      { x: -this.sprite.width * 0.075, y: -this.sprite.height * 0.58 },
+      { x: -this.sprite.width * 0.3, y: -this.sprite.height * 0.25 },
+      { x: this.sprite.width * 0.15, y: -this.sprite.height * 0.05 },
     ];
 
     // Only create texts for the number of winners
     winners.forEach((winner, index) => {
-        if (index >= 3) return; // Limit to max 5
-        const pos = positions[index];
-        const text = createText(winner, pos.x, pos.y);
-        this.addChild(text);
+      if (index >= 3) return; // Limit to max 5
+      const pos = positions[index];
+      const text = createText(winner, pos.x, pos.y);
+      this.addChild(text);
     });
 
     function createText(playerName: string, x: number, y: number) {
@@ -76,7 +84,12 @@ export class EndScreen extends Container {
     await this.textureLoaded;
     this.sprite = new Sprite(this.texture);
     this.sprite.anchor.set(0.5);
+    this.sprite.scale.set(
+      (GameSettings.screen_width * 0.51) / this.sprite.width,
+    );
     this.x = GameSettings.get_mid_x();
     this.y = GameSettings.get_mid_y();
+    console.log(this.sprite.width / GameSettings.screen_width);
+    console.log(this.sprite.height / GameSettings.screen_height);
   }
 }

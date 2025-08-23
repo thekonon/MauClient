@@ -11,6 +11,7 @@ export class PlayerHand extends Container {
   background!: Graphics;
 
   public pass_command!: () => void;
+  remainingTime!: Text;
 
   public constructor() {
     super();
@@ -64,9 +65,24 @@ export class PlayerHand extends Container {
       this.reorder_cards();
     });
 
+    const style = new TextStyle({
+      fontFamily: "Impact",
+      fontSize: 30,
+      fill: "#000000",
+    });
+
+    this.remainingTime = new Text({
+      text: `Remaining time: `,
+      style,
+    });
+
+    this.remainingTime.x = 50
+    this.remainingTime.y = -40;
+
     this.addChild(this.background);
     this.addChild(drawButton);
     this.addChild(reorderCardsButton);
+    this.addChild(this.remainingTime)
   }
 
   public updateBackgroundColor(newColor: number = 0xde3249) {
@@ -81,6 +97,10 @@ export class PlayerHand extends Container {
         GameSettings.player_hand_padding,
       )
       .fill(newColor);
+  }
+
+  public updateRemainingTime(remainingTime: string){
+    this.remainingTime.text = `Remaining time: ${remainingTime}`;
   }
 
   public draw_card(card: Card) {

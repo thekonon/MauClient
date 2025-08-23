@@ -37,7 +37,7 @@ export class AnotherPlayer extends Container {
     this.cardCountText.text = String(this.cardCount);
   }
 
-  public addCardCound(cardCount: number) {
+  public addCardCount(cardCount: number) {
     this.cardCount += cardCount;
     this.cardCountText.text = String(this.cardCount);
   }

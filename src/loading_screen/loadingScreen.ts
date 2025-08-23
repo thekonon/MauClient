@@ -1,106 +1,57 @@
-import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
-import { GameSettings } from "../gameSettings";
-
-export class LoadingScreen extends Container {
-  app: Application;
-
+export class LoadingScreen {
   mainPlayer: string;
   connectedPlayers: string[];
 
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
-  public reconnectCommand: () => void = () => {
+  public reconnectCommand: (_: string, __: string) => void = (
+    _: string,
+    __: string,
+  ) => {
     alert("Reconnect button not implement yet");
   };
 
-  constructor(app: Application) {
-    super();
-    this.app = app;
+  constructor() {
     this.mainPlayer = "";
     this.connectedPlayers = [];
+    this.addEvents()
   }
 
   public show() {
-    this.app.stage.addChild(this);
-    this.draw_loading_screen();
+    this.createFallingCards(30);
+    const loginMenu = document.getElementById("loginMenu");
+    if (loginMenu) {
+      loginMenu.style.display = "block";
+    }
     this.updateConnectedPlayers();
   }
 
   public hide() {
-    document.getElementById("loginMenu")?.remove();
-    this.app.stage.removeChild(this);
+    this.removeFallingCards();
+    const loginMenu = document.getElementById("loginMenu");
+    if (loginMenu) {
+      loginMenu.style.display = "none";
+    }
   }
 
-  public draw_loading_screen() {
-    // Draw background
-    const topX = GameSettings.get_loading_screen_top_x();
-    const topY = GameSettings.get_loading_screen_top_y();
-    const width = GameSettings.get_loading_screen_width();
-    const height = GameSettings.get_loading_screen_height();
+  public addEvents() {
+    const input = document.getElementById("playerName") as HTMLInputElement | null;
+    const ip = document.getElementById("IP") as HTMLInputElement | null;
 
-    const background = new Graphics();
-    background
-      .roundRect(
-        topX,
-        topY,
-        width,
-        height,
-        GameSettings.loading_screen_round_edge,
-      )
-      .fill(0xde3249);
-    this.addChild(background);
-
-    // Draw text
-    const style = new TextStyle({
-      fontFamily: "Impact",
-      fontSize: 100,
-      fontWeight: "bold",
-    });
-    const text = new Text({ text: "MňauMňauGame", style });
-    text.position.x = GameSettings.get_mid_x() - text.getSize().width / 2;
-    text.position.y = topY + 5;
-    this.addChild(text);
-
-    // Form styled to match PIXI background
-    const uiContainer = document.createElement("div");
-    uiContainer.id = "loginMenu";
-    uiContainer.classList.add("login-menu");
-
-    uiContainer.style.left = `${topX}px`;
-    uiContainer.style.top = `${topY}px`;
-    uiContainer.style.width = `${width}px`;
-    uiContainer.style.height = `${height}px`;
-
-    uiContainer.innerHTML = `
-            <div class="input-row">
-                <label for="playerName">Player Name:</label>
-                <input type="text" id="playerName" class="form-input">
-            </div>
-            <div class="input-row">
-                <label for="playerName" >IP: </label>
-                <input type="text" id="IP" class="form-input" value="localhost">
-            </div>
-            <div class="input-row">
-                <label for="playerName">PORT: </label>
-                <input type="text" id="PORT" class="form-input" value="8080">
-            </div>
-            <div class="input-row">
-                <button id="connectButton" class="connect-button">
-                    Connect to lobby!
-                </button>
-                <button id="reconnectButton" class="connect-button">
-                    Try to reconnect!
-                </button>
-            </div>
-
-            <div id="connectedPlayersListLabel">Connected Players:</div>
-            <div id="connectedPlayersList">
-                <em>No players connected yet.</em>
-            </div>
-        `;
-    document.body.appendChild(uiContainer);
-
+    if (input) {
+      input.addEventListener("input", () => {
+        if (input.value.length >= input.maxLength) {
+          console.log("Max reached")
+          input.classList.add("max-reached");
+        } else {
+          input.classList.remove("max-reached");
+        }
+      });
+    }
+    if (ip) {
+      ip.value = window.location.hostname; // now works
+    }
     const connectButton = document.getElementById(
       "connectButton",
     ) as HTMLButtonElement;
@@ -112,7 +63,7 @@ export class LoadingScreen extends Container {
       "reconnectButton",
     ) as HTMLButtonElement;
     reconnectButton.addEventListener("click", () => {
-      this.reconnectCommand();
+      this.reconnectPlayer();
     });
 
     window.addEventListener("keydown", (e) => {
@@ -139,6 +90,11 @@ export class LoadingScreen extends Container {
       throw Error("This client supports maximum of 5 players");
     }
     this.connectedPlayers.push(player);
+    this.updateConnectedPlayers();
+  }
+
+  public removePlayerFromList(player: string) {
+    this.connectedPlayers = this.connectedPlayers.filter((p) => p !== player);
     this.updateConnectedPlayers();
   }
 
@@ -178,6 +134,24 @@ export class LoadingScreen extends Container {
     this.on_register_player?.(playerName, ip, port);
   }
 
+  private reconnectPlayer() {
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.reconnectCommand(ip, port);
+  }
+
   private updateConnectedPlayers() {
     const container = document.getElementById("connectedPlayersList");
 
@@ -188,7 +162,6 @@ export class LoadingScreen extends Container {
 
     // Clear current content
     container.innerHTML = "";
-
     if (this.connectedPlayers.length === 0) {
       container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
       return;
@@ -213,7 +186,44 @@ export class LoadingScreen extends Container {
   private disableConnectButton(): void {
     const connectButton = document.getElementById(
       "connectButton",
-    ) as HTMLButtonElement;
-    connectButton.disabled = true;
+    ) as HTMLButtonElement | null;
+
+    if (connectButton) {
+      connectButton.disabled = true;
+      connectButton.classList.add("disabled"); // so CSS can style it
+    }
+  }
+
+  private createFallingCards(count: number) {
+    for (let i = 0; i < count; i++) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      // Random size
+      const width = Math.random() * 40 + 30; // 30-70px
+      const height = width * 1.4; // typical card ratio
+      card.style.width = `${width}px`;
+      card.style.height = `${height}px`;
+
+      // Random horizontal position
+      card.style.left = `${Math.random() * 100}vw`;
+
+      // Random color (optional)
+      const colors = ['#fff', '#f5f5dc', '#f0e68c', '#ffe4e1'];
+      card.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+      // Random animation duration and delay
+      const duration = Math.random() * 5 + 4; // 4-9s
+      const delay = Math.random() * 5; // 0-5s
+      card.style.animation = `fall ${duration}s linear infinite`;
+      card.style.animationDelay = `${delay}s`;
+
+      document.body.appendChild(card);
+    }
+  }
+
+  private removeFallingCards() {
+    const cards = document.querySelectorAll('.card'); // find all elements with class 'card'
+    cards.forEach(card => card.remove()); // remove each element
   }
 }
