@@ -169,9 +169,9 @@ export class WebSocketHandle {
 
   private createSocket(): WebSocket {
     const socket = new WebSocket(this.url);
-
     socket.addEventListener("open", () => {
       console.log("WebSocket connected");
+      
       this.onOpen();
     });
 

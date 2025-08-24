@@ -33,33 +33,32 @@ export class PlayerHand extends Container {
   public draw_hand(backgroundColor = 0xde3249): void {
     this.background = new Graphics();
     // place for card
+
     this.background
       .roundRect(
         0,
         0,
         GameSettings.get_player_hand_width(),
         GameSettings.get_player_hand_height(),
-        GameSettings.player_hand_padding,
+        GameSettings.player_hand_padding * 2,
       )
       .fill(backgroundColor);
 
     // button for pass action
-    const drawButton = this.createButton("PASS (ACE / 7)");
-    drawButton.x =
-      GameSettings.get_player_hand_top_x() +
-      GameSettings.get_player_hand_width() * 0.6;
-    drawButton.y = -100;
-    drawButton.on("pointerdown", () => {
+    const passButton = this.createButton("PASS (ACE / 7)");
+    passButton.x =
+      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
+    passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
+    passButton.on("pointerdown", () => {
       console.log("Playing pass");
       this.pass_command();
     });
 
     // button for pass action
-    const reorderCardsButton = this.createButton("REORDER CARDS");
+    const reorderCardsButton = this.createButton("REORDER\n  CARDS");
     reorderCardsButton.x =
-      GameSettings.get_player_hand_top_x() +
-      GameSettings.get_player_hand_width() * 0.4;
-    reorderCardsButton.y = -100;
+      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
+    reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 2.1;
     reorderCardsButton.on("pointerdown", () => {
       console.log("Reordering cards");
       this.reorder_cards();
@@ -67,7 +66,7 @@ export class PlayerHand extends Container {
 
     const style = new TextStyle({
       fontFamily: "Impact",
-      fontSize: 30,
+      fontSize: GameSettings.fontSize,
       fill: "#000000",
     });
 
@@ -76,11 +75,11 @@ export class PlayerHand extends Container {
       style,
     });
 
-    this.remainingTime.x = 50
-    this.remainingTime.y = -40;
+    this.remainingTime.x = 0
+    this.remainingTime.y = -GameSettings.fontSize * 1.2;
 
     this.addChild(this.background);
-    this.addChild(drawButton);
+    this.addChild(passButton);
     this.addChild(reorderCardsButton);
     this.addChild(this.remainingTime)
   }
@@ -99,7 +98,7 @@ export class PlayerHand extends Container {
       .fill(newColor);
   }
 
-  public updateRemainingTime(remainingTime: string){
+  public updateRemainingTime(remainingTime: string) {
     this.remainingTime.text = `Remaining time: ${remainingTime}`;
   }
 
@@ -159,9 +158,9 @@ export class PlayerHand extends Container {
   private createButton(displayed_text: string = "Empty"): Container {
     const buttonContainer = new Container();
 
-    const width = 300 - GameSettings.dialog_window_padding * 2;
-    const height = 80;
-    const edge_radius = 10;
+    const width = GameSettings.playerHandButtonWidth;
+    const height = GameSettings.playerHandButtonHeight;
+    const edge_radius = GameSettings.playerHandButtonRadius;
 
     const button = new Graphics();
     const drawButton = (color: number) => {
@@ -187,8 +186,8 @@ export class PlayerHand extends Container {
 
     // Create and center text
     const style = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: 24,
+      fontFamily: "Impact",
+      fontSize: GameSettings.fontSize,
       fill: "#ffffff",
     });
 

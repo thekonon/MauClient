@@ -48,7 +48,7 @@ export class Pile extends Container {
 
     const style = new TextStyle({
       fontFamily: "Impact",
-      fontSize: 30,
+      fontSize: GameSettings.fontSize,
       fill: "#000000",
     });
 
@@ -58,8 +58,8 @@ export class Pile extends Container {
     });
 
     const point = this.getPileTopLeftPoint();
-    point.x -= 300;
-    point.y -= 75;
+    point.x -= GameSettings.card_height + GameSettings.fontSize*1;
+    point.y -= 0;
 
     if (this.previousText != null) {
       this.removeChild(this.previousText);

@@ -16,14 +16,14 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"PLAYERS","players":["aa"]}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"bb","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"asdasasdasdasdasdasdasdasdasddasdasdcc","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"cc","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
   ];
   const startGameMsgs = [
     '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
     '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true},"expireAtMs":1756045736534}}',
   ];
   const midMsgs = [
     '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
@@ -35,13 +35,12 @@ async function testing(
   ];
   const endMsgs = [
     '{"messageType":"ACTION","action":{"type":"WIN","playerDto":{"username":"a","active":false}}}',
-    '{"messageType":"ACTION","action":{"type":"END_GAME"}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_RANK","players":["player 1","Pepa","Lol"]}}',
+    '{"messageType":"ACTION","action":{"type":"END_GAME","playerRank":["aa","bb", "cc", "dd", "Ee"]}}',
   ];
 
   for (const msgStr of initMsgs) {
     web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 100));
+    await new Promise((res) => setTimeout(res, 50));
   }
   // return;
   for (const msgStr of startGameMsgs) {
@@ -49,9 +48,10 @@ async function testing(
   }
   for (const msgStr of midMsgs) {
     web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 500));
+    await new Promise((res) => setTimeout(res, 50));
   }
   for (const msgStr of endMsgs) {
+    continue
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
   }
@@ -61,6 +61,7 @@ async function testing(
 
   const loading_screen = new LoadingScreen();
   loading_screen.show()
+
   const web_socket = new WebSocketHandle();
 
   // Create websocket connection after providing a name under which is user connected to WS
@@ -92,23 +93,43 @@ async function testing(
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
+
   document.getElementById("pixi-container")!.appendChild(app.canvas);
-  GameSettings.setScreenDimensions(app.screen.height, app.screen.width);
-  const game = new Game(app);
+
+
+  let game!: Game;
 
   // Create a endScreen instance
-  const endScreen = new EndScreen(app);
+  let endScreen!: EndScreen;
 
-  // Bind callbacks
-  web_socket.start_pile = game.startPileAction.bind(game);
-  web_socket.drawCardAction = game.drawCardAction.bind(game);
-  web_socket.playCardAction = game.playCard.bind(game);
-  web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
-  web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
+
 
   web_socket.start_game = async () => {
     // When game stats, hide loading screen
     loading_screen.hide();
+    GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+
+    game = new Game(app);
+
+    web_socket.start_pile = game.startPileAction.bind(game);
+    web_socket.drawCardAction = game.drawCardAction.bind(game);
+    web_socket.playCardAction = game.playCard.bind(game);
+    web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
+    web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
+
+    /* User callbacks - user want to send */
+    game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
+    game.passCommand = web_socket.playPassCommand.bind(web_socket);
+
+    endScreen = new EndScreen(app);
+
+    web_socket.gameEndAction = async () => {
+      await new Promise((res) => setTimeout(res, 1000));
+      game.hide();
+      endScreen.show();
+    };
+
+    web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
 
     game.mainPlayer = loading_screen.getMainPlayer();
     game.register_players(loading_screen.get_players_list());
@@ -117,18 +138,6 @@ async function testing(
     game.startGame();
   };
 
-  web_socket.gameEndAction = async () => {
-    await new Promise((res) => setTimeout(res, 1000));
-    game.hide();
-    endScreen.show();
-  };
-
-  web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
-
-  /* User callbacks - user want to send */
-  game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
-  game.passCommand = web_socket.playPassCommand.bind(web_socket);
-
   // Bypapass for testing
-  // testing(web_socket, loading_screen)
+  testing(web_socket, loading_screen)
 })();

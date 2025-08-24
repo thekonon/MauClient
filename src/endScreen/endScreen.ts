@@ -51,7 +51,7 @@ export class EndScreen extends Container {
     function createText(playerName: string, x: number, y: number) {
       const style = new TextStyle({
         fontFamily: "Impact",
-        fontSize: 30,
+        fontSize: GameSettings.fontSize,
         fill: "#000000",
       });
 

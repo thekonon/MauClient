@@ -92,7 +92,7 @@ export class QueenDialog extends Container {
 
     const style = new TextStyle({
       fontFamily: "Arial",
-      fontSize: 24,
+      fontSize: GameSettings.fontSize,
       fill: "#ffffff",
     });
 
