@@ -26,7 +26,7 @@ export class PlayerHand extends Container {
     this.y = GameSettings.get_player_hand_top_y();
 
     this.pass_command = () => {
-      console.log("Pass command not defined yet");
+      console.warn("Pass command not defined yet");
     };
   }
 
@@ -50,7 +50,6 @@ export class PlayerHand extends Container {
       GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     passButton.on("pointerdown", () => {
-      console.log("Playing pass");
       this.pass_command();
     });
 

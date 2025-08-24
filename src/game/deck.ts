@@ -32,6 +32,6 @@ export class Deck extends Container {
   }
 
   public deck_clicked_action() {
-    console.log("not yet defined");
+    console.warn("deck_clicked_action not yet defined");
   }
 }

@@ -297,7 +297,6 @@ export class WebSocketHandle {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
         if (!msg.count) return console.error("Card count was not specified");
-        console.log("Someone took card, but secretly! Psst");
         this.hiddenDraw(msg.playerDto.username, msg.count);
       },
       PLAYER_RANK: (msg) => {

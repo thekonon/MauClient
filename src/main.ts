@@ -23,13 +23,17 @@ async function testing(
   const startGameMsgs = [
     '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
     '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true},"expireAtMs":1756045736534}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":1756045736534}}',
   ];
   const midMsgs = [
     '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true},"expireAtMs":1756045736534}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"bb","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"cc","active":true},"expireAtMs":1756045736534}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"cc","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"dd","active":true},"expireAtMs":1756045736534}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"dd","active":true},"count":4}}',
+    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"ee","active":true},"expireAtMs":1756045736534}}',
     '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"ee","active":true},"count":4}}',
     '{"messageType":"ACTION","action":{"type":"PLAY_CARD","playerDto":{"username":"aa","active":true},"card":{"type":"SEVEN","color":"DIAMONDS"}}}',
   ];

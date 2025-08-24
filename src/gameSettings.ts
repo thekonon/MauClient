@@ -5,23 +5,18 @@ export class GameSettings {
 
   // Player hand
   static player_hand_width_percent = 80;
-  static player_hand_height_percent = 25;
+  static player_hand_height_percent = 30;
   static player_hand_card_delta = 5;
 
   // Deck
   static deck_margin = 50;
 
   // Queen dialog window
-  static dialog_window_pos = [100, 100];
-  static dialog_window_dim = [300, 300];
-  static dialog_window_radius = 15;
-  static dialog_window_padding = 15;
   static dialog_window_color = 0x00ff00;
 
   // Other players settings
   static otherPlayerMarginsPercent = 1;
-  static otherPLayerGapPercent = 20;
-  static otherPlayerCardSizeScale = 1.2;
+  // static otherPLayerGapPercent = 30;
 
   static setScreenDimensions(height: number, width: number) {
     GameSettings.screen_height = height;
@@ -109,7 +104,12 @@ export class GameSettings {
     return this.screen_width;
   }
 
+  static get otherPlayerCardSizeScale(){
+    return this.screen_width*(1 - this.player_hand_width_percent/100-4*this.otherPlayerMarginsPercent/100)/2 / this.card_width;
+  }
+
   static getOtherPlayerWidth(): number {
+    // return this.screen_width*(1 - this.player_hand_width_percent/100-4*this.otherPlayerMarginsPercent/100)/2;
     return this.card_width * this.otherPlayerCardSizeScale;
   }
 
@@ -133,8 +133,7 @@ export class GameSettings {
       return (this.screen_width * this.otherPlayerMarginsPercent) / 100;
     } else {
       return (
-        this.getOtherPlayerY(0) +
-        (this.screen_width * this.otherPLayerGapPercent) / 100
+        this.screen_height * (1-4*this.otherPlayerMarginsPercent/100) - this.getOtherPlayerHeight()-2*this.fontSize
       );
     }
   }

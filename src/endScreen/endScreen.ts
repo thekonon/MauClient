@@ -26,7 +26,6 @@ export class EndScreen extends Container {
 
   public async show() {
     await this.textureLoaded;
-    console.log("adding sprite");
     this.addChild(this.sprite);
     this.app.stage.addChild(this);
   }
@@ -76,7 +75,7 @@ export class EndScreen extends Container {
           );
           resolve(true);
         } catch (err) {
-          console.log("loading failed");
+          console.error("loading failed");
           reject(err);
         }
       })();
@@ -89,7 +88,5 @@ export class EndScreen extends Container {
     );
     this.x = GameSettings.get_mid_x();
     this.y = GameSettings.get_mid_y();
-    console.log(this.sprite.width / GameSettings.screen_width);
-    console.log(this.sprite.height / GameSettings.screen_height);
   }
 }

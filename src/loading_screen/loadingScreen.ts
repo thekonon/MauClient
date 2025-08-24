@@ -42,7 +42,6 @@ export class LoadingScreen {
     if (input) {
       input.addEventListener("input", () => {
         if (input.value.length >= input.maxLength) {
-          console.log("Max reached")
           input.classList.add("max-reached");
         } else {
           input.classList.remove("max-reached");

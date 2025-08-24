@@ -61,6 +61,7 @@ export class Card extends Container {
   private dragOffset = new Point();
   private dragStartPosition = new Point();
   private wasDragged = false;
+  private isDialogActive = false;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
@@ -95,21 +96,10 @@ export class Card extends Container {
     this.animation_duration = 1;
 
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
-      console.log("Not defined");
+      console.warn("playCardCommand not defined");
     };
 
     this.interactive = true;
-    // this.on("pointerdown", async () => {
-    //     let nextColor = "";
-    //     if (this.value === "Q") {
-    //         const dialog = new QueenDialog();
-    //         dialog.zIndex = 999; // Hehe u know what i did here
-    //         this.parent.addChild(dialog)
-    //         nextColor = await dialog.show(); // wait for user to choose
-    //         this.parent.removeChild(dialog)
-    //     }
-    //     this.play_card_action(this.type, this.value, nextColor);
-    // });
 
     this.on("pointerdown", this.onDragStart, this);
     this.on("pointerup", this.onDragEnd, this);
@@ -207,12 +197,19 @@ export class Card extends Container {
   }
   private async onCardClick() {
     let nextColor = "";
+    if (this.isDialogActive){
+      console.warn("There is already active dialog window for queen!")
+      return
+    }
     if (this.value === "Q") {
       const dialog = new QueenDialog();
-      dialog.zIndex = 999;
+      this.isDialogActive = true;
+      dialog.exitFnc = () => {this.parent.removeChild(dialog); this.isDialogActive = false;};
+      dialog.zIndex = 999999999999;
       this.parent.addChild(dialog);
       nextColor = await dialog.show();
       this.parent.removeChild(dialog);
+      this.isDialogActive = false;
     }
     this.playCardCommand(this.type, this.value, nextColor);
   }
