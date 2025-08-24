@@ -163,7 +163,7 @@ export class LoadingScreen {
     // Clear current content
     container.innerHTML = "";
     if (this.connectedPlayers.length === 0) {
-      container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
+      container.innerHTML = `<em style="color: #555;">No connection to lobby</em>`;
       return;
     } else {
       this.disableConnectButton();
@@ -173,7 +173,7 @@ export class LoadingScreen {
     this.connectedPlayers.forEach((player) => {
       const div = document.createElement("div");
       if (player == this.mainPlayer) {
-        div.textContent = `🟢 ${player} - current user`;
+        div.textContent = `🟢 ${player} - user`;
       } else {
         div.textContent = `🟢 ${player}`;
       }

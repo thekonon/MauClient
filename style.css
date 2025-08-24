@@ -1,3 +1,7 @@
+:root {
+  --main-font-family: 'Press Start 2P', Impact
+}
+
 body,
 html {
   margin: 0;
@@ -32,7 +36,7 @@ canvas {
   justify-content: center;
   width: fit-content;
 
-  background: linear-gradient(135deg, #de3249, #a53838);
+  background: linear-gradient(0deg, #de3249, #a41f31);
   border-radius: 1em;
   border-top: 0.3em solid black;
   padding: 1em;
@@ -41,7 +45,7 @@ canvas {
 .form {
   display: flex;
   flex-direction: column;
-  font-family: 'Press Start 2P', Impact;
+  font-family: var(--main-font-family);
 }
 
 .form .title {
@@ -88,11 +92,11 @@ canvas {
   flex: 1;
   border: 1px solid black;
   border-radius: 1em;
-  min-width: 0;
+  min-width: 15em;
   box-sizing: border-box;
 
-  font-family: 'Press Start 2P', cursive;
-  font-size: 1em;
+  font-family: var(--main-font-family);
+  font-size: 1rem;
   padding: 1em;
 }
 
@@ -108,6 +112,59 @@ input.max-reached {
   box-shadow: 0 0 8px rgba(0, 255, 34, 0.5);
 }
 
+.form .btn-refresh {
+  /* Your existing settings remain untouched */
+  font-size: 1rem;
+  font-family: var(--main-font-family);
+  padding: 0.5em;
+  height: 100%;
+  border-radius: 1em;
+  box-sizing: border-box;
+
+  /* Effects from the original button */
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  border: 0.2em solid #b0283c;
+  background: #111;
+  color: #f06a7e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Ripple pseudo-element */
+.form .btn-refresh::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(240, 106, 126, 0.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+}
+
+.form .btn-refresh:hover::after {
+  width: 300%;
+  height: 300%;
+  opacity: 1;
+}
+
+/* Neon glow and scale on hover */
+.form .btn-refresh:hover {
+  color: white;
+  background: #b0283c;
+  box-shadow:
+    0 0 10px #f06a7e,
+    0 0 20px #f06a7e,
+    0 0 40px #f06a7e,
+    0 0 80px #f06a7e;
+  transform: scale(1.05);
+}
+
 /* Buttons spanning both columns */
 .form .buttons {
   grid-column: 1 / -1;
@@ -120,20 +177,18 @@ input.max-reached {
   overflow: hidden;
   border-radius: 1.5em;
   font-size: 1.0rem;
-  font-family: 'Press Start 2P', Impact;
+  font-family: var(--main-font-family);
   width: 100%;
   padding: 1em;
   margin: 1em;
   border: 0.2em solid #b0283c;
   background: #111;
-  /* Dark base for glow */
   color: #f06a7e;
   text-transform: uppercase;
   letter-spacing: 2px;
   transition: all 0.4s ease;
 }
 
-/* Ripple circle */
 .form .buttons .btn::after {
   content: "";
   position: absolute;
@@ -142,7 +197,6 @@ input.max-reached {
   width: 0;
   height: 0;
   background: rgba(240, 106, 126, 0.4);
-  /* Ripple color */
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
@@ -170,34 +224,64 @@ input.max-reached {
 .container .players {
   display: flex;
   flex-direction: column;
-
-  border: 2px black solid;
+  margin: 1rem;
+  padding: 1em;
+  padding-top: 0.5em;
+  border-radius: 1em;
+  background-color: #921b2d;
 }
 
 .container .players .players-connected-title {
-  border: 2px black solid;
+  font-family: var(--main-font-family);
+  white-space: nowrap;
+  padding: 1em;
 }
 
 .container .players .players-box {
   flex: 1 0 0;
   padding: 0.2em;
-  font-size: 1rem;
-  min-width: 15em;
+  font-size: 0.65rem;
+  min-width: 30em;
   background-color: aliceblue;
+  padding: 0.7em;
+  font-family: var(--main-font-family);
+  border-radius: 1em;
 
   border: 2px black solid;
 }
 
 @media (max-width: 1000px) {
+  .form .form-group{
+    gap: 0.1rem;
+  }
+  .form .form-group label {
+    font-size: 0.5rem;
+  }
 
   .form .form-group input,
   .form .form-group select {
-    padding: 0.5em;
+    padding: 0.1em;
+    padding-left: 1em;
+    font-size: 0.7rem;
+    
   }
 
   .form .title {
-    font-size: 2em;
+    font-size: 1.5em;
   }
+
+  .form .btn-refresh {
+    font-size: 0.5rem;
+    padding: 0.1em;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
+  .form .buttons .btn {
+    font-size: 0.5rem;
+    padding: 0.5em;
+  }
+
 }
 
 @media (min-width: 1200px) {
@@ -210,7 +294,7 @@ input.max-reached {
 
   0%,
   100% {
-    background-position: 0% 50%;
+    background-position: -50% 50%;
     border-radius: 0.1em;
   }
 
@@ -223,13 +307,11 @@ input.max-reached {
 .card {
   position: absolute;
   top: -100px;
-  /* start above the viewport */
   border-radius: 8px;
   border: 1px solid black;
   background-color: white;
   opacity: 0.8;
   pointer-events: none;
-  /* cards won't interfere with clicks */
 }
 
 @keyframes fall {
