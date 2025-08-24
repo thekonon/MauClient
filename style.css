@@ -221,6 +221,17 @@ input.max-reached {
   transform: scale(1.05);
 }
 
+.form .buttons .btn.disabled {
+  pointer-events: none;       /* Disable clicking */
+  opacity: 0.5;               /* Dim the button */
+  color: #999;                /* Optional: change text color */
+  background: #222;           /* Optional: darker background */
+  border-color: #555;         /* Optional: muted border */
+  box-shadow: none;           /* Remove glow */
+  transform: none;            /* Remove hover scale effect */
+}
+
+
 .container .players {
   display: flex;
   flex-direction: column;

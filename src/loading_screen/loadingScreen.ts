@@ -183,16 +183,21 @@ export class LoadingScreen {
     });
   }
 
-  private disableConnectButton(): void {
-    const connectButton = document.getElementById(
-      "connectButton",
-    ) as HTMLButtonElement | null;
+private disableConnectButton(): void {
+  const connectButton = document.getElementById(
+    "connectButton"
+  ) as HTMLButtonElement | null;
 
-    if (connectButton) {
-      connectButton.disabled = true;
-      connectButton.classList.add("disabled"); // so CSS can style it
+  if (connectButton) {
+    // Disable the native button functionality
+    connectButton.disabled = true;
+
+    // Add CSS class for styling
+    if (!connectButton.classList.contains("disabled")) {
+      connectButton.classList.add("disabled");
     }
   }
+}
 
   private createFallingCards(count: number) {
     for (let i = 0; i < count; i++) {
