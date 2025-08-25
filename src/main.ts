@@ -143,5 +143,5 @@ async function testing(
   };
 
   // Bypapass for testing
-  testing(web_socket, loading_screen)
+  // testing(web_socket, loading_screen)
 })();
