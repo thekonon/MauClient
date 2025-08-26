@@ -55,7 +55,6 @@ export class Card extends Container {
     */
   public playCardCommand: (type: string, value: string, _: string) => void;
   public card_sprite: Sprite;
-  static background_texture: Texture;
 
   private isDragging = false;
   private dragOffset = new Point();
@@ -71,8 +70,6 @@ export class Card extends Container {
   ): Promise<Card> {
     const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
-
-    Card.background_texture = await Card.load_texture("back", "", texture_name);
     return new Card(type, value, sprite);
   }
 
@@ -126,7 +123,7 @@ export class Card extends Container {
 
   public changeContainer(newContainer: Container) {
     if (this.parent) {
-      const globalPoint = this.toGlobal(new Point(this.x, this.y));
+      const globalPoint = this.toGlobal(new Point(0, 0));
       this.parent.removeChild(this);
       this.position.copyFrom(newContainer.toLocal(globalPoint));
       newContainer.addChild(this);
@@ -140,7 +137,7 @@ export class Card extends Container {
     const localPoint = this.toLocal(globalPoint);
     this.end_animation_point_x = localPoint.x;
     this.end_animation_point_y = localPoint.y;
-    this.rotation = rotation;
+    this.rotation_angle = rotation;
   }
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
