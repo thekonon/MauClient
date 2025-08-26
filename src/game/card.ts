@@ -61,6 +61,7 @@ export class Card extends Container {
   private dragStartPosition = new Point();
   private wasDragged = false;
   private isDialogActive = false;
+  useOriginOfCard: boolean;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
@@ -91,7 +92,14 @@ export class Card extends Container {
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
+    this.useOriginOfCard = true
 
+    if(this.useOriginOfCard){
+      this.card_sprite.anchor.set(0.5)
+      this.card_sprite.x = this.card_sprite.width/2
+      this.card_sprite.y = this.card_sprite.height/2
+    }
+    
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
       console.warn("playCardCommand not defined");
     };
