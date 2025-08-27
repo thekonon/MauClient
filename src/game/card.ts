@@ -5,6 +5,7 @@ import {
   Container,
   Point,
   FederatedPointerEvent,
+  Graphics,
 } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
@@ -92,14 +93,18 @@ export class Card extends Container {
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
-    this.useOriginOfCard = true
+    this.useOriginOfCard = false
 
-    if(this.useOriginOfCard){
+    if (this.useOriginOfCard) {
       this.card_sprite.anchor.set(0.5)
-      this.card_sprite.x = this.card_sprite.width/2
-      this.card_sprite.y = this.card_sprite.height/2
+      this.card_sprite.x = this.card_sprite.width / 2
+      this.card_sprite.y = this.card_sprite.height / 2
     }
-    
+
+    const constainer = new Graphics()
+    constainer.rect(0,0,100,200).fill(0xff0000)
+    this.addChild(constainer)
+
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
       console.warn("playCardCommand not defined");
     };
@@ -117,16 +122,32 @@ export class Card extends Container {
   public play(
     duration?: number,
     rotation?: number,
-    onFinish: () => void = () => {},
+    onFinish: () => void = () => { },
   ) {
-    gsap.to(this, {
-      x: this.end_animation_point_x,
-      y: this.end_animation_point_y,
-      rotation: rotation ?? this.rotation_angle,
-      duration: duration ?? this.animation_duration,
-      onComplete: onFinish,
-      ease: "power1.out",
-    });
+    console.log("End:", this.end_animation_point_x, this.end_animation_point_y)
+    if (this.useOriginOfCard) {
+      gsap.to(this, {
+        x: this.end_animation_point_x,
+        y: this.end_animation_point_y,
+        duration: duration ?? this.animation_duration,
+        onComplete: onFinish,
+        ease: "power1.out",
+      });
+      gsap.to(this.card_sprite, {
+        rotation: rotation ?? this.rotation_angle,
+        duration: duration ?? this.animation_duration,
+        ease: "power1.out",
+      });
+    } else {
+      gsap.to(this, {
+        x: this.end_animation_point_x,
+        y: this.end_animation_point_y,
+        rotation: rotation ?? this.rotation_angle,
+        duration: duration ?? this.animation_duration,
+        onComplete: onFinish,
+        ease: "power1.out",
+      });
+    }
   }
 
   public changeContainer(newContainer: Container) {
@@ -141,10 +162,27 @@ export class Card extends Container {
   }
 
   public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
-    const globalPoint = new Point(x, y);
-    const localPoint = this.toLocal(globalPoint);
-    this.end_animation_point_x = localPoint.x;
-    this.end_animation_point_y = localPoint.y;
+    const globalPoint = new Point(0,0);
+
+    // This tels you how much container must move
+    const localParrentDiff = this.parent.toLocal(globalPoint);
+    const localDiff = this.toLocal(globalPoint);
+    const localSpriteDiff = this.card_sprite.toLocal(globalPoint)
+
+    console.log("Global:", globalPoint)
+    console.log("Parrent:",localParrentDiff)
+    console.log("This:",localDiff)
+    console.log("SpriteLocal:",localSpriteDiff)
+
+    // globalPoint.x -= localDiff.x
+    // globalPoint.y -= localDiff.y
+
+    // console.log("Global: ", globalPoint)
+    
+    // const localPoint = this.parent.toLocal(globalPoint);
+
+    // this.end_animation_point_x = localPoint.x;
+    // this.end_animation_point_y = localPoint.y;
     this.rotation_angle = rotation;
   }
 
@@ -202,14 +240,14 @@ export class Card extends Container {
   }
   private async onCardClick() {
     let nextColor = "";
-    if (this.isDialogActive){
+    if (this.isDialogActive) {
       console.warn("There is already active dialog window for queen!")
       return
     }
     if (this.value === "Q") {
       const dialog = new QueenDialog();
       this.isDialogActive = true;
-      dialog.exitFnc = () => {this.parent.removeChild(dialog); this.isDialogActive = false;};
+      dialog.exitFnc = () => { this.parent.removeChild(dialog); this.isDialogActive = false; };
       dialog.zIndex = 999999999999;
       this.parent.addChild(dialog);
       nextColor = await dialog.show();

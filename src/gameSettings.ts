@@ -24,10 +24,12 @@ export class GameSettings {
   }
 
   static get card_height() {
+    return 200;
     return this.get_player_hand_height() - this.player_hand_padding * 2;
   }
 
   static get card_width() {
+    return 100
     return (this.card_height * 9) / 15;
   }
 

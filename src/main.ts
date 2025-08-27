@@ -1,9 +1,10 @@
-import { Application, localUniformMSDFBit } from "pixi.js";
+import { Application, Container, Graphics, localUniformMSDFBit, Point } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
 import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocket_handle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
+import { Card } from "./game/card.ts";
 
 async function testing(
   web_socket: WebSocketHandle,
@@ -20,10 +21,11 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
   ];
+  const expireTimeMs = (Date.now() + 60000)
   const startGameMsgs = [
     '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
     '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":1756045736534}}',
+    `{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":${expireTimeMs}}}`
   ];
   const midMsgs = [
     '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
@@ -59,6 +61,60 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
   }
+}
+
+async function cardTest(app: Application) {
+  GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+
+  const grid = new Graphics()
+  const delta = 50;
+  const xGridCount = 30;
+  const yGridCount = 50;
+  grid.setStrokeStyle({ width: 2, color: 0x0 })
+  for (let i = 0; i <= xGridCount; i++) {
+    grid.moveTo(i*delta, 0)
+    grid.lineTo(i*delta, 800)
+    grid.stroke()
+  }
+  for (let i = 0; i <= yGridCount; i++) {
+    grid.moveTo(0, i*delta)
+    grid.lineTo(1800, i*delta)
+    grid.stroke()
+  }
+
+  app.stage.addChild(grid)
+
+  // const redDot = new Graphics().rect(0,0,5,5).fill(0xff0000)
+
+  // const testContainer1 = new Container()
+  // testContainer1.x = 500
+  // testContainer1.y = 300
+  // testContainer1.addChild(redDot)
+
+  // app.stage.addChild(testContainer1)
+
+  const testCard = await Card.create("", "back");
+  testCard.x = 1
+  console.log(testCard.width)
+  console.log(testCard.card_sprite.width)
+  console.log(testCard.x)
+  console.log(testCard.card_sprite.x)
+  // testCard.y = 100
+  // testCard.end_animation_point_x = 200
+  // testCard.end_animation_point_y = 100
+
+
+  app.stage.addChild(testCard)
+
+  await new Promise((res) => setTimeout(res, 500));
+  // testCard.changeContainer(testContainer1)
+
+  testCard.setGlobalEndOfAnimation(0, 0, -0*Math.PI/16)
+  // testCard.play()
+
+  await new Promise((res) => setTimeout(res, 1100));
+  testCard.setGlobalEndOfAnimation(250, 100, 0)
+  // testCard.play()
 }
 
 (async () => {
@@ -99,6 +155,15 @@ async function testing(
   await app.init({ background: "#1099bb", resizeTo: window });
 
   document.getElementById("pixi-container")!.appendChild(app.canvas);
+
+  loading_screen.hide()
+  cardTest(app)
+
+
+
+
+
+
 
 
   let game!: Game;
