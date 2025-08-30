@@ -10,6 +10,7 @@ import {
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
+import { DropShadowFilter } from "pixi-filters";
 
 export class Card extends Container {
   // General settings of the card
@@ -121,6 +122,15 @@ export class Card extends Container {
     this.on("pointerup", this.onDragEnd, this);
     this.on("pointerupoutside", this.onDragEnd, this);
     this.on("pointermove", this.onDragMove, this);
+
+    sprite.filters = [
+      new DropShadowFilter({
+        offset: {x: 10, y:10},
+        alpha: 0.6,
+        blur:6,
+        color: 0x000000
+      })
+    ]
 
     this.spriteContainer.addChild(sprite);
     this.addChild(this.spriteContainer)
