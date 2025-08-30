@@ -19,7 +19,6 @@ export class LoadingScreen {
   }
 
   public show() {
-    this.createFallingCards(30);
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "block";
@@ -28,7 +27,6 @@ export class LoadingScreen {
   }
 
   public hide() {
-    this.removeFallingCards();
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "none";
@@ -63,6 +61,13 @@ export class LoadingScreen {
     ) as HTMLButtonElement;
     reconnectButton.addEventListener("click", () => {
       this.reconnectPlayer();
+    });
+
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLButtonElement;
+    readyButton.addEventListener("click", () => {
+      this.readyPlayerButtonClicked();
     });
 
     window.addEventListener("keydown", (e) => {
@@ -103,6 +108,45 @@ export class LoadingScreen {
     }
     this.connectedPlayers = playerList;
     this.updateConnectedPlayers();
+  }
+
+  public unsetReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (readyButton.classList.contains("ready")) {
+      readyButton.textContent = "Make me ready"
+      readyButton.classList.remove("ready");
+    }
+  }
+
+  public setReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (!readyButton.classList.contains("ready")) {
+      readyButton.textContent = "I am ready"
+      readyButton.classList.add("ready");
+    }
+  }
+
+  public toggleReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (!readyButton.classList.contains("ready")) {
+      this.setReadyButtonReady()
+    } else{
+      this.unsetReadyButtonReady()
+    }
+  }
+
+  private readyPlayerButtonClicked() {
+    console.log("player is ready")
+    this.toggleReadyButtonReady()
   }
 
   private registerPlayer() {
@@ -182,52 +226,19 @@ export class LoadingScreen {
     });
   }
 
-private disableConnectButton(): void {
-  const connectButton = document.getElementById(
-    "connectButton"
-  ) as HTMLButtonElement | null;
+  private disableConnectButton(): void {
+    const connectButton = document.getElementById(
+      "connectButton"
+    ) as HTMLButtonElement | null;
 
-  if (connectButton) {
-    // Disable the native button functionality
-    connectButton.disabled = true;
+    if (connectButton) {
+      // Disable the native button functionality
+      connectButton.disabled = true;
 
-    // Add CSS class for styling
-    if (!connectButton.classList.contains("disabled")) {
-      connectButton.classList.add("disabled");
+      // Add CSS class for styling
+      if (!connectButton.classList.contains("disabled")) {
+        connectButton.classList.add("disabled");
+      }
     }
-  }
-}
-
-  private createFallingCards(count: number) {
-    for (let i = 0; i < count; i++) {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      // Random size
-      const width = Math.random() * 40 + 30; // 30-70px
-      const height = width * 1.4; // typical card ratio
-      card.style.width = `${width}px`;
-      card.style.height = `${height}px`;
-
-      // Random horizontal position
-      card.style.left = `${Math.random() * 100}vw`;
-
-      // Random color (optional)
-      const colors = ['#fff', '#f5f5dc', '#f0e68c', '#ffe4e1'];
-      card.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-      // Random animation duration and delay
-      const duration = Math.random() * 5 + 4; // 4-9s
-      const delay = Math.random() * 5; // 0-5s
-      card.style.animation = `fall ${duration}s linear infinite`;
-      card.style.animationDelay = `${delay}s`;
-
-      document.body.appendChild(card);
-    }
-  }
-
-  private removeFallingCards() {
-    const cards = document.querySelectorAll('.card'); // find all elements with class 'card'
-    cards.forEach(card => card.remove()); // remove each element
   }
 }

@@ -268,6 +268,7 @@ input.max-reached {
 
 /* Base ready state - green glow */
 .btn.ready {
+  content: "";
   color: white;
   background: #228b22;
   border-color: #28b028;
@@ -281,15 +282,18 @@ input.max-reached {
   overflow: hidden;
 }
 
-/* Ripple stays green in normal state */
+.btn.ready::before{
+  content: "";
+}
+
 .btn.ready::after {
+  content: "";
   background: rgba(40, 176, 40, 0.4);
 }
 
-/* On hover → show "NotReady" text */
 .btn.ready:hover {
   color: transparent;
-  background: #8b2222; /* red background */
+  background: #8b2222;
   border-color: #b02828;
   box-shadow:
     0 0 10px #b02828,
@@ -298,9 +302,8 @@ input.max-reached {
     0 0 80px #b02828;
 }
 
-/* New hover text in red mode */
 .btn.ready:hover::before {
-  content: "not ready";
+  content: "Make me not ready";
   color: white;
   position: absolute;
   top: 50%;

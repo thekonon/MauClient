@@ -5,6 +5,7 @@ import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocket_handle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { Card } from "./game/card.ts";
+import { CardManager } from "./loading_screen/CardManage.ts";
 
 async function testing(
   web_socket: WebSocketHandle,
@@ -156,15 +157,15 @@ async function cardTest(app: Application) {
 
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  loading_screen.hide()
-  cardTest(app)
+  // loading_screen.hide()
+  // cardTest(app)
 
+  // loading_screen.toggleReadyButtonReady()
 
-
-
-
-
-
+  const cardManager = new CardManager(app)
+  // await new Promise((res) => setTimeout(res, 1050));
+  await cardManager.loadCardTextures()
+  cardManager.createFallingCards(50);
 
   let game!: Game;
 
@@ -176,6 +177,7 @@ async function cardTest(app: Application) {
   web_socket.start_game = async () => {
     // When game stats, hide loading screen
     loading_screen.hide();
+    cardManager.removeFallingCards()
     GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
 
     game = new Game(app);
