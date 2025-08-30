@@ -175,11 +175,11 @@ export class WebSocketHandle {
     this.socket = this.createSocket();
   }
 
-  public sendReadyCommand() {
+  public sendReadyCommand(ready: boolean) {
     const readyCommand = JSON.stringify({
       requestType: "CONTROL",
       control: {
-        controlType: "READY",
+        controlType: ready ? "READY": "UNREADY",
       },
     });
     this.send(readyCommand);

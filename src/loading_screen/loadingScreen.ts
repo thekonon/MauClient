@@ -7,7 +7,7 @@ export class LoadingScreen {
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
-  public playerReadyCommand: () => void = () => { console.warn("Player Ready not implemented in loadingScreen") };
+  public playerReadyCommand: (_:boolean) => void = (_:boolean) => { console.warn("Player Ready not implemented in loadingScreen") };
   public reconnectCommand: (_: string, __: string) => void = (
     _: string,
     __: string,
@@ -172,8 +172,12 @@ export class LoadingScreen {
   }
 
   private readyPlayerButtonClicked() {
-    this.toggleReadyButtonReady()
-    this.playerReadyCommand()
+    if(this.mainPlayer.isReady){
+      this.playerReadyCommand(false)
+    }
+    else{
+      this.playerReadyCommand(true)
+    }
   }
 
   private registerPlayer() {
