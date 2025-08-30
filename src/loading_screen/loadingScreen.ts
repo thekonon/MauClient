@@ -1,10 +1,13 @@
+import { Player } from "./player";
+
 export class LoadingScreen {
-  mainPlayer: string;
-  connectedPlayers: string[];
+  mainPlayer: Player;
+  connectedPlayers: Player[];
 
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
+  public playerReadyCommand: () => void = () => { console.warn("Player Ready not implemented in loadingScreen") };
   public reconnectCommand: (_: string, __: string) => void = (
     _: string,
     __: string,
@@ -13,7 +16,7 @@ export class LoadingScreen {
   };
 
   constructor() {
-    this.mainPlayer = "";
+    this.mainPlayer = new Player("");
     this.connectedPlayers = [];
     this.addEvents()
   }
@@ -77,40 +80,64 @@ export class LoadingScreen {
     });
   }
 
-  public get_players_list(): string[] {
+  public get_players_list(): Player[] {
     let listWithoutMainPlayer = this.connectedPlayers;
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
-      (item) => item != this.getMainPlayer(),
+      (item) => item.name != this.getMainPlayer(),
     );
     return listWithoutMainPlayer;
   }
 
   public getMainPlayer(): string {
-    return this.mainPlayer;
+    return this.mainPlayer.name;
   }
 
-  public addPlayerToList(player: string) {
+  public addPlayerToList(player_name: string) {
     if (this.connectedPlayers.length > 4) {
       throw Error("This client supports maximum of 5 players");
     }
-    this.connectedPlayers.push(player);
+    this.connectedPlayers.push(new Player(player_name));
     this.updateConnectedPlayers();
   }
 
-  public removePlayerFromList(player: string) {
-    this.connectedPlayers = this.connectedPlayers.filter((p) => p !== player);
+  public removePlayerFromList(player_name: string) {
+    this.connectedPlayers = this.connectedPlayers.filter((player) => player.name !== player_name);
     this.updateConnectedPlayers();
   }
 
-  public updatePlayerList(playerList: string[]) {
-    if (playerList.length > 5) {
+  public updatePlayerList(playerNames: string[]) {
+    if (playerNames.length > 5) {
       throw Error("This client supports maximum of 5 players");
     }
-    this.connectedPlayers = playerList;
+
+    this.connectedPlayers = []
+
+    playerNames.forEach(name => {
+      this.connectedPlayers.push(new Player(name))
+    });
+
     this.updateConnectedPlayers();
   }
 
-  public unsetReadyButtonReady() {
+  public readyPlayerMessage(playerName: string, ready: boolean) {
+    if (playerName === this.mainPlayer.name) {
+      if (ready) {
+        this.setReadyButtonReady()
+      } else {
+        this.unsetReadyButtonReady()
+      }
+      this.mainPlayer.isReady = ready
+    }
+
+    this.connectedPlayers.forEach(player => {
+      if (player.name === playerName) {
+        player.isReady = ready
+      }
+    });
+    this.updateConnectedPlayers()
+  }
+
+  private unsetReadyButtonReady() {
     const readyButton = document.getElementById(
       "readyButton",
     ) as HTMLInputElement;
@@ -121,7 +148,7 @@ export class LoadingScreen {
     }
   }
 
-  public setReadyButtonReady() {
+  private setReadyButtonReady() {
     const readyButton = document.getElementById(
       "readyButton",
     ) as HTMLInputElement;
@@ -139,14 +166,14 @@ export class LoadingScreen {
 
     if (!readyButton.classList.contains("ready")) {
       this.setReadyButtonReady()
-    } else{
+    } else {
       this.unsetReadyButtonReady()
     }
   }
 
   private readyPlayerButtonClicked() {
-    console.log("player is ready")
     this.toggleReadyButtonReady()
+    this.playerReadyCommand()
   }
 
   private registerPlayer() {
@@ -173,7 +200,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = playerName;
+    this.mainPlayer = new Player(playerName);
     this.on_register_player?.(playerName, ip, port);
   }
 
@@ -212,13 +239,19 @@ export class LoadingScreen {
       this.disableConnectButton();
     }
 
-    // Add each player as a line
     this.connectedPlayers.forEach((player) => {
       const div = document.createElement("div");
-      if (player == this.mainPlayer) {
-        div.textContent = `🟢 ${player} - user`;
+      let symbol = "";
+      if (player.isReady) {
+        symbol = '🟢'
+      }
+      else {
+        symbol = '🔴'
+      }
+      if (player.name == this.mainPlayer.name) {
+        div.textContent = `${symbol} ${player.name} - user`;
       } else {
-        div.textContent = `🟢 ${player}`;
+        div.textContent = `${symbol} ${player.name}`;
       }
       div.style.color = "black";
       div.style.marginBottom = "5px";
@@ -232,10 +265,7 @@ export class LoadingScreen {
     ) as HTMLButtonElement | null;
 
     if (connectButton) {
-      // Disable the native button functionality
       connectButton.disabled = true;
-
-      // Add CSS class for styling
       if (!connectButton.classList.contains("disabled")) {
         connectButton.classList.add("disabled");
       }

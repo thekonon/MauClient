@@ -136,6 +136,8 @@ async function cardTest(app: Application) {
     web_socket.createConnection();
   };
 
+  loading_screen.playerReadyCommand = web_socket.sendReadyCommand.bind(web_socket)
+
   loading_screen.reconnectCommand = (ip: string, port: string) => {
     web_socket.setIPPort(ip, port);
     web_socket.reconnect();
@@ -146,6 +148,7 @@ async function cardTest(app: Application) {
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
   web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
+  web_socket.playerReadyMessage = loading_screen.readyPlayerMessage.bind(loading_screen);
   web_socket.removePlayerAction =
     loading_screen.removePlayerFromList.bind(loading_screen);
 
@@ -159,8 +162,6 @@ async function cardTest(app: Application) {
 
   // loading_screen.hide()
   // cardTest(app)
-
-  // loading_screen.toggleReadyButtonReady()
 
   const cardManager = new CardManager(app)
   // await new Promise((res) => setTimeout(res, 1050));
