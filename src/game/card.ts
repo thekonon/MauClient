@@ -63,6 +63,7 @@ export class Card extends Container {
   private wasDragged = false;
   private isDialogActive = false;
   useOriginOfCard: boolean;
+  spriteContainer: any;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
@@ -93,17 +94,22 @@ export class Card extends Container {
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
-    this.useOriginOfCard = false
+    this.useOriginOfCard = true
 
+    
+    // This is a point to which i set the position of whole container
+    const background = new Graphics()
+    background.rect(0,0,10,10).fill(0xff0000)
+    this.addChild(background)
+    
+    // This is the container for rotating and transforming sprite itself
+    this.spriteContainer = new Container()
+    
     if (this.useOriginOfCard) {
       this.card_sprite.anchor.set(0.5)
-      this.card_sprite.x = this.card_sprite.width / 2
-      this.card_sprite.y = this.card_sprite.height / 2
+      this.spriteContainer.x = this.card_sprite.width / 2
+      this.spriteContainer.y = this.card_sprite.height / 2
     }
-
-    const constainer = new Graphics()
-    constainer.rect(0,0,100,200).fill(0xff0000)
-    this.addChild(constainer)
 
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
       console.warn("playCardCommand not defined");
@@ -116,7 +122,8 @@ export class Card extends Container {
     this.on("pointerupoutside", this.onDragEnd, this);
     this.on("pointermove", this.onDragMove, this);
 
-    this.addChild(sprite);
+    this.spriteContainer.addChild(sprite);
+    this.addChild(this.spriteContainer)
   }
 
   public play(
@@ -133,7 +140,7 @@ export class Card extends Container {
         onComplete: onFinish,
         ease: "power1.out",
       });
-      gsap.to(this.card_sprite, {
+      gsap.to(this.spriteContainer, {
         rotation: rotation ?? this.rotation_angle,
         duration: duration ?? this.animation_duration,
         ease: "power1.out",
@@ -162,33 +169,38 @@ export class Card extends Container {
   }
 
   public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
-    const globalPoint = new Point(0,0);
+    const topLeftEdge = new Point(-this.card_sprite.width/2,-this.card_sprite.height/2)
 
-    // This tels you how much container must move
-    const localParrentDiff = this.parent.toLocal(globalPoint);
-    const localDiff = this.toLocal(globalPoint);
-    const localSpriteDiff = this.card_sprite.toLocal(globalPoint)
+    // Simulate end of rotation in order to get the end point
+    const prevRotation = this.spriteContainer.rotation
+    this.spriteContainer.rotation = rotation
+    const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
+    this.spriteContainer.rotation = prevRotation
 
-    console.log("Global:", globalPoint)
-    console.log("Parrent:",localParrentDiff)
-    console.log("This:",localDiff)
-    console.log("SpriteLocal:",localSpriteDiff)
+    const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
+    this.spriteContainer.addChild(testGraphics)
 
-    // globalPoint.x -= localDiff.x
-    // globalPoint.y -= localDiff.y
+    const testGraphics2 = new Graphics().moveTo(0,0).lineTo(globalDiff.x, globalDiff.y).stroke({ width: 2, color: 0x000000 })
+    // this.addChild(testGraphics2)
 
-    // console.log("Global: ", globalPoint)
-    
-    // const localPoint = this.parent.toLocal(globalPoint);
-
-    // this.end_animation_point_x = localPoint.x;
-    // this.end_animation_point_y = localPoint.y;
+    this.end_animation_point_x = x - globalDiff.x
+    this.end_animation_point_y = y - globalDiff.y
     this.rotation_angle = rotation;
   }
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
-    this.end_animation_point_x = x;
-    this.end_animation_point_y = y;
+    const topLeftEdge = new Point(-this.card_sprite.width/2,-this.card_sprite.height/2)
+
+    // Simulate end of rotation in order to get the end point
+    const prevRotation = this.spriteContainer.rotation
+    this.spriteContainer.rotation = rotation
+    const localDiff = this.spriteContainer.parent.toLocal(this.spriteContainer.toGlobal(topLeftEdge));
+    this.spriteContainer.rotation = prevRotation
+
+    const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
+    this.spriteContainer.addChild(testGraphics)
+    this.end_animation_point_x = x - localDiff.x;
+    this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;
   }
 
