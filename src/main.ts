@@ -18,7 +18,7 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"PLAYERS","players":["aa"]}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"bb","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"cc","active":true}}}',
+    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"asdasasdasdasdasdasdasdasdasddasdasdcc","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
   ];
@@ -134,12 +134,6 @@ async function cardTest(app: Application) {
   // testCard.setGlobalEndOfAnimation(250, 100, 0)
   // testCard.play()
 }
-
-(async () => {
-
-  const loading_screen = new LoadingScreen();
-  loading_screen.show()
-
   const web_socket = new WebSocketHandle();
 
   // Create websocket connection after providing a name under which is user connected to WS
@@ -154,7 +148,6 @@ async function cardTest(app: Application) {
   };
 
   loading_screen.playerReadyCommand = web_socket.sendReadyCommand.bind(web_socket)
-
   loading_screen.reconnectCommand = (ip: string, port: string) => {
     web_socket.setIPPort(ip, port);
     web_socket.reconnect();
@@ -219,7 +212,6 @@ async function cardTest(app: Application) {
     // Start game
     game.startGame();
   };
-
   // Bypapass for testing
   // testing(web_socket, loading_screen)
 })();

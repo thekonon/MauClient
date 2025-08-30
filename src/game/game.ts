@@ -124,6 +124,7 @@ export class Game extends Container {
       if (Date.now() >= expireAtMs) {
         clearInterval(this.intervalId);
         console.error("Time expired!");
+
       }
     }, 100); // 100 ms = 0.1s
 

@@ -1,7 +1,6 @@
 :root {
   --main-font-family: 'Press Start 2P', Impact
 }
-
 body,
 html {
   margin: 0;
@@ -35,7 +34,6 @@ canvas {
   display: flex;
   justify-content: center;
   width: fit-content;
-
   background: linear-gradient(0deg, #de3249, #a41f31);
   border-radius: 1em;
   border-top: 0.3em solid black;
@@ -347,7 +345,6 @@ input.max-reached {
     font-size: 0.5rem;
     padding: 0.5em;
   }
-
 }
 
 @media (min-width: 1200px) {

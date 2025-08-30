@@ -88,5 +88,7 @@ export class EndScreen extends Container {
     );
     this.x = GameSettings.get_mid_x();
     this.y = GameSettings.get_mid_y();
+    console.log(this.sprite.width / GameSettings.screen_width);
+    console.log(this.sprite.height / GameSettings.screen_height);
   }
 }

@@ -184,7 +184,6 @@ export class WebSocketHandle {
     });
     this.send(readyCommand);
   }
-
   private createSocket(): WebSocket {
     const socket = new WebSocket(this.url);
     socket.addEventListener("open", () => {
