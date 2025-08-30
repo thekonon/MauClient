@@ -66,7 +66,6 @@ async function testing(
 
   const loading_screen = new LoadingScreen();
   loading_screen.show()
-
   const web_socket = new WebSocketHandle();
 
   // Create websocket connection after providing a name under which is user connected to WS
@@ -81,7 +80,6 @@ async function testing(
   };
 
   loading_screen.playerReadyCommand = web_socket.sendReadyCommand.bind(web_socket)
-
   loading_screen.reconnectCommand = (ip: string, port: string) => {
     web_socket.setIPPort(ip, port);
     web_socket.reconnect();
@@ -145,7 +143,6 @@ async function testing(
 
     game.startGame();
   };
-
   // Bypapass for testing
   // testing(web_socket, loading_screen)
 })();
