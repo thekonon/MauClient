@@ -26,7 +26,6 @@ export class EndScreen extends Container {
 
   public async show() {
     await this.textureLoaded;
-    console.log("adding sprite");
     this.addChild(this.sprite);
     this.app.stage.addChild(this);
   }
@@ -51,7 +50,7 @@ export class EndScreen extends Container {
     function createText(playerName: string, x: number, y: number) {
       const style = new TextStyle({
         fontFamily: "Impact",
-        fontSize: 30,
+        fontSize: GameSettings.fontSize,
         fill: "#000000",
       });
 
@@ -76,7 +75,7 @@ export class EndScreen extends Container {
           );
           resolve(true);
         } catch (err) {
-          console.log("loading failed");
+          console.error("loading failed");
           reject(err);
         }
       })();

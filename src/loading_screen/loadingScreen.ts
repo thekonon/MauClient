@@ -1,10 +1,13 @@
+import { Player } from "./player";
+
 export class LoadingScreen {
-  mainPlayer: string;
-  connectedPlayers: string[];
+  mainPlayer: Player;
+  connectedPlayers: Player[];
 
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
+  public playerReadyCommand: (_:boolean) => void = (_:boolean) => { console.warn("Player Ready not implemented in loadingScreen") };
   public reconnectCommand: (_: string, __: string) => void = (
     _: string,
     __: string,
@@ -13,13 +16,12 @@ export class LoadingScreen {
   };
 
   constructor() {
-    this.mainPlayer = "";
+    this.mainPlayer = new Player("");
     this.connectedPlayers = [];
     this.addEvents()
   }
 
   public show() {
-    this.createFallingCards(30);
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "block";
@@ -28,7 +30,6 @@ export class LoadingScreen {
   }
 
   public hide() {
-    this.removeFallingCards();
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "none";
@@ -42,7 +43,6 @@ export class LoadingScreen {
     if (input) {
       input.addEventListener("input", () => {
         if (input.value.length >= input.maxLength) {
-          console.log("Max reached")
           input.classList.add("max-reached");
         } else {
           input.classList.remove("max-reached");
@@ -66,6 +66,13 @@ export class LoadingScreen {
       this.reconnectPlayer();
     });
 
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLButtonElement;
+    readyButton.addEventListener("click", () => {
+      this.readyPlayerButtonClicked();
+    });
+
     window.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         this.registerPlayer();
@@ -76,34 +83,101 @@ export class LoadingScreen {
   public get_players_list(): string[] {
     let listWithoutMainPlayer = this.connectedPlayers;
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
-      (item) => item != this.getMainPlayer(),
+      (item) => item.name != this.getMainPlayer(),
     );
-    return listWithoutMainPlayer;
+    return listWithoutMainPlayer.map(player => player.name)
   }
 
   public getMainPlayer(): string {
-    return this.mainPlayer;
+    return this.mainPlayer.name;
   }
 
-  public addPlayerToList(player: string) {
+  public addPlayerToList(player_name: string) {
     if (this.connectedPlayers.length > 4) {
       throw Error("This client supports maximum of 5 players");
     }
-    this.connectedPlayers.push(player);
+    this.connectedPlayers.push(new Player(player_name));
     this.updateConnectedPlayers();
   }
 
-  public removePlayerFromList(player: string) {
-    this.connectedPlayers = this.connectedPlayers.filter((p) => p !== player);
+  public removePlayerFromList(player_name: string) {
+    this.connectedPlayers = this.connectedPlayers.filter((player) => player.name !== player_name);
     this.updateConnectedPlayers();
   }
 
-  public updatePlayerList(playerList: string[]) {
-    if (playerList.length > 5) {
+  public updatePlayerList(playerNames: string[]) {
+    if (playerNames.length > 5) {
       throw Error("This client supports maximum of 5 players");
     }
-    this.connectedPlayers = playerList;
+
+    this.connectedPlayers = []
+
+    playerNames.forEach(name => {
+      this.connectedPlayers.push(new Player(name))
+    });
+
     this.updateConnectedPlayers();
+  }
+
+  public readyPlayerMessage(playerName: string, ready: boolean) {
+    if (playerName === this.mainPlayer.name) {
+      if (ready) {
+        this.setReadyButtonReady()
+      } else {
+        this.unsetReadyButtonReady()
+      }
+      this.mainPlayer.isReady = ready
+    }
+
+    this.connectedPlayers.forEach(player => {
+      if (player.name === playerName) {
+        player.isReady = ready
+      }
+    });
+    this.updateConnectedPlayers()
+  }
+
+  private unsetReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (readyButton.classList.contains("ready")) {
+      readyButton.textContent = "Make me ready"
+      readyButton.classList.remove("ready");
+    }
+  }
+
+  private setReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (!readyButton.classList.contains("ready")) {
+      readyButton.textContent = "I am ready"
+      readyButton.classList.add("ready");
+    }
+  }
+
+  public toggleReadyButtonReady() {
+    const readyButton = document.getElementById(
+      "readyButton",
+    ) as HTMLInputElement;
+
+    if (!readyButton.classList.contains("ready")) {
+      this.setReadyButtonReady()
+    } else {
+      this.unsetReadyButtonReady()
+    }
+  }
+
+  private readyPlayerButtonClicked() {
+    if(this.mainPlayer.isReady){
+      this.playerReadyCommand(false)
+    }
+    else{
+      this.playerReadyCommand(true)
+    }
   }
 
   private registerPlayer() {
@@ -130,7 +204,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = playerName;
+    this.mainPlayer = new Player(playerName);
     this.on_register_player?.(playerName, ip, port);
   }
 
@@ -163,19 +237,25 @@ export class LoadingScreen {
     // Clear current content
     container.innerHTML = "";
     if (this.connectedPlayers.length === 0) {
-      container.innerHTML = `<em style="color: #555;">No players connected yet.</em>`;
+      container.innerHTML = `<em style="color: #555;">No connection to lobby</em>`;
       return;
     } else {
       this.disableConnectButton();
     }
 
-    // Add each player as a line
     this.connectedPlayers.forEach((player) => {
       const div = document.createElement("div");
-      if (player == this.mainPlayer) {
-        div.textContent = `🟢 ${player} - current user`;
+      let symbol = "";
+      if (player.isReady) {
+        symbol = '🟢'
+      }
+      else {
+        symbol = '🔴'
+      }
+      if (player.name == this.mainPlayer.name) {
+        div.textContent = `${symbol} ${player.name} - user`;
       } else {
-        div.textContent = `🟢 ${player}`;
+        div.textContent = `${symbol} ${player.name}`;
       }
       div.style.color = "black";
       div.style.marginBottom = "5px";
@@ -185,45 +265,14 @@ export class LoadingScreen {
 
   private disableConnectButton(): void {
     const connectButton = document.getElementById(
-      "connectButton",
+      "connectButton"
     ) as HTMLButtonElement | null;
 
     if (connectButton) {
       connectButton.disabled = true;
-      connectButton.classList.add("disabled"); // so CSS can style it
+      if (!connectButton.classList.contains("disabled")) {
+        connectButton.classList.add("disabled");
+      }
     }
-  }
-
-  private createFallingCards(count: number) {
-    for (let i = 0; i < count; i++) {
-      const card = document.createElement('div');
-      card.classList.add('card');
-
-      // Random size
-      const width = Math.random() * 40 + 30; // 30-70px
-      const height = width * 1.4; // typical card ratio
-      card.style.width = `${width}px`;
-      card.style.height = `${height}px`;
-
-      // Random horizontal position
-      card.style.left = `${Math.random() * 100}vw`;
-
-      // Random color (optional)
-      const colors = ['#fff', '#f5f5dc', '#f0e68c', '#ffe4e1'];
-      card.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-
-      // Random animation duration and delay
-      const duration = Math.random() * 5 + 4; // 4-9s
-      const delay = Math.random() * 5; // 0-5s
-      card.style.animation = `fall ${duration}s linear infinite`;
-      card.style.animationDelay = `${delay}s`;
-
-      document.body.appendChild(card);
-    }
-  }
-
-  private removeFallingCards() {
-    const cards = document.querySelectorAll('.card'); // find all elements with class 'card'
-    cards.forEach(card => card.remove()); // remove each element
   }
 }

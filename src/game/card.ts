@@ -5,6 +5,7 @@ import {
   Container,
   Point,
   FederatedPointerEvent,
+  Graphics,
 } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
@@ -55,12 +56,14 @@ export class Card extends Container {
     */
   public playCardCommand: (type: string, value: string, _: string) => void;
   public card_sprite: Sprite;
-  static background_texture: Texture;
 
   private isDragging = false;
   private dragOffset = new Point();
   private dragStartPosition = new Point();
   private wasDragged = false;
+  private isDialogActive = false;
+  useOriginOfCard: boolean;
+  spriteContainer: any;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
@@ -70,8 +73,6 @@ export class Card extends Container {
   ): Promise<Card> {
     const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
-
-    Card.background_texture = await Card.load_texture("back", "", texture_name);
     return new Card(type, value, sprite);
   }
 
@@ -93,50 +94,72 @@ export class Card extends Container {
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
+    this.useOriginOfCard = true
+
+    
+    // This is a point to which i set the position of whole container
+    const background = new Graphics()
+    background.rect(0,0,10,10).fill(0xff0000)
+    // this.addChild(background)
+    
+    // This is the container for rotating and transforming sprite itself
+    this.spriteContainer = new Container()
+    
+    if (this.useOriginOfCard) {
+      this.card_sprite.anchor.set(0.5)
+      this.spriteContainer.x = this.card_sprite.width / 2
+      this.spriteContainer.y = this.card_sprite.height / 2
+    }
 
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
-      console.log("Not defined");
+      console.warn("playCardCommand not defined");
     };
 
     this.interactive = true;
-    // this.on("pointerdown", async () => {
-    //     let nextColor = "";
-    //     if (this.value === "Q") {
-    //         const dialog = new QueenDialog();
-    //         dialog.zIndex = 999; // Hehe u know what i did here
-    //         this.parent.addChild(dialog)
-    //         nextColor = await dialog.show(); // wait for user to choose
-    //         this.parent.removeChild(dialog)
-    //     }
-    //     this.play_card_action(this.type, this.value, nextColor);
-    // });
 
     this.on("pointerdown", this.onDragStart, this);
     this.on("pointerup", this.onDragEnd, this);
     this.on("pointerupoutside", this.onDragEnd, this);
     this.on("pointermove", this.onDragMove, this);
 
-    this.addChild(sprite);
+    this.spriteContainer.addChild(sprite);
+    this.addChild(this.spriteContainer)
   }
 
   public play(
     duration?: number,
     rotation?: number,
-    onFinish: () => void = () => {},
+    onFinish: () => void = () => { },
   ) {
-    gsap.to(this, {
-      x: this.end_animation_point_x,
-      y: this.end_animation_point_y,
-      rotation: rotation ?? this.rotation_angle,
-      duration: duration ?? this.animation_duration,
-      onComplete: onFinish,
-      ease: "power1.out",
-    });
+    console.log("End:", this.end_animation_point_x, this.end_animation_point_y)
+    if (this.useOriginOfCard) {
+      gsap.to(this, {
+        x: this.end_animation_point_x,
+        y: this.end_animation_point_y,
+        duration: duration ?? this.animation_duration,
+        onComplete: onFinish,
+        ease: "power1.out",
+      });
+      gsap.to(this.spriteContainer, {
+        rotation: rotation ?? this.rotation_angle,
+        duration: duration ?? this.animation_duration,
+        ease: "power1.out",
+      });
+    } else {
+      gsap.to(this, {
+        x: this.end_animation_point_x,
+        y: this.end_animation_point_y,
+        rotation: rotation ?? this.rotation_angle,
+        duration: duration ?? this.animation_duration,
+        onComplete: onFinish,
+        ease: "power1.out",
+      });
+    }
   }
 
   public changeContainer(newContainer: Container) {
     if (this.parent) {
-      const globalPoint = this.toGlobal(new Point(this.x, this.y));
+      const globalPoint = this.toGlobal(new Point(0, 0));
       this.parent.removeChild(this);
       this.position.copyFrom(newContainer.toLocal(globalPoint));
       newContainer.addChild(this);
@@ -146,16 +169,38 @@ export class Card extends Container {
   }
 
   public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
-    const globalPoint = new Point(x, y);
-    const localPoint = this.toLocal(globalPoint);
-    this.end_animation_point_x = localPoint.x;
-    this.end_animation_point_y = localPoint.y;
-    this.rotation = rotation;
+    const topLeftEdge = new Point(-this.card_sprite.width/2,-this.card_sprite.height/2)
+
+    // Simulate end of rotation in order to get the end point
+    const prevRotation = this.spriteContainer.rotation
+    this.spriteContainer.rotation = rotation
+    const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
+    this.spriteContainer.rotation = prevRotation
+
+    const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
+    // this.spriteContainer.addChild(testGraphics)
+
+    const testGraphics2 = new Graphics().moveTo(0,0).lineTo(globalDiff.x, globalDiff.y).stroke({ width: 2, color: 0x000000 })
+    // this.addChild(testGraphics2)
+
+    this.end_animation_point_x = x - globalDiff.x
+    this.end_animation_point_y = y - globalDiff.y
+    this.rotation_angle = rotation;
   }
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
-    this.end_animation_point_x = x;
-    this.end_animation_point_y = y;
+    const topLeftEdge = new Point(-this.card_sprite.width/2,-this.card_sprite.height/2)
+
+    // Simulate end of rotation in order to get the end point
+    const prevRotation = this.spriteContainer.rotation
+    this.spriteContainer.rotation = rotation
+    const localDiff = this.spriteContainer.parent.toLocal(this.spriteContainer.toGlobal(topLeftEdge));
+    this.spriteContainer.rotation = prevRotation
+
+    const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
+    // this.spriteContainer.addChild(testGraphics)
+    this.end_animation_point_x = x - localDiff.x;
+    this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;
   }
 
@@ -207,12 +252,19 @@ export class Card extends Container {
   }
   private async onCardClick() {
     let nextColor = "";
+    if (this.isDialogActive) {
+      console.warn("There is already active dialog window for queen!")
+      return
+    }
     if (this.value === "Q") {
       const dialog = new QueenDialog();
-      dialog.zIndex = 999;
+      this.isDialogActive = true;
+      dialog.exitFnc = () => { this.parent.removeChild(dialog); this.isDialogActive = false; };
+      dialog.zIndex = 999999999999;
       this.parent.addChild(dialog);
       nextColor = await dialog.show();
       this.parent.removeChild(dialog);
+      this.isDialogActive = false;
     }
     this.playCardCommand(this.type, this.value, nextColor);
   }

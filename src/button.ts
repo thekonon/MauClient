@@ -1,6 +1,7 @@
 import { Graphics, Container, Text, TextStyle } from "pixi.js";
 import { Button } from "@pixi/ui";
 import { Card } from "./game/card.ts";
+import { GameSettings } from "./gameSettings.ts";
 
 export class MyButton {
   button: Button;
@@ -17,7 +18,7 @@ export class MyButton {
     });
 
     const style = new TextStyle({
-      fontSize: 16,
+      fontSize: GameSettings.fontSize,
       fill: 0x000000,
       align: "center",
     });

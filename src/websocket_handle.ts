@@ -12,25 +12,26 @@ interface Move {
 export interface ServerMessage {
   messageType: "ACTION" | "ERROR" | string; // expand as needed
   action?: GameAction; // present when messageType === "ACTION"
+  body?: ServerMessageBody;
   error?: string; // you can add more for ERROR, etc.
 }
 
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -47,6 +48,12 @@ export interface GameAction {
   count?: number;
   nextColor?: string;
 }
+
+export interface ServerMessageBody {
+  bodyType: "READY";
+  username: string;
+}
+
 export class WebSocketHandle {
   private readonly cardNameMap = new Map<string, string>([
     ["ACE", "A"],
@@ -69,12 +76,13 @@ export class WebSocketHandle {
   );
 
   // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => {};
+  public drawCardAction: (card: Card) => void = (_: Card) => { };
   public update_player_list!: (player_list: string[]) => void;
   public add_player!: (player: string) => void;
   public removePlayerAction: (player: string) => void = (_: string) => {
     console.warn("removePlayerAction not implemented");
   };
+  public playerReadyMessage: (name: string, ready: boolean) => void = (_:string, __:boolean) => {console.warn("PlayerReadyMessage not implemented yet");};
   public start_game!: () => void;
   public start_pile!: (card: Card) => void;
   public playCardAction!: (
@@ -102,9 +110,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
   game_started: boolean;
@@ -167,11 +175,20 @@ export class WebSocketHandle {
     this.socket = this.createSocket();
   }
 
+  public sendReadyCommand(ready: boolean) {
+    const readyCommand = JSON.stringify({
+      requestType: "CONTROL",
+      control: {
+        controlType: ready ? "READY": "UNREADY",
+      },
+    });
+    this.send(readyCommand);
+  }
   private createSocket(): WebSocket {
     const socket = new WebSocket(this.url);
-
     socket.addEventListener("open", () => {
       console.log("WebSocket connected");
+
       this.onOpen();
     });
 
@@ -252,6 +269,9 @@ export class WebSocketHandle {
         case "ACTION":
           this.handleAction(message.action);
           break;
+        case "SERVER_MESSAGE":
+          this.handleServerMessage(message.body);
+          break;
         case "ERROR":
           console.error("Error detected, not implemented yet");
           break;
@@ -297,7 +317,6 @@ export class WebSocketHandle {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
         if (!msg.count) return console.error("Card count was not specified");
-        console.log("Someone took card, but secretly! Psst");
         this.hiddenDraw(msg.playerDto.username, msg.count);
       },
       PLAYER_RANK: (msg) => {
@@ -336,6 +355,13 @@ export class WebSocketHandle {
     } else {
       console.log("Unknown command!:", message.type);
     }
+  }
+
+  private handleServerMessage(message: ServerMessageBody){
+      switch(message.bodyType){
+        case "READY":
+          this.playerReadyMessage(message.username, true);
+      }
   }
 
   public playCard(message: GameAction) {
@@ -391,13 +417,6 @@ export class WebSocketHandle {
       this.cardNameMap.get(card_info.type)!,
       "pythonGen",
     );
-
-    card.end_animation_point_x = card.position.x;
-    card.end_animation_point_y = card.position.y;
-    card.end_animation_point_x -= card.width * 1.1;
-    card.end_animation_point_y += card.height * 0.3;
-
-    card.rotation = Math.PI / 2;
     this.start_pile(card);
   }
 

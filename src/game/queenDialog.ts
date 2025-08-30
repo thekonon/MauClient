@@ -8,17 +8,20 @@ export class QueenDialog extends Container {
   rect_height: number;
   edge_radius: number;
   button_height: number;
+  margin: number;
+  exitFnc: () => void = () => {console.warn("Exit fun not defined")}
 
   constructor() {
     super();
-    this.rect_x = GameSettings.dialog_window_pos[0];
-    this.rect_y = GameSettings.dialog_window_pos[1] - 600;
-    this.rect_width = GameSettings.dialog_window_dim[0];
-    this.rect_height = GameSettings.dialog_window_dim[1];
-    this.edge_radius = GameSettings.dialog_window_radius;
+    this.rect_x = 0;
+    this.rect_y = -500;
+    this.rect_width = GameSettings.fontSize * 15;
+    this.rect_height = GameSettings.fontSize * 8;
+    this.edge_radius = GameSettings.fontSize / 2;
+    this.margin = GameSettings.fontSize * 0.2;
 
     this.button_height =
-      (this.rect_height - GameSettings.dialog_window_padding * 5) / 4;
+      (this.rect_height - this.margin * 5) / 4;
   }
 
   public show(): Promise<string> {
@@ -45,27 +48,77 @@ export class QueenDialog extends Container {
 
       suits.forEach(([suit, symbol], index) => {
         const btn = this.create_button(suit, symbol);
-        btn.x = this.rect_x + GameSettings.dialog_window_padding;
+        btn.x = this.rect_x + this.margin;
         btn.y =
           this.rect_y +
-          index * (this.button_height + GameSettings.dialog_window_padding) +
-          GameSettings.dialog_window_padding;
+          index * (this.button_height + this.margin) +
+          this.margin;
         btn.interactive = true;
         btn.on("pointerdown", () => {
           resolve(suit);
         });
         this.addChild(btn);
       });
+
+      const exitButton = new Graphics();
+
+      // Draw the button background with border
+      exitButton
+        .roundRect(
+          this.rect_x + this.rect_width - GameSettings.fontSize,
+          this.rect_y - GameSettings.fontSize,
+          GameSettings.fontSize * 2,
+          GameSettings.fontSize * 2,
+          GameSettings.fontSize * 0.3
+        )
+        .fill(0xffffff);
+
+      // Draw the red cross
+      const crossPadding = GameSettings.fontSize * 0.3;
+      const x1 = this.rect_x + this.rect_width - GameSettings.fontSize + crossPadding;
+      const y1 = this.rect_y - GameSettings.fontSize + crossPadding;
+      const x2 = x1 + GameSettings.fontSize * 2 - 2 * crossPadding;
+      const y2 = y1 + GameSettings.fontSize * 2 - 2 * crossPadding;
+
+      exitButton
+        .setStrokeStyle({ width: 5, color: 0x000000, alpha: 1 }) // red cross
+        .moveTo(x1, y1)
+        .lineTo(x2, y2)
+        .moveTo(x1, y2)
+        .lineTo(x2, y1)
+        .stroke();
+
+      exitButton
+        .setStrokeStyle({ width: 2, color: 0x000000, alpha: 1 }) // width, color, alpha
+        .roundRect(
+          this.rect_x + this.rect_width - GameSettings.fontSize,
+          this.rect_y - GameSettings.fontSize,
+          GameSettings.fontSize * 2,
+          GameSettings.fontSize * 2,
+          GameSettings.fontSize * 0.3
+        ).stroke()
+        ;
+
+      exitButton.interactive = true;
+      exitButton.eventMode = "static";
+      exitButton.cursor = "pointer";
+
+      exitButton.on("pointerdown", () => {
+        this.exitFnc();
+      })
+
+      this.addChild(exitButton);
     });
   }
 
   private create_button(
+
     displayed_text: string = "Empty",
     symbol: string,
   ): Container {
     const buttonContainer = new Container();
 
-    const width = this.rect_width - GameSettings.dialog_window_padding * 2;
+    const width = this.rect_width - this.margin * 2;
     const height = this.button_height;
 
     const button = new Graphics();
@@ -92,7 +145,7 @@ export class QueenDialog extends Container {
 
     const style = new TextStyle({
       fontFamily: "Arial",
-      fontSize: 24,
+      fontSize: GameSettings.fontSize,
       fill: "#ffffff",
     });
 

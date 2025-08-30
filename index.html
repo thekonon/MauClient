@@ -20,7 +20,8 @@
           <div class="title">Mňau Mňau Game</div>
           <div class="form-group">
             <label for="playerName">Player Name:</label>
-            <input type="text" id="playerName" name="playerName" maxLength="20">
+            <input type="text" id="playerName" name="playerName" maxLength="20" autocomplete="additional-name">
+
           </div>
           <div class="form-group">
             <label for="ip">IP:</label>
@@ -35,11 +36,12 @@
           <div class="form-group">
             <label for="port">Lobies:</label>
             <select name="cars" id="cars">
-              <option value="volvo">SELECT</option>
+              <option value="volvo">Random</option>
               <option value="saab">Saab</option>
               <option value="mercedes">Mercedes</option>
               <option value="audi">Audi</option>
             </select>
+            <button class="btn-refresh">Refresh lobbies</button>
           </div>
           <div class="buttons">
             <button class="btn" id="connectButton">Connect to lobby!</button>
@@ -51,6 +53,7 @@
           <div class="players-box" id="connectedPlayersList">
             No players connected yet.
           </div>
+          <button class="btn" id="readyButton">MAKE ME READY</button>
         </div>
       </div>
     </div>

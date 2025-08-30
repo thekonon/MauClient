@@ -77,8 +77,8 @@ export class AnotherPlayer extends Container {
     const textContainer = new Container();
     const style = new TextStyle({
       fontFamily: "Impact",
-      fontSize: 50,
-      fill: "#0000ff",
+      fontSize: GameSettings.fontSize,
+      fill: "#000000ff",
     });
 
     const text = new Text({
@@ -91,11 +91,11 @@ export class AnotherPlayer extends Container {
       style,
     });
 
-    text.x = 10;
-    text.y = 10;
+    text.x = 5;
+    text.y = GameSettings.getOtherPlayerHeight();
 
-    cardCountText.x = 10;
-    cardCountText.y = 80;
+    cardCountText.x = text.x;
+    cardCountText.y = text.y + GameSettings.fontSize*1.1;
     this.cardCountText = cardCountText;
 
     textContainer.addChild(text);
