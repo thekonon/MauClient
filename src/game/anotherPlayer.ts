@@ -95,7 +95,7 @@ export class AnotherPlayer extends Container {
     text.y = GameSettings.getOtherPlayerHeight();
 
     cardCountText.x = text.x;
-    cardCountText.y = text.y + GameSettings.fontSize*1.1;
+    cardCountText.y = text.y + GameSettings.fontSize * 1.1;
     this.cardCountText = cardCountText;
 
     textContainer.addChild(text);

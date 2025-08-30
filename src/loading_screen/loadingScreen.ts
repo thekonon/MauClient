@@ -7,7 +7,9 @@ export class LoadingScreen {
   public on_register_player:
     | ((playerName: string, ip: string, port: string) => void)
     | null = null;
-  public playerReadyCommand: (_:boolean) => void = (_:boolean) => { console.warn("Player Ready not implemented in loadingScreen") };
+  public playerReadyCommand: (_: boolean) => void = (_: boolean) => {
+    console.warn("Player Ready not implemented in loadingScreen");
+  };
   public reconnectCommand: (_: string, __: string) => void = (
     _: string,
     __: string,
@@ -18,7 +20,7 @@ export class LoadingScreen {
   constructor() {
     this.mainPlayer = new Player("");
     this.connectedPlayers = [];
-    this.addEvents()
+    this.addEvents();
   }
 
   public show() {
@@ -37,7 +39,9 @@ export class LoadingScreen {
   }
 
   public addEvents() {
-    const input = document.getElementById("playerName") as HTMLInputElement | null;
+    const input = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement | null;
     const ip = document.getElementById("IP") as HTMLInputElement | null;
 
     if (input) {
@@ -85,7 +89,7 @@ export class LoadingScreen {
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
       (item) => item.name != this.getMainPlayer(),
     );
-    return listWithoutMainPlayer.map(player => player.name)
+    return listWithoutMainPlayer.map((player) => player.name);
   }
 
   public getMainPlayer(): string {
@@ -101,7 +105,9 @@ export class LoadingScreen {
   }
 
   public removePlayerFromList(player_name: string) {
-    this.connectedPlayers = this.connectedPlayers.filter((player) => player.name !== player_name);
+    this.connectedPlayers = this.connectedPlayers.filter(
+      (player) => player.name !== player_name,
+    );
     this.updateConnectedPlayers();
   }
 
@@ -110,10 +116,10 @@ export class LoadingScreen {
       throw Error("This client supports maximum of 5 players");
     }
 
-    this.connectedPlayers = []
+    this.connectedPlayers = [];
 
-    playerNames.forEach(name => {
-      this.connectedPlayers.push(new Player(name))
+    playerNames.forEach((name) => {
+      this.connectedPlayers.push(new Player(name));
     });
 
     this.updateConnectedPlayers();
@@ -122,19 +128,19 @@ export class LoadingScreen {
   public readyPlayerMessage(playerName: string, ready: boolean) {
     if (playerName === this.mainPlayer.name) {
       if (ready) {
-        this.setReadyButtonReady()
+        this.setReadyButtonReady();
       } else {
-        this.unsetReadyButtonReady()
+        this.unsetReadyButtonReady();
       }
-      this.mainPlayer.isReady = ready
+      this.mainPlayer.isReady = ready;
     }
 
-    this.connectedPlayers.forEach(player => {
+    this.connectedPlayers.forEach((player) => {
       if (player.name === playerName) {
-        player.isReady = ready
+        player.isReady = ready;
       }
     });
-    this.updateConnectedPlayers()
+    this.updateConnectedPlayers();
   }
 
   private unsetReadyButtonReady() {
@@ -143,7 +149,7 @@ export class LoadingScreen {
     ) as HTMLInputElement;
 
     if (readyButton.classList.contains("ready")) {
-      readyButton.textContent = "Make me ready"
+      readyButton.textContent = "Make me ready";
       readyButton.classList.remove("ready");
     }
   }
@@ -154,7 +160,7 @@ export class LoadingScreen {
     ) as HTMLInputElement;
 
     if (!readyButton.classList.contains("ready")) {
-      readyButton.textContent = "I am ready"
+      readyButton.textContent = "I am ready";
       readyButton.classList.add("ready");
     }
   }
@@ -165,18 +171,17 @@ export class LoadingScreen {
     ) as HTMLInputElement;
 
     if (!readyButton.classList.contains("ready")) {
-      this.setReadyButtonReady()
+      this.setReadyButtonReady();
     } else {
-      this.unsetReadyButtonReady()
+      this.unsetReadyButtonReady();
     }
   }
 
   private readyPlayerButtonClicked() {
-    if(this.mainPlayer.isReady){
-      this.playerReadyCommand(false)
-    }
-    else{
-      this.playerReadyCommand(true)
+    if (this.mainPlayer.isReady) {
+      this.playerReadyCommand(false);
+    } else {
+      this.playerReadyCommand(true);
     }
   }
 
@@ -247,10 +252,9 @@ export class LoadingScreen {
       const div = document.createElement("div");
       let symbol = "";
       if (player.isReady) {
-        symbol = '🟢'
-      }
-      else {
-        symbol = '🔴'
+        symbol = "🟢";
+      } else {
+        symbol = "🔴";
       }
       if (player.name == this.mainPlayer.name) {
         div.textContent = `${symbol} ${player.name} - user`;
@@ -265,7 +269,7 @@ export class LoadingScreen {
 
   private disableConnectButton(): void {
     const connectButton = document.getElementById(
-      "connectButton"
+      "connectButton",
     ) as HTMLButtonElement | null;
 
     if (connectButton) {

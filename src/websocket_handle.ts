@@ -19,19 +19,19 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-  | "PLAYERS"
-  | "REGISTER_PLAYER"
-  | "START_GAME"
-  | "START_PILE"
-  | "DRAW"
-  | "PLAY_CARD"
-  | "PLAYER_SHIFT"
-  | "HIDDEN_DRAW"
-  | "PLAYER_RANK"
-  | "WIN"
-  | "LOSE"
-  | "END_GAME"
-  | "REMOVE_PLAYER";
+    | "PLAYERS"
+    | "REGISTER_PLAYER"
+    | "START_GAME"
+    | "START_PILE"
+    | "DRAW"
+    | "PLAY_CARD"
+    | "PLAYER_SHIFT"
+    | "HIDDEN_DRAW"
+    | "PLAYER_RANK"
+    | "WIN"
+    | "LOSE"
+    | "END_GAME"
+    | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -76,13 +76,18 @@ export class WebSocketHandle {
   );
 
   // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => { };
+  public drawCardAction: (card: Card) => void = (_: Card) => {};
   public update_player_list!: (player_list: string[]) => void;
   public add_player!: (player: string) => void;
   public removePlayerAction: (player: string) => void = (_: string) => {
     console.warn("removePlayerAction not implemented");
   };
-  public playerReadyMessage: (name: string, ready: boolean) => void = (_:string, __:boolean) => {console.warn("PlayerReadyMessage not implemented yet");};
+  public playerReadyMessage: (name: string, ready: boolean) => void = (
+    _: string,
+    __: boolean,
+  ) => {
+    console.warn("PlayerReadyMessage not implemented yet");
+  };
   public start_game!: () => void;
   public start_pile!: (card: Card) => void;
   public playCardAction!: (
@@ -91,7 +96,10 @@ export class WebSocketHandle {
     value: string,
     newColor: string,
   ) => Promise<void>;
-  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (_, __) => {
+  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (
+    _,
+    __,
+  ) => {
     console.warn("ShiftPlayerAction not defined in WS");
   };
   public hiddenDrawAction: (userName: string, cardCount: number) => void = (
@@ -110,9 +118,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void { }
-  public onClose(): void { }
-  public onError(_: Event): void { }
+  public onOpen(): void {}
+  public onClose(): void {}
+  public onError(_: Event): void {}
 
   // Game state
   game_started: boolean;
@@ -179,7 +187,7 @@ export class WebSocketHandle {
     const readyCommand = JSON.stringify({
       requestType: "CONTROL",
       control: {
-        controlType: ready ? "READY": "UNREADY",
+        controlType: ready ? "READY" : "UNREADY",
       },
     });
     this.send(readyCommand);
@@ -357,11 +365,11 @@ export class WebSocketHandle {
     }
   }
 
-  private handleServerMessage(message: ServerMessageBody){
-      switch(message.bodyType){
-        case "READY":
-          this.playerReadyMessage(message.username, true);
-      }
+  private handleServerMessage(message: ServerMessageBody) {
+    switch (message.bodyType) {
+      case "READY":
+        this.playerReadyMessage(message.username, true);
+    }
   }
 
   public playCard(message: GameAction) {

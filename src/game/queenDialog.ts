@@ -9,7 +9,9 @@ export class QueenDialog extends Container {
   edge_radius: number;
   button_height: number;
   margin: number;
-  exitFnc: () => void = () => {console.warn("Exit fun not defined")}
+  exitFnc: () => void = () => {
+    console.warn("Exit fun not defined");
+  };
 
   constructor() {
     super();
@@ -20,8 +22,7 @@ export class QueenDialog extends Container {
     this.edge_radius = GameSettings.fontSize / 2;
     this.margin = GameSettings.fontSize * 0.2;
 
-    this.button_height =
-      (this.rect_height - this.margin * 5) / 4;
+    this.button_height = (this.rect_height - this.margin * 5) / 4;
   }
 
   public show(): Promise<string> {
@@ -69,13 +70,14 @@ export class QueenDialog extends Container {
           this.rect_y - GameSettings.fontSize,
           GameSettings.fontSize * 2,
           GameSettings.fontSize * 2,
-          GameSettings.fontSize * 0.3
+          GameSettings.fontSize * 0.3,
         )
         .fill(0xffffff);
 
       // Draw the red cross
       const crossPadding = GameSettings.fontSize * 0.3;
-      const x1 = this.rect_x + this.rect_width - GameSettings.fontSize + crossPadding;
+      const x1 =
+        this.rect_x + this.rect_width - GameSettings.fontSize + crossPadding;
       const y1 = this.rect_y - GameSettings.fontSize + crossPadding;
       const x2 = x1 + GameSettings.fontSize * 2 - 2 * crossPadding;
       const y2 = y1 + GameSettings.fontSize * 2 - 2 * crossPadding;
@@ -95,9 +97,9 @@ export class QueenDialog extends Container {
           this.rect_y - GameSettings.fontSize,
           GameSettings.fontSize * 2,
           GameSettings.fontSize * 2,
-          GameSettings.fontSize * 0.3
-        ).stroke()
-        ;
+          GameSettings.fontSize * 0.3,
+        )
+        .stroke();
 
       exitButton.interactive = true;
       exitButton.eventMode = "static";
@@ -105,14 +107,13 @@ export class QueenDialog extends Container {
 
       exitButton.on("pointerdown", () => {
         this.exitFnc();
-      })
+      });
 
       this.addChild(exitButton);
     });
   }
 
   private create_button(
-
     displayed_text: string = "Empty",
     symbol: string,
   ): Container {

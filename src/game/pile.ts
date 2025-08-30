@@ -58,7 +58,7 @@ export class Pile extends Container {
     });
 
     const point = this.getPileTopLeftPoint();
-    point.x -= GameSettings.card_height + GameSettings.fontSize*1;
+    point.x -= GameSettings.card_height + GameSettings.fontSize * 1;
     point.y -= 0;
 
     if (this.previousText != null) {

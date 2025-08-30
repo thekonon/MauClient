@@ -33,12 +33,12 @@ export class GameSettings {
     return (this.card_height * 9) / 15;
   }
 
-  static get player_hand_padding(){
-    return this.get_player_hand_height()* 0.05;
+  static get player_hand_padding() {
+    return this.get_player_hand_height() * 0.05;
   }
 
-  static get fontSize(){
-    return this.screen_height*0.05;
+  static get fontSize() {
+    return this.screen_height * 0.05;
   }
 
   static get_deck_top_x() {
@@ -78,16 +78,16 @@ export class GameSettings {
     return (this.screen_height * this.player_hand_height_percent) / 100;
   }
 
-  static get playerHandButtonWidth(){
-    return this.fontSize*7;
+  static get playerHandButtonWidth() {
+    return this.fontSize * 7;
   }
 
-  static get playerHandButtonHeight(){
-    return this.fontSize*3;
+  static get playerHandButtonHeight() {
+    return this.fontSize * 3;
   }
 
-  static get playerHandButtonRadius(){
-    return this.fontSize/3;
+  static get playerHandButtonRadius() {
+    return this.fontSize / 3;
   }
 
   static get_mid_x() {
@@ -106,8 +106,15 @@ export class GameSettings {
     return this.screen_width;
   }
 
-  static get otherPlayerCardSizeScale(){
-    return this.screen_width*(1 - this.player_hand_width_percent/100-4*this.otherPlayerMarginsPercent/100)/2 / this.card_width;
+  static get otherPlayerCardSizeScale() {
+    return (
+      (this.screen_width *
+        (1 -
+          this.player_hand_width_percent / 100 -
+          (4 * this.otherPlayerMarginsPercent) / 100)) /
+      2 /
+      this.card_width
+    );
   }
 
   static getOtherPlayerWidth(): number {
@@ -135,7 +142,9 @@ export class GameSettings {
       return (this.screen_width * this.otherPlayerMarginsPercent) / 100;
     } else {
       return (
-        this.screen_height * (1-4*this.otherPlayerMarginsPercent/100) - this.getOtherPlayerHeight()-2*this.fontSize
+        this.screen_height * (1 - (4 * this.otherPlayerMarginsPercent) / 100) -
+        this.getOtherPlayerHeight() -
+        2 * this.fontSize
       );
     }
   }

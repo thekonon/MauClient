@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run dev",
     "build": "tsc && vite build",
-    "lint": "eslint .",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "dev": "vite --host"
   },
   "dependencies": {

@@ -74,13 +74,13 @@ export class PlayerHand extends Container {
       style,
     });
 
-    this.remainingTime.x = 0
+    this.remainingTime.x = 0;
     this.remainingTime.y = -GameSettings.fontSize * 1.2;
 
     this.addChild(this.background);
     this.addChild(passButton);
     this.addChild(reorderCardsButton);
-    this.addChild(this.remainingTime)
+    this.addChild(this.remainingTime);
   }
 
   public updateBackgroundColor(newColor: number = 0xde3249) {
