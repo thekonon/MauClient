@@ -17,7 +17,7 @@ export class Pile extends Container {
 
     const point = this.getPileTopLeftPoint();
 
-    card.setLocalEndOfAnimation(point.x, point.y, Math.PI * 4 - Math.PI / 2);
+    card.setLocalEndOfAnimation(point.x, point.y, -Math.PI / 2);
     this.addChild(card);
     card.play(undefined, undefined, () => {
       // Remove the previously finished card (if any)

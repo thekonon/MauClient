@@ -12,7 +12,7 @@ async function testing(
   loading_screen: LoadingScreen,
 ) {
   loading_screen.on_register_player?.("aa", "localhost", "8080");
-  loading_screen.mainPlayer = "aa";
+  loading_screen.mainPlayer.name = "aa";
 
   const initMsgs = [
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
@@ -49,7 +49,6 @@ async function testing(
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 50));
   }
-  // return;
   for (const msgStr of startGameMsgs) {
     web_socket.onMessage(msgStr);
   }
@@ -58,10 +57,10 @@ async function testing(
     await new Promise((res) => setTimeout(res, 50));
   }
   for (const msgStr of endMsgs) {
-    continue
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 500));
   }
+  return;
 }
 
 async function cardTest(app: Application) {
@@ -73,48 +72,66 @@ async function cardTest(app: Application) {
   const yGridCount = 50;
   grid.setStrokeStyle({ width: 2, color: 0x0 })
   for (let i = 0; i <= xGridCount; i++) {
-    grid.moveTo(i*delta, 0)
-    grid.lineTo(i*delta, 800)
+    grid.moveTo(i * delta, 0)
+    grid.lineTo(i * delta, 800)
     grid.stroke()
   }
   for (let i = 0; i <= yGridCount; i++) {
-    grid.moveTo(0, i*delta)
-    grid.lineTo(1800, i*delta)
+    grid.moveTo(0, i * delta)
+    grid.lineTo(1800, i * delta)
     grid.stroke()
   }
-
   app.stage.addChild(grid)
 
-  // const redDot = new Graphics().rect(0,0,5,5).fill(0xff0000)
 
-  // const testContainer1 = new Container()
-  // testContainer1.x = 500
-  // testContainer1.y = 300
-  // testContainer1.addChild(redDot)
+  const height = 200
+  const widht = 100
+  
+  const testCard = await Card.create("C", "7", "pythonGen");
+  testCard.width = widht
+  testCard.height = height
 
-  // app.stage.addChild(testContainer1)
+  const blueDot = new Graphics().rect(0,0,10,10).fill(0x0000ff)
+  const connectingLine = new Graphics().moveTo(0,0).lineTo(100, 300).stroke({width:2, color:0x000000})
+  
+  const testContainer = new Container()
+  testContainer.x = 500
+  testContainer.y = 100
+  testContainer.rotation = Math.PI/2
+  app.stage.addChild(testContainer)
+  testContainer.addChild(testCard)
+  testContainer.addChild(blueDot)
+  testContainer.addChild(connectingLine)
 
-  const testCard = await Card.create("", "back");
-  testCard.x = 1
-  console.log(testCard.width)
-  console.log(testCard.card_sprite.width)
-  console.log(testCard.x)
-  console.log(testCard.card_sprite.x)
+  testCard.setLocalEndOfAnimation(100, 300, -Math.PI/2)
+  testCard.play()
+
+  // app.ticker.add((ticker) => {
+  //   testContainer2.rotation += 0.1 * ticker.deltaTime;
+  //   testContainer1.x = 300 + 100 * Math.sin(0.01 * ticker.lastTime)
+  //   testContainer1.y = 200 + 100 * Math.cos(0.01 * ticker.lastTime)
+  // })
+
+  // testCard.x = 1
+  // console.log(testCard.width)
+  // console.log(testCard.card_sprite.width)
+  // console.log(testCard.x)
+  // console.log(testCard.card_sprite.x)
   // testCard.y = 100
   // testCard.end_animation_point_x = 200
   // testCard.end_animation_point_y = 100
 
 
-  app.stage.addChild(testCard)
+  // app.stage.addChild(testCard)
 
-  await new Promise((res) => setTimeout(res, 500));
-  // testCard.changeContainer(testContainer1)
+  // await new Promise((res) => setTimeout(res, 500));
+  // // testCard.changeContainer(testContainer1)
 
-  testCard.setGlobalEndOfAnimation(0, 0, -0*Math.PI/16)
-  // testCard.play()
+  // testCard.setGlobalEndOfAnimation(0, 0, -0*Math.PI/16)
+  // // testCard.play()
 
-  await new Promise((res) => setTimeout(res, 1100));
-  testCard.setGlobalEndOfAnimation(250, 100, 0)
+  // await new Promise((res) => setTimeout(res, 1100));
+  // testCard.setGlobalEndOfAnimation(250, 100, 0)
   // testCard.play()
 }
 
@@ -159,12 +176,7 @@ async function cardTest(app: Application) {
   await app.init({ background: "#1099bb", resizeTo: window });
 
   document.getElementById("pixi-container")!.appendChild(app.canvas);
-
-  // loading_screen.hide()
-  // cardTest(app)
-
   const cardManager = new CardManager(app)
-  // await new Promise((res) => setTimeout(res, 1050));
   await cardManager.loadCardTextures()
   cardManager.createFallingCards(50);
 
@@ -173,12 +185,10 @@ async function cardTest(app: Application) {
   // Create a endScreen instance
   let endScreen!: EndScreen;
 
-
-
   web_socket.start_game = async () => {
     // When game stats, hide loading screen
     loading_screen.hide();
-    cardManager.removeFallingCards()
+    // cardManager.removeFallingCards()
     GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
 
     game = new Game(app);

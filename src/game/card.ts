@@ -100,7 +100,7 @@ export class Card extends Container {
     // This is a point to which i set the position of whole container
     const background = new Graphics()
     background.rect(0,0,10,10).fill(0xff0000)
-    this.addChild(background)
+    // this.addChild(background)
     
     // This is the container for rotating and transforming sprite itself
     this.spriteContainer = new Container()
@@ -178,7 +178,7 @@ export class Card extends Container {
     this.spriteContainer.rotation = prevRotation
 
     const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
-    this.spriteContainer.addChild(testGraphics)
+    // this.spriteContainer.addChild(testGraphics)
 
     const testGraphics2 = new Graphics().moveTo(0,0).lineTo(globalDiff.x, globalDiff.y).stroke({ width: 2, color: 0x000000 })
     // this.addChild(testGraphics2)
@@ -198,7 +198,7 @@ export class Card extends Container {
     this.spriteContainer.rotation = prevRotation
 
     const testGraphics = new Graphics().moveTo(0,0).lineTo(topLeftEdge.x, topLeftEdge.y).stroke({ width: 2, color: 0x000000 })
-    this.spriteContainer.addChild(testGraphics)
+    // this.spriteContainer.addChild(testGraphics)
     this.end_animation_point_x = x - localDiff.x;
     this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;

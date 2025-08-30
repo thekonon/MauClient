@@ -80,12 +80,12 @@ export class LoadingScreen {
     });
   }
 
-  public get_players_list(): Player[] {
+  public get_players_list(): string[] {
     let listWithoutMainPlayer = this.connectedPlayers;
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
       (item) => item.name != this.getMainPlayer(),
     );
-    return listWithoutMainPlayer;
+    return listWithoutMainPlayer.map(player => player.name)
   }
 
   public getMainPlayer(): string {
