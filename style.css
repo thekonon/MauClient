@@ -166,13 +166,13 @@ input.max-reached {
 }
 
 /* Buttons spanning both columns */
-.form .buttons {
+.buttons {
   grid-column: 1 / -1;
   display: flex;
   justify-content: space-around;
 }
 
-.form .buttons .btn {
+.btn {
   position: relative;
   overflow: hidden;
   border-radius: 1.5em;
@@ -189,7 +189,7 @@ input.max-reached {
   transition: all 0.4s ease;
 }
 
-.form .buttons .btn::after {
+.btn::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -203,14 +203,14 @@ input.max-reached {
   opacity: 0;
 }
 
-.form .buttons .btn:hover::after {
+.btn:hover::after {
   width: 300%;
   height: 300%;
   opacity: 1;
 }
 
 /* Neon glow effect */
-.form .buttons .btn:hover {
+.btn:hover {
   color: white;
   background: #b0283c;
   box-shadow:
@@ -221,7 +221,7 @@ input.max-reached {
   transform: scale(1.05);
 }
 
-.form .buttons .btn.disabled {
+.btn.disabled {
   pointer-events: none;       /* Disable clicking */
   opacity: 0.5;               /* Dim the button */
   color: #999;                /* Optional: change text color */
@@ -259,6 +259,58 @@ input.max-reached {
   border-radius: 1em;
 
   border: 2px black solid;
+}
+
+.players .btn {
+  margin: 0;
+  margin-top: 1em;
+}
+
+/* Base ready state - green glow */
+.btn.ready {
+  color: white;
+  background: #228b22;
+  border-color: #28b028;
+  box-shadow:
+    0 0 10px #28b028,
+    0 0 20px #28b028,
+    0 0 40px #28b028,
+    0 0 80px #28b028;
+  transform: scale(1.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ripple stays green in normal state */
+.btn.ready::after {
+  background: rgba(40, 176, 40, 0.4);
+}
+
+/* On hover → show "NotReady" text */
+.btn.ready:hover {
+  color: transparent;
+  background: #8b2222; /* red background */
+  border-color: #b02828;
+  box-shadow:
+    0 0 10px #b02828,
+    0 0 20px #b02828,
+    0 0 40px #b02828,
+    0 0 80px #b02828;
+}
+
+/* New hover text in red mode */
+.btn.ready:hover::before {
+  content: "not ready";
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Optional: ripple also red when hovering */
+.btn.ready:hover::after {
+  background: rgba(176, 40, 40, 0.4);
 }
 
 @media (max-width: 1000px) {
