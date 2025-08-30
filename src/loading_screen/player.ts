@@ -1,10 +1,9 @@
-export class Player{
+export class Player {
+  name: string;
+  isReady: boolean;
 
-    name: string;
-    isReady: boolean;
-
-    constructor(name: string){
-        this.name = name;
-        this.isReady = false;
-    }
+  constructor(name: string) {
+    this.name = name;
+    this.isReady = false;
+  }
 }

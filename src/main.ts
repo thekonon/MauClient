@@ -1,4 +1,4 @@
-import { Application} from "pixi.js";
+import { Application } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
 import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
@@ -21,11 +21,11 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
     '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
   ];
-  const expireTimeMs = (Date.now() + 60000)
+  const expireTimeMs = Date.now() + 60000;
   const startGameMsgs = [
     '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
     '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
-    `{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":${expireTimeMs}}}`
+    `{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":${expireTimeMs}}}`,
   ];
   const midMsgs = [
     '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
@@ -44,16 +44,18 @@ async function testing(
     '{"messageType":"ACTION","action":{"type":"END_GAME","playerRank":["aa","bb", "cc", "dd", "Ee"]}}',
   ];
 
+  await new Promise((res) => setTimeout(res, 3000));
   for (const msgStr of initMsgs) {
     web_socket.onMessage(msgStr);
     await new Promise((res) => setTimeout(res, 50));
   }
   for (const msgStr of startGameMsgs) {
     web_socket.onMessage(msgStr);
+    await new Promise((res) => setTimeout(res, 200));
   }
   for (const msgStr of midMsgs) {
     web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 50));
+    await new Promise((res) => setTimeout(res, 200));
   }
   for (const msgStr of endMsgs) {
     web_socket.onMessage(msgStr);
@@ -63,9 +65,8 @@ async function testing(
 }
 
 (async () => {
-
   const loading_screen = new LoadingScreen();
-  loading_screen.show()
+  loading_screen.show();
   const web_socket = new WebSocketHandle();
 
   // Create websocket connection after providing a name under which is user connected to WS
@@ -79,7 +80,8 @@ async function testing(
     web_socket.createConnection();
   };
 
-  loading_screen.playerReadyCommand = web_socket.sendReadyCommand.bind(web_socket)
+  loading_screen.playerReadyCommand =
+    web_socket.sendReadyCommand.bind(web_socket);
   loading_screen.reconnectCommand = (ip: string, port: string) => {
     web_socket.setIPPort(ip, port);
     web_socket.reconnect();
@@ -90,7 +92,8 @@ async function testing(
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
   web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
-  web_socket.playerReadyMessage = loading_screen.readyPlayerMessage.bind(loading_screen);
+  web_socket.playerReadyMessage =
+    loading_screen.readyPlayerMessage.bind(loading_screen);
   web_socket.removePlayerAction =
     loading_screen.removePlayerFromList.bind(loading_screen);
 
@@ -101,8 +104,8 @@ async function testing(
   await app.init({ background: "#1099bb", resizeTo: window });
 
   document.getElementById("pixi-container")!.appendChild(app.canvas);
-  const cardManager = new CardManager(app)
-  await cardManager.loadCardTextures()
+  const cardManager = new CardManager(app);
+  await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
   let game!: Game;
@@ -144,5 +147,5 @@ async function testing(
     game.startGame();
   };
   // Bypapass for testing
-  // testing(web_socket, loading_screen)
+  testing(web_socket, loading_screen);
 })();
