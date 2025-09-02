@@ -6,6 +6,7 @@ import {
   Point,
   FederatedPointerEvent,
   Graphics,
+  Bounds,
 } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
@@ -65,6 +66,7 @@ export class Card extends Container {
   private isDialogActive = false;
   useOriginOfCard: boolean;
   spriteContainer: any;
+  private bounds!: Bounds;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
@@ -95,7 +97,7 @@ export class Card extends Container {
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
-    this.useOriginOfCard = true;
+    this.useOriginOfCard = false;
 
     // This is a point to which i set the position of whole container
     const background = new Graphics();
@@ -117,10 +119,7 @@ export class Card extends Container {
 
     this.interactive = true;
 
-    this.on("pointerdown", this.onDragStart, this);
-    this.on("pointerup", this.onDragEnd, this);
-    this.on("pointerupoutside", this.onDragEnd, this);
-    this.on("pointermove", this.onDragMove, this);
+    this.makeButtonMovable()
 
     sprite.filters = [
       new DropShadowFilter({
@@ -138,9 +137,8 @@ export class Card extends Container {
   public play(
     duration?: number,
     rotation?: number,
-    onFinish: () => void = () => {},
+    onFinish: () => void = () => { },
   ) {
-    console.log("End:", this.end_animation_point_x, this.end_animation_point_y);
     if (this.useOriginOfCard) {
       gsap.to(this, {
         x: this.end_animation_point_x,
@@ -225,6 +223,11 @@ export class Card extends Container {
       .lineTo(topLeftEdge.x, topLeftEdge.y)
       .stroke({ width: 2, color: 0x000000 });
     // this.spriteContainer.addChild(testGraphics)
+
+    if(!this.useOriginOfCard){
+      localDiff.x = 0;
+      localDiff.y = 0;
+    }
     this.end_animation_point_x = x - localDiff.x;
     this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;
@@ -235,6 +238,20 @@ export class Card extends Container {
     this.card_sprite.height = GameSettings.card_height;
   }
 
+  public makeButtonMovable() {
+    this.on("pointerdown", this.onDragStart, this);
+    this.on("pointerup", this.onDragEnd, this);
+    this.on("pointerupoutside", this.onDragEnd, this);
+    this.on("pointermove", this.onDragMove, this);
+  }
+
+  public removeButtonMovable() {
+    this.off("pointerdown", this.onDragStart, this);
+    this.off("pointerup", this.onDragEnd, this);
+    this.off("pointerupoutside", this.onDragEnd, this);
+    this.off("pointermove", this.onDragMove, this);
+  }
+
   private onDragStart(event: FederatedPointerEvent): void {
     this.isDragging = true;
     this.wasDragged = false;
@@ -242,6 +259,7 @@ export class Card extends Container {
     this.dragStartPosition = event.getLocalPosition(this.parent);
     this.zIndex = 1000;
     this.alpha = 0.7;
+    this.bounds = this.parent.getBounds()
   }
 
   private onDragMove(event: FederatedPointerEvent): void {
@@ -252,8 +270,21 @@ export class Card extends Container {
     const dy = currentPosition.y - this.dragStartPosition.y;
 
     // Set as dragged if movement is beyond threshold
-    if (!this.wasDragged && Math.sqrt(dx * dx + dy * dy) > 5) {
+    if (!this.wasDragged && Math.sqrt(dx * dx + dy * dy) > 500) {
       this.wasDragged = true;
+    }
+
+    if (currentPosition.x - this.dragOffset.x < -GameSettings.get_player_hand_width() * 0.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y < -GameSettings.get_player_hand_height() * 0.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_width() * 1.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_height() * 1.1) {
+      return;
     }
 
     this.position.set(
@@ -274,6 +305,11 @@ export class Card extends Container {
       this.onCardClick();
     } else {
       // Drag finished — optional: snap back or drop logic here
+      console.log("snapping back")
+      this.position.set(
+        this.dragStartPosition.x - this.dragOffset.x,
+        this.dragStartPosition.y - this.dragOffset.y,
+      );
     }
   }
   private async onCardClick() {
