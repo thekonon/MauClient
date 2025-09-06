@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -20,4 +20,4 @@ jobs:
       - run: npm install
       - name: Install Playwright browsers
         run: npx playwright install
-      - run: npm run test # Vitest will run in headless browser
+      - run: npm run test
