@@ -3,6 +3,8 @@ export class GameSettings {
   static screen_height: number;
   static screen_width: number;
 
+  static useOriginOfCard: boolean = false;
+
   // Player hand
   static player_hand_width_percent = 80;
   static player_hand_height_percent = 30;

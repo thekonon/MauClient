@@ -69,7 +69,7 @@ export class Card extends Container {
     type: string,
     value: string,
     texture_name: string = "default",
-    useOriginOfCard: boolean = true,
+    useOriginOfCard: boolean = GameSettings.useOriginOfCard,
   ): Promise<Card> {
     const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
@@ -190,7 +190,7 @@ export class Card extends Container {
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
     this.rotation_angle = rotation;
-    if (this.useOriginOfCard) {
+    if (!this.useOriginOfCard) {
       this.end_animation_point_x = x;
       this.end_animation_point_y = y;
     }
