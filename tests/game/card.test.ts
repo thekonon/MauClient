@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { Application, Assets } from "pixi.js";
 import { Card } from "../../src/game/card"
 import { GameSettings } from "../../src/gameSettings";
@@ -21,9 +21,9 @@ beforeAll(async () => {
     document.body.appendChild(app.canvas);
 });
 
-afterAll(async () => {
-    app.destroy(true, { children: true, texture: false });
-});
+// afterAll(async () => {
+//     app.destroy(true, { children: true, texture: false });
+// });
 
 describe("card.ts assertions tests", () => {
     it.each(suits)("creates card with type %s", async (testedType) => {
