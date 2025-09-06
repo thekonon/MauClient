@@ -147,5 +147,5 @@ async function testing(
     game.startGame();
   };
   // Bypapass for testing
-  testing(web_socket, loading_screen);
+  // testing(web_socket, loading_screen);
 })();
