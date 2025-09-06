@@ -9,13 +9,20 @@ export default defineConfig({
     open: true,
     host: true,
   },
-test: {
+  test: {
     globals: true,
     browser: {
+      provider: "playwright",
       enabled: true,
-      name: "firefox", // or "firefox", "safari" depending on what you have installed
-      headless: false, // 👈 keep browser window open
+      instances: [
+        {
+          browser: "firefox", // must be "browser", not "name"
+          headless: true,     // headless in CI
+        },
+        // you can add more instances if needed
+        // { browser: "chromium", headless: true }
+      ],
     },
-    include: ["tests/**/*.test.ts"]
+    include: ["tests/**/*.test.ts"],
   },
 });
