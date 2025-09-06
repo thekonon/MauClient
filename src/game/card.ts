@@ -64,71 +64,53 @@ export class Card extends Container {
   private dragStartPosition = new Point();
   private wasDragged = false;
   private isDialogActive = false;
-  useOriginOfCard: boolean;
+  private _useOriginOfCard: boolean;
   spriteContainer: any;
-  private bounds!: Bounds;
+  bounds!: Bounds;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
     type: string,
     value: string,
     texture_name: string = "default",
+    useOriginOfCard: boolean = true,
   ): Promise<Card> {
     const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
-    return new Card(type, value, sprite);
+    return new Card(type, value, sprite, useOriginOfCard);
   }
 
   private constructor(
     type: string,
     value: string,
     sprite: Sprite,
-    texture: string = "default",
+    useOriginOfCard: boolean = true,
   ) {
     super();
 
     this.type = type;
     this.value = value;
     this.card_sprite = sprite;
-    this.texture = texture;
 
     this.setDefaultSize();
     this.end_animation_point_x = 0;
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
-    this.useOriginOfCard = false;
-
-    // This is a point to which i set the position of whole container
-    const background = new Graphics();
-    background.rect(0, 0, 10, 10).fill(0xff0000);
-    // this.addChild(background)
+    this.interactive = true;
 
     // This is the container for rotating and transforming sprite itself
     this.spriteContainer = new Container();
 
-    if (this.useOriginOfCard) {
-      this.card_sprite.anchor.set(0.5);
-      this.spriteContainer.x = this.card_sprite.width / 2;
-      this.spriteContainer.y = this.card_sprite.height / 2;
-    }
+    this.useOriginOfCard = useOriginOfCard; // needs to be defined after spriteContainer
 
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
       console.warn("playCardCommand not defined");
     };
 
-    this.interactive = true;
 
     this.makeButtonMovable()
-
-    sprite.filters = [
-      new DropShadowFilter({
-        offset: { x: 10, y: 10 },
-        alpha: 0.6,
-        blur: 6,
-        color: 0x000000,
-      }),
-    ];
+    this.addShade();
 
     this.spriteContainer.addChild(sprite);
     this.addChild(this.spriteContainer);
@@ -176,61 +158,69 @@ export class Card extends Container {
   }
 
   public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
-    const topLeftEdge = new Point(
-      -this.card_sprite.width / 2,
-      -this.card_sprite.height / 2,
-    );
-
-    // Simulate end of rotation in order to get the end point
-    const prevRotation = this.spriteContainer.rotation;
-    this.spriteContainer.rotation = rotation;
-    const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
-    this.spriteContainer.rotation = prevRotation;
-
-    const testGraphics = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(topLeftEdge.x, topLeftEdge.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.spriteContainer.addChild(testGraphics)
-
-    const testGraphics2 = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(globalDiff.x, globalDiff.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.addChild(testGraphics2)
-
-    this.end_animation_point_x = x - globalDiff.x;
-    this.end_animation_point_y = y - globalDiff.y;
     this.rotation_angle = rotation;
+    if (!this.useOriginOfCard) {
+      this.end_animation_point_x = x;
+      this.end_animation_point_y = y;
+    }
+    else {
+      const topLeftEdge = new Point(
+        -this.card_sprite.width / 2,
+        -this.card_sprite.height / 2,
+      );
+      console.log(topLeftEdge)
+
+      // Simulate end of rotation in order to get the end point
+      const prevRotation = this.spriteContainer.rotation;
+      this.spriteContainer.rotation = rotation;
+      const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
+      this.spriteContainer.rotation = prevRotation;
+
+      const testGraphics = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(topLeftEdge.x, topLeftEdge.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.spriteContainer.addChild(testGraphics)
+
+      const testGraphics2 = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(globalDiff.x, globalDiff.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.addChild(testGraphics2)
+
+      this.end_animation_point_x = x - globalDiff.x;
+      this.end_animation_point_y = y - globalDiff.y;
+    }
   }
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
-    const topLeftEdge = new Point(
-      -this.card_sprite.width / 2,
-      -this.card_sprite.height / 2,
-    );
-
-    // Simulate end of rotation in order to get the end point
-    const prevRotation = this.spriteContainer.rotation;
-    this.spriteContainer.rotation = rotation;
-    const localDiff = this.spriteContainer.parent.toLocal(
-      this.spriteContainer.toGlobal(topLeftEdge),
-    );
-    this.spriteContainer.rotation = prevRotation;
-
-    const testGraphics = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(topLeftEdge.x, topLeftEdge.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.spriteContainer.addChild(testGraphics)
-
-    if(!this.useOriginOfCard){
-      localDiff.x = 0;
-      localDiff.y = 0;
-    }
-    this.end_animation_point_x = x - localDiff.x;
-    this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;
+    if (this.useOriginOfCard) {
+      this.end_animation_point_x = x;
+      this.end_animation_point_y = y;
+    }
+    else {
+      const topLeftEdge = new Point(
+        -this.card_sprite.width / 2,
+        -this.card_sprite.height / 2,
+      );
+
+      // Simulate end of rotation in order to get the end point
+      const prevRotation = this.spriteContainer.rotation;
+      this.spriteContainer.rotation = rotation;
+      const localDiff = this.spriteContainer.parent.toLocal(
+        this.spriteContainer.toGlobal(topLeftEdge),
+      );
+      this.spriteContainer.rotation = prevRotation;
+
+      const testGraphics = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(topLeftEdge.x, topLeftEdge.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.spriteContainer.addChild(testGraphics)
+      this.end_animation_point_x = x - localDiff.x;
+      this.end_animation_point_y = y - localDiff.y;
+    }
   }
 
   public setDefaultSize() {
@@ -345,5 +335,34 @@ export class Card extends Container {
     } catch {
       return await Assets.load(`assets/default/back.png`);
     }
+  }
+
+  private addShade() {
+    this.card_sprite.filters = [
+      new DropShadowFilter({
+        offset: { x: 10, y: 10 },
+        alpha: 0.6,
+        blur: 6,
+        color: 0x000000,
+      }),
+    ];
+  }
+
+  set useOriginOfCard(useOriginOfCard: boolean) {
+    this._useOriginOfCard = useOriginOfCard
+    if (useOriginOfCard) {
+      this.card_sprite.anchor.set(0.5);
+      this.spriteContainer.x = this.card_sprite.width / 2;
+      this.spriteContainer.y = this.card_sprite.height / 2;
+    }
+    else {
+      this.card_sprite.anchor.set(0);
+      this.spriteContainer.x = 0;
+      this.spriteContainer.y = 0;
+    }
+  }
+
+  get userOriginOfCard() {
+    return this._useOriginOfCard;
   }
 }
