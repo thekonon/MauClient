@@ -33,10 +33,6 @@ export class Card extends Container {
     A - Ace
     */
   value: string;
-  /* Textures:
-    - default
-    */
-  texture: string;
 
   /* Animation properties */
   /*  end_animation_point_x / y
@@ -64,7 +60,7 @@ export class Card extends Container {
   private dragStartPosition = new Point();
   private wasDragged = false;
   private isDialogActive = false;
-  private _useOriginOfCard: boolean;
+  private _useOriginOfCard: boolean = false;
   spriteContainer: any;
   bounds!: Bounds;
 
@@ -168,7 +164,6 @@ export class Card extends Container {
         -this.card_sprite.width / 2,
         -this.card_sprite.height / 2,
       );
-      console.log(topLeftEdge)
 
       // Simulate end of rotation in order to get the end point
       const prevRotation = this.spriteContainer.rotation;
@@ -362,7 +357,7 @@ export class Card extends Container {
     }
   }
 
-  get userOriginOfCard() {
+  get useOriginOfCard() {
     return this._useOriginOfCard;
   }
 }
