@@ -18,8 +18,6 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - name: Install Firefox for browser tests
-        run: sudo apt-get update && sudo apt-get install -y firefox-esr libgtk-3-0 libdbus-glib-1-2
       - name: Install Playwright browsers
         run: npx playwright install
       - run: npm run test # Vitest will run in headless browser
