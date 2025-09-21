@@ -1,4 +1,5 @@
 import { Card } from "./game/card.ts";
+import { eventBus } from "./EventBus.ts";
 
 interface Move {
   moveType: "PLAY";
@@ -406,7 +407,8 @@ export class WebSocketHandle {
       this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
-    this.add_player(player);
+    eventBus.emit("Action:ADD_PLAYER", {playerName: player})
+    // this.add_player(player);
   }
 
   public players_action(message: GameAction) {

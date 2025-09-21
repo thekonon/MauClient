@@ -6,6 +6,7 @@ import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loading_screen/CardManage.ts";
 
+
 async function testing(
   web_socket: WebSocketHandle,
   loading_screen: LoadingScreen,
@@ -91,13 +92,11 @@ async function testing(
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
-  web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
+  // web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
   web_socket.playerReadyMessage =
     loading_screen.readyPlayerMessage.bind(loading_screen);
   web_socket.removePlayerAction =
     loading_screen.removePlayerFromList.bind(loading_screen);
-
-  /* Game callbacks - server sends */
 
   // Create a game instance
   const app = new Application();

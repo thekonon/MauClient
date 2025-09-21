@@ -1,3 +1,4 @@
+import { eventBus } from "../EventBus";
 import { Player } from "./player";
 
 export class LoadingScreen {
@@ -82,6 +83,10 @@ export class LoadingScreen {
         this.registerPlayer();
       }
     });
+
+    eventBus.on("Action:ADD_PLAYER", payload =>{
+      this.addPlayerToList(payload.playerName)
+    })
   }
 
   public get_players_list(): string[] {
@@ -96,7 +101,7 @@ export class LoadingScreen {
     return this.mainPlayer.name;
   }
 
-  public addPlayerToList(player_name: string) {
+  private addPlayerToList(player_name: string) {
     if (this.connectedPlayers.length > 4) {
       throw Error("This client supports maximum of 5 players");
     }
