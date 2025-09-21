@@ -81,7 +81,10 @@ async function testing(
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
+  GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
   game = new Game(app);
+  // game.register_players(loading_screen.get_players_list());
+  // game.mainPlayer = loading_screen.getMainPlayer();
 
   // web_socket.start_game = async () => {
     // When game stats, hide loading screen
@@ -104,8 +107,8 @@ async function testing(
 
     // web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
 
-    // game.mainPlayer = loading_screen.getMainPlayer();
-    // game.register_players(loading_screen.get_players_list());
+    
+    // 
 
     // game.startGame();
   // };
