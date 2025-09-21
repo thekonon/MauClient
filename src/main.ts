@@ -68,31 +68,21 @@ async function testing(
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
-  const web_socket = new WebSocketHandle();
-
+  
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
-
+  
   document.getElementById("pixi-container")!.appendChild(app.canvas);
   const cardManager = new CardManager(app);
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
-
+  
+  
+  new WebSocketHandle();
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
   new Game(app);
   new EndScreen(app);
-
-  // web_socket.start_game = async () => {
-
-    // web_socket.gameEndAction = async () => {
-    //   await new Promise((res) => setTimeout(res, 1000));
-    //   game.hide();
-    //   endScreen.show();
-    // };
-
-    // web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
-  // };
   // Bypapass for testing
   // testing(web_socket, loading_screen);
 })();
