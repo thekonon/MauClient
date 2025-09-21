@@ -34,7 +34,7 @@ export class Game extends Container {
 
     this.mainPlayer = "";
     this.otherPlayers = [];
-    this.addEventListerners()
+    this.addEventListerners();
   }
 
   public async startGame() {
@@ -186,27 +186,32 @@ export class Game extends Container {
         return;
       }
       await this.readyPlayers;
-      this.startGame()
-    })
-    eventBus.on("Helper:SET_MAIN_PLAYER", payload => {
+      this.startGame();
+    });
+    eventBus.on("Helper:SET_MAIN_PLAYER", (payload) => {
       this.mainPlayer = payload.playerName;
-    })
-    eventBus.on("Helper:REGISTER_PLAYERS", payload => {
-      this.registerPlayers(payload.playerNames)
-    })
-    eventBus.on("Action:PLAYER_SHIFT", payload => {
-      this.shiftPlayerAction(payload.playerName, payload.expireAtMs)
-    })
-    eventBus.on("Action:HIDDEN_DRAW", payload => {
-      this.hiddenDrawAction(payload.playerName, payload.cardCount)
-    })
-    eventBus.on("Action:PLAY_CARD", payload => {
-      this.playCard(payload.playerName, payload.type, payload.value, payload.newColor)
-    })
+    });
+    eventBus.on("Helper:REGISTER_PLAYERS", (payload) => {
+      this.registerPlayers(payload.playerNames);
+    });
+    eventBus.on("Action:PLAYER_SHIFT", (payload) => {
+      this.shiftPlayerAction(payload.playerName, payload.expireAtMs);
+    });
+    eventBus.on("Action:HIDDEN_DRAW", (payload) => {
+      this.hiddenDrawAction(payload.playerName, payload.cardCount);
+    });
+    eventBus.on("Action:PLAY_CARD", (payload) => {
+      this.playCard(
+        payload.playerName,
+        payload.type,
+        payload.value,
+        payload.newColor,
+      );
+    });
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
       this.hide();
-    })
+    });
   }
 
   private expires(expireAtMs: number) {

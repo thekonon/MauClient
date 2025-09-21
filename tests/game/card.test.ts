@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { Application, Assets } from "pixi.js";
+import { Application } from "pixi.js";
 import { Card } from "../../src/game/card";
 import { GameSettings } from "../../src/gameSettings";
 

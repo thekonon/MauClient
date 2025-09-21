@@ -11,8 +11,7 @@ export default [
 
   // Custom project rules
   {
-    files: ["**/*.{js,jsx,ts,tsx}"], // include JS + TS
-    ignores: ["dist", "node_modules"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
 
     languageOptions: {
       parser: tseslint.parser,
@@ -33,5 +32,10 @@ export default [
       ],
       "prettier/prettier": "error",
     },
+  },
+
+  // 👇 Global ignores go here
+  {
+    ignores: ["dist/**", "node_modules/**"],
   },
 ];
