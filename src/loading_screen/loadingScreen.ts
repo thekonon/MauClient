@@ -82,6 +82,9 @@ export class LoadingScreen {
     eventBus.on("Action:REMOVE_PLAYER", payload => {
       this.removePlayerFromList(payload.playerName);
     })
+    eventBus.on("Action:START_GAME", () => {
+      this.hide()
+    })
     eventBus.on("ServerMessage:PLAYER_READY", payload => {
       this.readyPlayerMessage(payload.playerName, payload.ready)
     })

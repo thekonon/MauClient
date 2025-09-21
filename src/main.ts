@@ -66,11 +66,11 @@ async function testing(
 }
 
 (async () => {
+  let game!: Game;
+  let endScreen!: EndScreen;
   const loading_screen = new LoadingScreen();
   loading_screen.show();
   const web_socket = new WebSocketHandle();
-
-
 
   // Create a game instance
   const app = new Application();
@@ -81,40 +81,34 @@ async function testing(
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
-  let game!: Game;
+  game = new Game(app);
 
-  // Create a endScreen instance
-  let endScreen!: EndScreen;
-
-  web_socket.start_game = async () => {
+  // web_socket.start_game = async () => {
     // When game stats, hide loading screen
-    loading_screen.hide();
+    // loading_screen.hide();
     // cardManager.removeFallingCards()
-    GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+    
+    // web_socket.start_pile = game.startPileAction.bind(game);
+    // web_socket.drawCardAction = game.drawCardAction.bind(game);
+    // web_socket.playCardAction = game.playCard.bind(game);
+    // web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
+    // web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
 
-    game = new Game(app);
+    // endScreen = new EndScreen(app);
 
-    web_socket.start_pile = game.startPileAction.bind(game);
-    web_socket.drawCardAction = game.drawCardAction.bind(game);
-    web_socket.playCardAction = game.playCard.bind(game);
-    web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
-    web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
+    // web_socket.gameEndAction = async () => {
+    //   await new Promise((res) => setTimeout(res, 1000));
+    //   game.hide();
+    //   endScreen.show();
+    // };
 
-    endScreen = new EndScreen(app);
+    // web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
 
-    web_socket.gameEndAction = async () => {
-      await new Promise((res) => setTimeout(res, 1000));
-      game.hide();
-      endScreen.show();
-    };
+    // game.mainPlayer = loading_screen.getMainPlayer();
+    // game.register_players(loading_screen.get_players_list());
 
-    web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
-
-    game.mainPlayer = loading_screen.getMainPlayer();
-    game.register_players(loading_screen.get_players_list());
-
-    game.startGame();
-  };
+    // game.startGame();
+  // };
   // Bypapass for testing
   // testing(web_socket, loading_screen);
 })();

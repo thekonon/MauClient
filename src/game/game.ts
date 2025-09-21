@@ -5,10 +5,10 @@ import { PlayerHand } from "./playerHand";
 import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
+import { eventBus } from "../EventBus";
 
 export class Game extends Container {
   private app: Application;
-  public startPileAction!: (card: Card) => void;
   public drawCardAction!: (card: Card) => void;
   public drawCardCommand!: () => void;
   public passCommand!: () => void;
@@ -33,7 +33,6 @@ export class Game extends Container {
 
     // Create a pile - place to which cards go
     this.pile = new Pile();
-    this.startPileAction = this.pile.playCard.bind(this.pile);
 
     this.mainPlayer = "";
     this.otherPlayers = [];
@@ -181,6 +180,13 @@ export class Game extends Container {
 
   public hide(): void {
     this.app.stage.removeChild(this);
+  }
+
+  private addEventListerners(){
+    eventBus.on("Action:START_GAME", () => {
+      this.startGame()
+    })
+
   }
 
   private expires(expireAtMs: number) {

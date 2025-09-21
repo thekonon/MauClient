@@ -89,7 +89,6 @@ export class WebSocketHandle {
   ) => {
     console.warn("PlayerReadyMessage not implemented yet");
   };
-  public start_game!: () => void;
   public start_pile!: (card: Card) => void;
   public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (
     _,
@@ -329,7 +328,7 @@ export class WebSocketHandle {
       REGISTER_PLAYER: (msg) => this.register_player_action(msg),
       START_GAME: (_) => {
         this.game_started = true;
-        this.start_game_action();
+        eventBus.emit("Action:START_GAME", undefined)
       },
       START_PILE: (msg) => {
         if (!this.game_started)
@@ -425,10 +424,6 @@ export class WebSocketHandle {
     );
   }
 
-  public start_game_action() {
-    this.start_game();
-  }
-
   public register_player_action(message: GameAction) {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
@@ -456,7 +451,7 @@ export class WebSocketHandle {
       this.cardNameMap.get(card_info.type)!,
       "pythonGen",
     );
-    this.start_pile(card);
+    eventBus.emit("Action:START_PILE", card)
   }
 
   public async drawCard(message: GameAction) {
