@@ -21,7 +21,7 @@ export class Game extends Container {
   /* Info about players */
   mainPlayer: string;
   readyPlayers?: Promise<unknown>;
-  intervalId?: number;
+  private intervalId?: ReturnType<typeof setInterval>;
 
   constructor(app: Application) {
     super();
@@ -36,15 +36,16 @@ export class Game extends Container {
 
     this.mainPlayer = "";
     this.otherPlayers = [];
+    this.addEventListerners()
   }
 
   public async startGame() {
-    // Create a deck - place where user can request drawing card
     if (this.readyPlayers === undefined) {
       console.error("Report this bug to Pepa thanks");
       return;
     }
     await this.readyPlayers;
+     // Create a deck - place where user can request drawing card
     this.deck = await Deck.create();
     this.deck.deck_clicked_action = this.drawCardCommand.bind(this);
     this.playerHand.pass_command = this.passCommand.bind(this);
@@ -184,6 +185,7 @@ export class Game extends Container {
 
   private addEventListerners(){
     eventBus.on("Action:START_GAME", () => {
+      console.log("starting game")
       this.startGame()
     })
 
