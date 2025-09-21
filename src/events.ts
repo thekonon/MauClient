@@ -5,7 +5,8 @@ export interface AppEvents {
     "Command:REGISTER_PLAYER": { playerName: string, ip: string, port: string };
     "Command:PLAYER_READY": {playerReady: boolean};
     "Command:RECONNECT": void;
-    "Action:PLAYERS": { playerName: string };
+    "ServerMessage:PLAYER_READY": {ready: boolean, playerName: string};
+    "Action:PLAYERS": { playerNames: string[] };
     "Action:REGISTER_PLAYER": {playerName: string};
     "Action:ADD_PLAYER": {playerName: string};
     "Action:START_GAME": void;

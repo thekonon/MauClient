@@ -91,12 +91,6 @@ export class WebSocketHandle {
   };
   public start_game!: () => void;
   public start_pile!: (card: Card) => void;
-  public playCardAction!: (
-    user: string,
-    type: string,
-    value: string,
-    newColor: string,
-  ) => Promise<void>;
   public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (
     _,
     __,
@@ -389,9 +383,7 @@ export class WebSocketHandle {
       REMOVE_PLAYER: (msg) => {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
-        console.log("Removing player");
-        console.warn("Not implemented");
-        this.removePlayerAction(msg.playerDto.username);
+        eventBus.emit("Action:REMOVE_PLAYER", {playerName: msg.playerDto.username})
       },
     };
 
@@ -406,7 +398,7 @@ export class WebSocketHandle {
   private handleServerMessage(message: ServerMessageBody) {
     switch (message.bodyType) {
       case "READY":
-        this.playerReadyMessage(message.username, true);
+        eventBus.emit("ServerMessage:PLAYER_READY", {ready: true, playerName: message.username})
     }
   }
 
@@ -452,7 +444,7 @@ export class WebSocketHandle {
     if (!message.players)
       return console.error("Players field was not specified");
     const players = message.players;
-    this.update_player_list(players);
+    eventBus.emit("Action:PLAYERS", {playerNames: players})
   }
 
   public async start_pile_action(message: GameAction) {

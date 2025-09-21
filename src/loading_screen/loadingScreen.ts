@@ -5,19 +5,6 @@ export class LoadingScreen {
   mainPlayer: Player;
   connectedPlayers: Player[];
 
-  public on_register_player:
-    | ((playerName: string, ip: string, port: string) => void)
-    | null = null;
-  public playerReadyCommand: (_: boolean) => void = (_: boolean) => {
-    console.warn("Player Ready not implemented in loadingScreen");
-  };
-  public reconnectCommand: (_: string, __: string) => void = (
-    _: string,
-    __: string,
-  ) => {
-    alert("Reconnect button not implement yet");
-  };
-
   constructor() {
     this.mainPlayer = new Player("");
     this.connectedPlayers = [];
@@ -25,6 +12,7 @@ export class LoadingScreen {
   }
 
   public show() {
+    // Show logging window to user
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "block";
@@ -33,6 +21,7 @@ export class LoadingScreen {
   }
 
   public hide() {
+    // Hide logging window to user
     const loginMenu = document.getElementById("loginMenu");
     if (loginMenu) {
       loginMenu.style.display = "none";
@@ -87,6 +76,15 @@ export class LoadingScreen {
     eventBus.on("Action:ADD_PLAYER", payload =>{
       this.addPlayerToList(payload.playerName)
     })
+    eventBus.on("Action:PLAYERS", payload => {
+      this.updatePlayerList(payload.playerNames)
+    })
+    eventBus.on("Action:REMOVE_PLAYER", payload => {
+      this.removePlayerFromList(payload.playerName);
+    })
+    eventBus.on("ServerMessage:PLAYER_READY", payload => {
+      this.readyPlayerMessage(payload.playerName, payload.ready)
+    })
   }
 
   public get_players_list(): string[] {
@@ -109,14 +107,14 @@ export class LoadingScreen {
     this.updateConnectedPlayers();
   }
 
-  public removePlayerFromList(player_name: string) {
+  private removePlayerFromList(playerName: string) {
     this.connectedPlayers = this.connectedPlayers.filter(
-      (player) => player.name !== player_name,
+      (player) => player.name !== playerName,
     );
     this.updateConnectedPlayers();
   }
 
-  public updatePlayerList(playerNames: string[]) {
+  private updatePlayerList(playerNames: string[]) {
     if (playerNames.length > 5) {
       throw Error("This client supports maximum of 5 players");
     }
@@ -130,7 +128,7 @@ export class LoadingScreen {
     this.updateConnectedPlayers();
   }
 
-  public readyPlayerMessage(playerName: string, ready: boolean) {
+  private readyPlayerMessage(playerName: string, ready: boolean) {
     if (playerName === this.mainPlayer.name) {
       if (ready) {
         this.setReadyButtonReady();

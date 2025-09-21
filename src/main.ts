@@ -70,14 +70,7 @@ async function testing(
   loading_screen.show();
   const web_socket = new WebSocketHandle();
 
-  /* Loading screen callbacks - server sends */
-  web_socket.update_player_list =
-    loading_screen.updatePlayerList.bind(loading_screen);
-  // web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
-  web_socket.playerReadyMessage =
-    loading_screen.readyPlayerMessage.bind(loading_screen);
-  web_socket.removePlayerAction =
-    loading_screen.removePlayerFromList.bind(loading_screen);
+
 
   // Create a game instance
   const app = new Application();
