@@ -7,10 +7,16 @@ import {
   Ticker,
 } from "pixi.js";
 
+// extend Sprite with custom props
+interface FallingCard extends Sprite {
+  fallSpeed: number;
+  rotationSpeed: number;
+}
+
 export class CardManager {
   private app: Application;
   private container: Container;
-  private cards: Sprite[] = [];
+  private cards: FallingCard[] = [];
   private cardTextures: Texture[] = [];
 
   constructor(app: Application) {
@@ -38,10 +44,8 @@ export class CardManager {
       src: `assets/pythonGen/${name}.png`,
     }));
 
-    // Load all textures into Pixi's cache
     await Assets.load(assets);
 
-    // Retrieve from cache
     this.cardTextures = cardNames.map((name) => Assets.get(name) as Texture);
     console.log(this.cardTextures.length);
   }
@@ -55,23 +59,22 @@ export class CardManager {
     }
 
     for (let i = 0; i < count; i++) {
-      // Pick random card texture
       const tex =
         this.cardTextures[Math.floor(Math.random() * this.cardTextures.length)];
-      const card = new Sprite(tex);
+      const card = new Sprite(tex) as FallingCard;
 
       // Random size
-      const width = Math.random() * 40 + 30; // 30–70px
+      const width = Math.random() * 40 + 30;
       const scale = width / card.width;
       card.scale.set(scale);
 
-      // Random horizontal position
+      // Random start position
       card.x = Math.random() * this.app.renderer.width;
-      card.y = -card.height; // start above screen
+      card.y = -card.height;
 
-      // Falling + rotation speed
-      (card as any).fallSpeed = Math.random() * 2 + 1; // 1–3 px/frame
-      (card as any).rotationSpeed = (Math.random() - 0.5) * 0.02;
+      // Custom properties
+      card.fallSpeed = Math.random() * 2 + 1;
+      card.rotationSpeed = (Math.random() - 0.5) * 0.02;
 
       this.container.addChild(card);
       this.cards.push(card);
@@ -81,10 +84,10 @@ export class CardManager {
   }
 
   private update(ticker: Ticker) {
-    const delta = ticker.deltaTime; // same as old "delta"
+    const delta = ticker.deltaTime;
     for (const card of this.cards) {
-      card.y += (card as any).fallSpeed * delta;
-      card.rotation += (card as any).rotationSpeed * delta;
+      card.y += card.fallSpeed * delta;
+      card.rotation += card.rotationSpeed * delta;
 
       if (card.y > this.app.renderer.height + card.height) {
         card.y = -card.height;
@@ -99,8 +102,6 @@ export class CardManager {
       card.destroy();
     }
     this.cards = [];
-
-    // Stop update loop when no cards
     this.app.ticker.remove(this.update, this);
   }
 }

@@ -15,7 +15,7 @@ export class EndScreen extends Container {
   sprite!: Sprite;
   texture!: Texture;
   textureLoaded?: Promise<unknown>;
-  playersSet?: Promise<void>
+  playersSet?: Promise<void>;
 
   winners: string[];
 
@@ -24,7 +24,7 @@ export class EndScreen extends Container {
     this.draw();
     this.app = app;
     this.winners = [];
-    this.addEventListeners()
+    this.addEventListeners();
   }
 
   public async show() {
@@ -63,7 +63,6 @@ export class EndScreen extends Container {
       })();
     });
 
-
     function createText(playerName: string, x: number, y: number) {
       const style = new TextStyle({
         fontFamily: "Impact",
@@ -86,11 +85,11 @@ export class EndScreen extends Container {
   private addEventListeners(): void {
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
-      this.show()
+      this.show();
     });
-    eventBus.on("Action:PLAYER_RANK", payload => {
-      this.setWinners(payload.playersOrder)
-    })
+    eventBus.on("Action:PLAYER_RANK", (payload) => {
+      this.setWinners(payload.playersOrder);
+    });
   }
 
   private async draw() {

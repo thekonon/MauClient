@@ -73,23 +73,27 @@ export class LoadingScreen {
       }
     });
 
-    eventBus.on("Action:ADD_PLAYER", payload =>{
-      this.addPlayerToList(payload.playerName)
-    })
-    eventBus.on("Action:PLAYERS", payload => {
-      this.updatePlayerList(payload.playerNames)
-    })
-    eventBus.on("Action:REMOVE_PLAYER", payload => {
+    eventBus.on("Action:ADD_PLAYER", (payload) => {
+      this.addPlayerToList(payload.playerName);
+    });
+    eventBus.on("Action:PLAYERS", (payload) => {
+      this.updatePlayerList(payload.playerNames);
+    });
+    eventBus.on("Action:REMOVE_PLAYER", (payload) => {
       this.removePlayerFromList(payload.playerName);
-    })
+    });
     eventBus.on("Action:START_GAME", () => {
-      eventBus.emit("Helper:SET_MAIN_PLAYER", {playerName: this.getMainPlayer()})
-      eventBus.emit("Helper:REGISTER_PLAYERS", {playerNames: this.getPlayersList()})
-      this.hide()
-    })
-    eventBus.on("ServerMessage:PLAYER_READY", payload => {
-      this.readyPlayerMessage(payload.playerName, payload.ready)
-    })
+      eventBus.emit("Helper:SET_MAIN_PLAYER", {
+        playerName: this.getMainPlayer(),
+      });
+      eventBus.emit("Helper:REGISTER_PLAYERS", {
+        playerNames: this.getPlayersList(),
+      });
+      this.hide();
+    });
+    eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
+      this.readyPlayerMessage(payload.playerName, payload.ready);
+    });
   }
 
   public getPlayersList(): string[] {
@@ -186,7 +190,9 @@ export class LoadingScreen {
   }
 
   private readyPlayerButtonClicked() {
-    eventBus.emit("Command:PLAYER_READY", {playerReady: !this.mainPlayer.isReady!})
+    eventBus.emit("Command:PLAYER_READY", {
+      playerReady: !this.mainPlayer.isReady!,
+    });
   }
 
   private registerPlayer() {
@@ -214,7 +220,11 @@ export class LoadingScreen {
       return;
     }
     this.mainPlayer = new Player(playerName);
-    eventBus.emit("Command:REGISTER_PLAYER", {playerName: playerName, ip: ip, port: port})
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+    });
   }
 
   private reconnectPlayer() {

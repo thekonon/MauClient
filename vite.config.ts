@@ -17,7 +17,7 @@ export default defineConfig({
       instances: [
         {
           browser: "firefox", // must be "browser", not "name"
-          headless: true,     // headless in CI
+          headless: true, // headless in CI
         },
         // you can add more instances if needed
         // { browser: "chromium", headless: true }

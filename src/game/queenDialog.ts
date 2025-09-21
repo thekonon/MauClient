@@ -19,7 +19,7 @@ export class QueenDialog extends Container {
     this.rect_width = GameSettings.fontSize * 10;
     this.rect_height = GameSettings.fontSize * 8;
     this.rect_x = 0;
-    this.rect_y = -this.rect_height-GameSettings.fontSize*3;
+    this.rect_y = -this.rect_height - GameSettings.fontSize * 3;
     this.edge_radius = GameSettings.fontSize / 2;
     this.margin = GameSettings.fontSize * 0.2;
     this.exitButtonSizeModifier = 0.4;
@@ -68,21 +68,35 @@ export class QueenDialog extends Container {
       // Draw the button background with border
       exitButton
         .roundRect(
-          this.rect_x + this.rect_width - GameSettings.fontSize*this.exitButtonSizeModifier,
-          this.rect_y - GameSettings.fontSize*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 2*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 2*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 0.3*this.exitButtonSizeModifier,
+          this.rect_x +
+            this.rect_width -
+            GameSettings.fontSize * this.exitButtonSizeModifier,
+          this.rect_y - GameSettings.fontSize * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 0.3 * this.exitButtonSizeModifier,
         )
         .fill(0xffffff);
 
       // Draw the red cross
       const crossPadding = GameSettings.fontSize * 0.3;
       const x1 =
-        this.rect_x + this.rect_width - GameSettings.fontSize*this.exitButtonSizeModifier + crossPadding;
-      const y1 = this.rect_y - GameSettings.fontSize*this.exitButtonSizeModifier + crossPadding;
-      const x2 = x1 + GameSettings.fontSize * 2*this.exitButtonSizeModifier - 2 * crossPadding;
-      const y2 = y1 + GameSettings.fontSize * 2 *this.exitButtonSizeModifier- 2 * crossPadding;
+        this.rect_x +
+        this.rect_width -
+        GameSettings.fontSize * this.exitButtonSizeModifier +
+        crossPadding;
+      const y1 =
+        this.rect_y -
+        GameSettings.fontSize * this.exitButtonSizeModifier +
+        crossPadding;
+      const x2 =
+        x1 +
+        GameSettings.fontSize * 2 * this.exitButtonSizeModifier -
+        2 * crossPadding;
+      const y2 =
+        y1 +
+        GameSettings.fontSize * 2 * this.exitButtonSizeModifier -
+        2 * crossPadding;
 
       exitButton
         .setStrokeStyle({ width: 5, color: 0x000000, alpha: 1 }) // red cross
@@ -95,11 +109,13 @@ export class QueenDialog extends Container {
       exitButton
         .setStrokeStyle({ width: 2, color: 0x000000, alpha: 1 }) // width, color, alpha
         .roundRect(
-          this.rect_x + this.rect_width - GameSettings.fontSize*this.exitButtonSizeModifier,
-          this.rect_y - GameSettings.fontSize*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 2*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 2*this.exitButtonSizeModifier,
-          GameSettings.fontSize * 0.3*this.exitButtonSizeModifier,
+          this.rect_x +
+            this.rect_width -
+            GameSettings.fontSize * this.exitButtonSizeModifier,
+          this.rect_y - GameSettings.fontSize * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
+          GameSettings.fontSize * 0.3 * this.exitButtonSizeModifier,
         )
         .stroke();
 

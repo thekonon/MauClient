@@ -6,7 +6,6 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../EventBus";
-import { Player } from "src/loading_screen/player";
 
 export class Game extends Container {
   private app: Application;
@@ -182,7 +181,6 @@ export class Game extends Container {
 
   private addEventListerners() {
     eventBus.on("Action:START_GAME", async () => {
-      console.log("starting game")
       if (this.readyPlayers === undefined) {
         console.error("Report this bug to Pepa thanks");
         return;

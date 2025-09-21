@@ -29,7 +29,7 @@ export class Deck extends Container {
   }
 
   private deck_clicked() {
-    eventBus.emit("Command:DRAW", undefined)
+    eventBus.emit("Command:DRAW", undefined);
   }
 
   public deck_clicked_action() {

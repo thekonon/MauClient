@@ -6,7 +6,6 @@ import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loading_screen/CardManage.ts";
 
-
 async function testing(
   web_socket: WebSocketHandle,
   loading_screen: LoadingScreen,
@@ -68,17 +67,16 @@ async function testing(
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
-  
+
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
-  
+
   document.getElementById("pixi-container")!.appendChild(app.canvas);
   const cardManager = new CardManager(app);
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
-  
-  
+
   new WebSocketHandle();
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
   new Game(app);

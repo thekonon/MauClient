@@ -47,7 +47,7 @@ export class PlayerHand extends Container {
       GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     passButton.on("pointerdown", () => {
-      eventBus.emit("Command:PASS", undefined)
+      eventBus.emit("Command:PASS", undefined);
     });
 
     // button for pass action
@@ -128,9 +128,9 @@ export class PlayerHand extends Container {
   }
 
   private addEventListeners(): void {
-    eventBus.on("Action:DRAW", card => {
-      this.draw_card(card)
-    })
+    eventBus.on("Action:DRAW", (card) => {
+      this.draw_card(card);
+    });
   }
 
   private reorder_cards() {

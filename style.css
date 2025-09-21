@@ -1,5 +1,5 @@
 :root {
-  --main-font-family: 'Press Start 2P', Impact
+  --main-font-family: "Press Start 2P", Impact;
 }
 body,
 html {
@@ -57,8 +57,8 @@ canvas {
   background: linear-gradient(120deg, #921b2d, #c13247, #32c143);
   background-size: 300% 100%;
   /* make it wider than element */
-  border-radius: .6em;
-  padding: .4em;
+  border-radius: 0.6em;
+  padding: 0.4em;
   margin: 1rem;
 
   border-top: 0.06em solid black;
@@ -141,7 +141,10 @@ input.max-reached {
   background: rgba(240, 106, 126, 0.4);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  transition:
+    width 0.6s ease,
+    height 0.6s ease,
+    opacity 0.6s ease;
   opacity: 0;
 }
 
@@ -174,7 +177,7 @@ input.max-reached {
   position: relative;
   overflow: hidden;
   border-radius: 1.5em;
-  font-size: 1.0rem;
+  font-size: 1rem;
   font-family: var(--main-font-family);
   width: 100%;
   padding: 1em;
@@ -197,7 +200,10 @@ input.max-reached {
   background: rgba(240, 106, 126, 0.4);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  transition:
+    width 0.6s ease,
+    height 0.6s ease,
+    opacity 0.6s ease;
   opacity: 0;
 }
 
@@ -220,15 +226,14 @@ input.max-reached {
 }
 
 .btn.disabled {
-  pointer-events: none;       /* Disable clicking */
-  opacity: 0.5;               /* Dim the button */
-  color: #999;                /* Optional: change text color */
-  background: #222;           /* Optional: darker background */
-  border-color: #555;         /* Optional: muted border */
-  box-shadow: none;           /* Remove glow */
-  transform: none;            /* Remove hover scale effect */
+  pointer-events: none; /* Disable clicking */
+  opacity: 0.5; /* Dim the button */
+  color: #999; /* Optional: change text color */
+  background: #222; /* Optional: darker background */
+  border-color: #555; /* Optional: muted border */
+  box-shadow: none; /* Remove glow */
+  transform: none; /* Remove hover scale effect */
 }
-
 
 .container .players {
   display: flex;
@@ -280,7 +285,7 @@ input.max-reached {
   overflow: hidden;
 }
 
-.btn.ready::before{
+.btn.ready::before {
   content: "";
 }
 
@@ -315,7 +320,7 @@ input.max-reached {
 }
 
 @media (max-width: 1000px) {
-  .form .form-group{
+  .form .form-group {
     gap: 0.1rem;
   }
   .form .form-group label {
@@ -327,7 +332,6 @@ input.max-reached {
     padding: 0.1em;
     padding-left: 1em;
     font-size: 0.7rem;
-    
   }
 
   .form .title {
@@ -354,7 +358,6 @@ input.max-reached {
 }
 
 @keyframes gradientMove {
-
   0%,
   100% {
     background-position: -50% 50%;

@@ -73,16 +73,16 @@ export class Pile extends Container {
   }
 
   private addEventListeners(): void {
-    eventBus.on("Action:START_PILE", card => {
-      this.playCard(card)
-    })
+    eventBus.on("Action:START_PILE", (card) => {
+      this.playCard(card);
+    });
   }
 
   private getPileTopLeftPoint(): Point {
     return new Point(
       GameSettings.get_deck_top_x() - GameSettings.card_height * 1.1,
       GameSettings.get_deck_top_y() +
-      (GameSettings.card_height + GameSettings.card_width) / 2,
+        (GameSettings.card_height + GameSettings.card_width) / 2,
     );
   }
 }
