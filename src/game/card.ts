@@ -12,6 +12,7 @@ import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
 import { DropShadowFilter } from "pixi-filters";
+import { eventBus } from "../EventBus";
 
 export class Card extends Container {
   // General settings of the card
@@ -316,7 +317,7 @@ export class Card extends Container {
       this.parent.removeChild(dialog);
       this.isDialogActive = false;
     }
-    this.playCardCommand(this.type, this.value, nextColor);
+    eventBus.emit("Command:PLAY_CARD", {type: this.type, value: this.value, nextColor})
   }
 
   private static async load_texture(

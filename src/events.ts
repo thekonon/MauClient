@@ -23,4 +23,6 @@ export interface AppEvents {
     "Command:PLAY_CARD": {type: string, value: string, nextColor: string}
     "Command:DRAW": void;
     "Command:PASS": void;
+    "Helper:SET_MAIN_PLAYER": {playerName: string}
+    "Helper:REGISTER_PLAYERS": {playerNames: string[]}
 }

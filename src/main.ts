@@ -66,7 +66,6 @@ async function testing(
 }
 
 (async () => {
-  let game!: Game;
   let endScreen!: EndScreen;
   const loading_screen = new LoadingScreen();
   loading_screen.show();
@@ -82,9 +81,8 @@ async function testing(
   cardManager.createFallingCards(50);
 
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
-  game = new Game(app);
-  // game.register_players(loading_screen.get_players_list());
-  // game.mainPlayer = loading_screen.getMainPlayer();
+  const game = new Game(app);
+  endScreen = new EndScreen(app);
 
   // web_socket.start_game = async () => {
     // When game stats, hide loading screen
@@ -97,7 +95,6 @@ async function testing(
     // web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
     // web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
 
-    // endScreen = new EndScreen(app);
 
     // web_socket.gameEndAction = async () => {
     //   await new Promise((res) => setTimeout(res, 1000));

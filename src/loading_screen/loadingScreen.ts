@@ -83,6 +83,8 @@ export class LoadingScreen {
       this.removePlayerFromList(payload.playerName);
     })
     eventBus.on("Action:START_GAME", () => {
+      eventBus.emit("Helper:SET_MAIN_PLAYER", {playerName: this.getMainPlayer()})
+      eventBus.emit("Helper:REGISTER_PLAYERS", {playerNames: this.getPlayersList()})
       this.hide()
     })
     eventBus.on("ServerMessage:PLAYER_READY", payload => {
@@ -90,7 +92,7 @@ export class LoadingScreen {
     })
   }
 
-  public get_players_list(): string[] {
+  public getPlayersList(): string[] {
     let listWithoutMainPlayer = this.connectedPlayers;
     listWithoutMainPlayer = listWithoutMainPlayer.filter(
       (item) => item.name != this.getMainPlayer(),

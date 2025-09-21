@@ -6,10 +6,10 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../EventBus";
+import { Player } from "src/loading_screen/player";
 
 export class Game extends Container {
   private app: Application;
-  public drawCardAction!: (card: Card) => void;
   public drawCardCommand!: () => void;
   public passCommand!: () => void;
 
@@ -29,7 +29,6 @@ export class Game extends Container {
     this.app = app;
     // Create a player hand - place where user cards are stored
     this.playerHand = new PlayerHand();
-    this.drawCardAction = this.playerHand.draw_card.bind(this.playerHand);
 
     // Create a pile - place to which cards go
     this.pile = new Pile();
@@ -45,14 +44,12 @@ export class Game extends Container {
       return;
     }
     await this.readyPlayers;
-     // Create a deck - place where user can request drawing card
+    // Create a deck - place where user can request drawing card
     this.deck = await Deck.create();
-    this.deck.deck_clicked_action = this.drawCardCommand.bind(this);
-    this.playerHand.pass_command = this.passCommand.bind(this);
     this.show();
   }
 
-  public register_players(playerNames: string[]) {
+  private registerPlayers(playerNames: string[]) {
     this.readyPlayers = new Promise((resolve, reject) => {
       (async () => {
         try {
@@ -183,12 +180,31 @@ export class Game extends Container {
     this.app.stage.removeChild(this);
   }
 
-  private addEventListerners(){
-    eventBus.on("Action:START_GAME", () => {
+  private addEventListerners() {
+    eventBus.on("Action:START_GAME", async () => {
       console.log("starting game")
+      if (this.readyPlayers === undefined) {
+        console.error("Report this bug to Pepa thanks");
+        return;
+      }
+      await this.readyPlayers;
       this.startGame()
     })
-
+    eventBus.on("Helper:SET_MAIN_PLAYER", payload => {
+      this.mainPlayer = payload.playerName;
+    })
+    eventBus.on("Helper:REGISTER_PLAYERS", payload => {
+      this.registerPlayers(payload.playerNames)
+    })
+    eventBus.on("Action:PLAYER_SHIFT", payload => {
+      this.shiftPlayerAction(payload.playerName, payload.expireAtMs)
+    })
+    eventBus.on("Action:HIDDEN_DRAW", payload => {
+      this.hiddenDrawAction(payload.playerName, payload.cardCount)
+    })
+    eventBus.on("Action:PLAY_CARD", payload => {
+      this.playCard(payload.playerName, payload.type, payload.value, payload.newColor)
+    })
   }
 
   private expires(expireAtMs: number) {

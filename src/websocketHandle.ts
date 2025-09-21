@@ -76,38 +76,6 @@ export class WebSocketHandle {
     Array.from(this.cardNameMap.entries()).map(([key, value]) => [value, key]),
   );
 
-  // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => { };
-  public update_player_list!: (player_list: string[]) => void;
-  public add_player!: (player: string) => void;
-  public removePlayerAction: (player: string) => void = (_: string) => {
-    console.warn("removePlayerAction not implemented");
-  };
-  public playerReadyMessage: (name: string, ready: boolean) => void = (
-    _: string,
-    __: boolean,
-  ) => {
-    console.warn("PlayerReadyMessage not implemented yet");
-  };
-  public start_pile!: (card: Card) => void;
-  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (
-    _,
-    __,
-  ) => {
-    console.warn("ShiftPlayerAction not defined in WS");
-  };
-  public hiddenDrawAction: (userName: string, cardCount: number) => void = (
-    _,
-    __,
-  ) => {
-    console.warn("hiddenDrawAction not defined in WS");
-  };
-  public gameEndAction: () => void = () => {
-    console.warn("gameEndAction not implemented yet");
-  };
-  public rankPlayerAction: (_: string[]) => void = (_: string[]) => {
-    console.warn("rankPlayerAction not implemented yet");
-  };
   public ip: string;
   public port: string;
 
@@ -375,14 +343,12 @@ export class WebSocketHandle {
         if (!msg.playerRank)
           return console.error("Players was not specified in RANK action");
         console.log("Game ended");
-        this.rankPlayerAction(msg.playerRank);
-        this.gameEndAction();
         console.warn("Not implemented");
       },
       REMOVE_PLAYER: (msg) => {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
-        eventBus.emit("Action:REMOVE_PLAYER", {playerName: msg.playerDto.username})
+        eventBus.emit("Action:REMOVE_PLAYER", { playerName: msg.playerDto.username })
       },
     };
 
@@ -397,7 +363,7 @@ export class WebSocketHandle {
   private handleServerMessage(message: ServerMessageBody) {
     switch (message.bodyType) {
       case "READY":
-        eventBus.emit("ServerMessage:PLAYER_READY", {ready: true, playerName: message.username})
+        eventBus.emit("ServerMessage:PLAYER_READY", { ready: true, playerName: message.username })
     }
   }
 
@@ -415,13 +381,12 @@ export class WebSocketHandle {
     const chosenNextColor = message.nextColor
       ? (this.cardNameMap.get(message.nextColor) ?? "")
       : "";
-
-    this.playCardAction(
-      message.playerDto.username,
-      this.cardNameMap.get(card_info.color)!,
-      this.cardNameMap.get(card_info.type)!,
-      chosenNextColor,
-    );
+    eventBus.emit("Action:PLAY_CARD", {
+      playerName: message.playerDto.username,
+      type: this.cardNameMap.get(card_info.color)!,
+      value: this.cardNameMap.get(card_info.type)!,
+      newColor: chosenNextColor
+    })
   }
 
   public register_player_action(message: GameAction) {
@@ -439,7 +404,7 @@ export class WebSocketHandle {
     if (!message.players)
       return console.error("Players field was not specified");
     const players = message.players;
-    eventBus.emit("Action:PLAYERS", {playerNames: players})
+    eventBus.emit("Action:PLAYERS", { playerNames: players })
   }
 
   public async start_pile_action(message: GameAction) {
@@ -465,16 +430,16 @@ export class WebSocketHandle {
         this.cardNameMap.get(type)!,
         "pythonGen",
       );
-      this.drawCardAction(card);
+      eventBus.emit("Action:DRAW", card)
     }
   }
 
   private shiftPlayer(activePlayerName: string, expireAtMs: number) {
-    this.shiftPlayerAction(activePlayerName, expireAtMs);
+    eventBus.emit("Action:PLAYER_SHIFT", { playerName: activePlayerName, expireAtMs: expireAtMs })
   }
 
   private hiddenDraw(playerName: string, count: number) {
-    this.hiddenDrawAction(playerName, count);
+    eventBus.emit("Action:HIDDEN_DRAW", { playerName: playerName, cardCount: count })
   }
 
   private saveUUID(uuid: string) {
