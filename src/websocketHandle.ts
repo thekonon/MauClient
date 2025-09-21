@@ -1,4 +1,5 @@
 import { Card } from "./game/card.ts";
+import { eventBus } from "./EventBus.ts";
 
 interface Move {
   moveType: "PLAY";
@@ -19,19 +20,19 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -75,52 +76,13 @@ export class WebSocketHandle {
     Array.from(this.cardNameMap.entries()).map(([key, value]) => [value, key]),
   );
 
-  // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => {};
-  public update_player_list!: (player_list: string[]) => void;
-  public add_player!: (player: string) => void;
-  public removePlayerAction: (player: string) => void = (_: string) => {
-    console.warn("removePlayerAction not implemented");
-  };
-  public playerReadyMessage: (name: string, ready: boolean) => void = (
-    _: string,
-    __: boolean,
-  ) => {
-    console.warn("PlayerReadyMessage not implemented yet");
-  };
-  public start_game!: () => void;
-  public start_pile!: (card: Card) => void;
-  public playCardAction!: (
-    user: string,
-    type: string,
-    value: string,
-    newColor: string,
-  ) => Promise<void>;
-  public shiftPlayerAction: (userName: string, expireAtMs: number) => void = (
-    _,
-    __,
-  ) => {
-    console.warn("ShiftPlayerAction not defined in WS");
-  };
-  public hiddenDrawAction: (userName: string, cardCount: number) => void = (
-    _,
-    __,
-  ) => {
-    console.warn("hiddenDrawAction not defined in WS");
-  };
-  public gameEndAction: () => void = () => {
-    console.warn("gameEndAction not implemented yet");
-  };
-  public rankPlayerAction: (_: string[]) => void = (_: string[]) => {
-    console.warn("rankPlayerAction not implemented yet");
-  };
   public ip: string;
   public port: string;
 
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
   game_started: boolean;
@@ -141,6 +103,7 @@ export class WebSocketHandle {
     this.url = "";
     this.userName = "";
     this.userID = "";
+    this.addEventListerners()
   }
 
   public setIPPort(ip: string, port: string) {
@@ -227,8 +190,44 @@ export class WebSocketHandle {
     }
   }
 
+  private addEventListerners(): void {
+    /* Event listers are added here
+    - Register player
+    - Reconnect player
+    - Player ready
+    - Player playCard
+    - Player drawCard
+    - Player pass*/
+
+    eventBus.on("Command:REGISTER_PLAYER", payload => {
+      this.setUser(payload.playerName);
+      this.setIPPort(payload.ip, payload.port);
+      this.createConnection();
+    })
+
+    eventBus.on("Command:RECONNECT", () => {
+      console.warn("Reconnect player event is not implemented yet in websocket")
+    })
+
+    eventBus.on("Command:PLAYER_READY", payload => {
+      this.sendReadyCommand(payload.playerReady);
+    })
+
+    eventBus.on("Command:PLAY_CARD", payload => {
+      this.playCardCommand(payload.type, payload.value, payload.nextColor);
+    })
+
+    eventBus.on("Command:DRAW", () => {
+      this.drawCardCommand();
+    })
+
+    eventBus.on("Command:PASS", () => {
+      this.playPassCommand()
+    })
+  }
+
   // Call this method when there is a draw card request
-  public drawCardCommand() {
+  private drawCardCommand() {
     const draw_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -238,7 +237,7 @@ export class WebSocketHandle {
     this.send(draw_command);
   }
 
-  public playCardCommand(type: string, value: string, nextColor: string = "") {
+  private playCardCommand(type: string, value: string, nextColor: string = "") {
     const move: Move = {
       moveType: "PLAY",
       card: {
@@ -259,7 +258,7 @@ export class WebSocketHandle {
     this.send(message);
   }
 
-  public playPassCommand() {
+  private playPassCommand() {
     const pass_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -297,7 +296,7 @@ export class WebSocketHandle {
       REGISTER_PLAYER: (msg) => this.register_player_action(msg),
       START_GAME: (_) => {
         this.game_started = true;
-        this.start_game_action();
+        eventBus.emit("Action:START_GAME", undefined)
       },
       START_PILE: (msg) => {
         if (!this.game_started)
@@ -344,16 +343,13 @@ export class WebSocketHandle {
         if (!msg.playerRank)
           return console.error("Players was not specified in RANK action");
         console.log("Game ended");
-        this.rankPlayerAction(msg.playerRank);
-        this.gameEndAction();
-        console.warn("Not implemented");
+        eventBus.emit("Action:PLAYER_RANK", {playersOrder: msg.playerRank})
+        eventBus.emit("Action:END_GAME", undefined)
       },
       REMOVE_PLAYER: (msg) => {
         if (!msg.playerDto)
           return console.error("Player DTO was not specified");
-        console.log("Removing player");
-        console.warn("Not implemented");
-        this.removePlayerAction(msg.playerDto.username);
+        eventBus.emit("Action:REMOVE_PLAYER", { playerName: msg.playerDto.username })
       },
     };
 
@@ -368,7 +364,7 @@ export class WebSocketHandle {
   private handleServerMessage(message: ServerMessageBody) {
     switch (message.bodyType) {
       case "READY":
-        this.playerReadyMessage(message.username, true);
+        eventBus.emit("ServerMessage:PLAYER_READY", { ready: true, playerName: message.username })
     }
   }
 
@@ -386,17 +382,12 @@ export class WebSocketHandle {
     const chosenNextColor = message.nextColor
       ? (this.cardNameMap.get(message.nextColor) ?? "")
       : "";
-
-    this.playCardAction(
-      message.playerDto.username,
-      this.cardNameMap.get(card_info.color)!,
-      this.cardNameMap.get(card_info.type)!,
-      chosenNextColor,
-    );
-  }
-
-  public start_game_action() {
-    this.start_game();
+    eventBus.emit("Action:PLAY_CARD", {
+      playerName: message.playerDto.username,
+      type: this.cardNameMap.get(card_info.color)!,
+      value: this.cardNameMap.get(card_info.type)!,
+      newColor: chosenNextColor
+    })
   }
 
   public register_player_action(message: GameAction) {
@@ -406,14 +397,15 @@ export class WebSocketHandle {
       this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
-    this.add_player(player);
+    eventBus.emit("Action:ADD_PLAYER", { playerName: player })
+    // this.add_player(player);
   }
 
   public players_action(message: GameAction) {
     if (!message.players)
       return console.error("Players field was not specified");
     const players = message.players;
-    this.update_player_list(players);
+    eventBus.emit("Action:PLAYERS", { playerNames: players })
   }
 
   public async start_pile_action(message: GameAction) {
@@ -425,7 +417,7 @@ export class WebSocketHandle {
       this.cardNameMap.get(card_info.type)!,
       "pythonGen",
     );
-    this.start_pile(card);
+    eventBus.emit("Action:START_PILE", card)
   }
 
   public async drawCard(message: GameAction) {
@@ -439,23 +431,16 @@ export class WebSocketHandle {
         this.cardNameMap.get(type)!,
         "pythonGen",
       );
-      card.playCardCommand = (
-        type: string,
-        value: string,
-        nextColor: string,
-      ) => {
-        this.playCardCommand(type, value, nextColor);
-      };
-      this.drawCardAction(card);
+      eventBus.emit("Action:DRAW", card)
     }
   }
 
   private shiftPlayer(activePlayerName: string, expireAtMs: number) {
-    this.shiftPlayerAction(activePlayerName, expireAtMs);
+    eventBus.emit("Action:PLAYER_SHIFT", { playerName: activePlayerName, expireAtMs: expireAtMs })
   }
 
   private hiddenDraw(playerName: string, count: number) {
-    this.hiddenDrawAction(playerName, count);
+    eventBus.emit("Action:HIDDEN_DRAW", { playerName: playerName, cardCount: count })
   }
 
   private saveUUID(uuid: string) {

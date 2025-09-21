@@ -1,6 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
+import { eventBus } from "../EventBus";
 
 export class PlayerHand extends Container {
   cards_list: Card[];
@@ -10,7 +11,6 @@ export class PlayerHand extends Container {
 
   background!: Graphics;
 
-  public pass_command!: () => void;
   remainingTime!: Text;
 
   public constructor() {
@@ -24,10 +24,7 @@ export class PlayerHand extends Container {
 
     this.x = GameSettings.get_player_hand_top_x();
     this.y = GameSettings.get_player_hand_top_y();
-
-    this.pass_command = () => {
-      console.warn("Pass command not defined yet");
-    };
+    this.addEventListeners();
   }
 
   public draw_hand(backgroundColor = 0xde3249): void {
@@ -50,7 +47,7 @@ export class PlayerHand extends Container {
       GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     passButton.on("pointerdown", () => {
-      this.pass_command();
+      eventBus.emit("Command:PASS", undefined)
     });
 
     // button for pass action
@@ -128,6 +125,12 @@ export class PlayerHand extends Container {
 
     console.error("No such card found type:", type, "value:", value);
     return null;
+  }
+
+  private addEventListeners(): void {
+    eventBus.on("Action:DRAW", card => {
+      this.draw_card(card)
+    })
   }
 
   private reorder_cards() {

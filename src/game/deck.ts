@@ -1,5 +1,6 @@
 import { Assets, Container, Sprite } from "pixi.js";
 import { GameSettings } from "../gameSettings";
+import { eventBus } from "../EventBus";
 
 export class Deck extends Container {
   sprite!: Sprite;
@@ -28,7 +29,7 @@ export class Deck extends Container {
   }
 
   private deck_clicked() {
-    this.deck_clicked_action();
+    eventBus.emit("Command:DRAW", undefined)
   }
 
   public deck_clicked_action() {

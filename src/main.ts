@@ -2,9 +2,10 @@ import { Application } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
 import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
-import { WebSocketHandle } from "./websocket_handle.ts";
+import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loading_screen/CardManage.ts";
+
 
 async function testing(
   web_socket: WebSocketHandle,
@@ -67,85 +68,21 @@ async function testing(
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
-  const web_socket = new WebSocketHandle();
-
-  // Create websocket connection after providing a name under which is user connected to WS
-  loading_screen.on_register_player = (
-    playerName: string,
-    ip: string,
-    port: string,
-  ) => {
-    web_socket.setUser(playerName);
-    web_socket.setIPPort(ip, port);
-    web_socket.createConnection();
-  };
-
-  loading_screen.playerReadyCommand =
-    web_socket.sendReadyCommand.bind(web_socket);
-  loading_screen.reconnectCommand = (ip: string, port: string) => {
-    web_socket.setIPPort(ip, port);
-    web_socket.reconnect();
-  };
-
-  /* These are messages that goes from server */
-  /* Loading screen callbacks - server sends */
-  web_socket.update_player_list =
-    loading_screen.updatePlayerList.bind(loading_screen);
-  web_socket.add_player = loading_screen.addPlayerToList.bind(loading_screen);
-  web_socket.playerReadyMessage =
-    loading_screen.readyPlayerMessage.bind(loading_screen);
-  web_socket.removePlayerAction =
-    loading_screen.removePlayerFromList.bind(loading_screen);
-
-  /* Game callbacks - server sends */
-
+  
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
-
+  
   document.getElementById("pixi-container")!.appendChild(app.canvas);
   const cardManager = new CardManager(app);
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
-
-  let game!: Game;
-
-  // Create a endScreen instance
-  let endScreen!: EndScreen;
-
-  web_socket.start_game = async () => {
-    // When game stats, hide loading screen
-    loading_screen.hide();
-    // cardManager.removeFallingCards()
-    GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
-
-    game = new Game(app);
-
-    web_socket.start_pile = game.startPileAction.bind(game);
-    web_socket.drawCardAction = game.drawCardAction.bind(game);
-    web_socket.playCardAction = game.playCard.bind(game);
-    web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
-    web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
-
-    /* User callbacks - user want to send */
-    game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
-    game.passCommand = web_socket.playPassCommand.bind(web_socket);
-
-    endScreen = new EndScreen(app);
-
-    web_socket.gameEndAction = async () => {
-      await new Promise((res) => setTimeout(res, 1000));
-      game.hide();
-      endScreen.show();
-    };
-
-    web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
-
-    game.mainPlayer = loading_screen.getMainPlayer();
-    game.register_players(loading_screen.get_players_list());
-
-    game.startGame();
-  };
+  
+  
+  new WebSocketHandle();
+  GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  new Game(app);
+  new EndScreen(app);
   // Bypapass for testing
-  testing(web_socket, loading_screen);
+  // testing(web_socket, loading_screen);
 })();

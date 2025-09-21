@@ -6,11 +6,13 @@ import {
   Point,
   FederatedPointerEvent,
   Graphics,
+  Bounds,
 } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
 import { DropShadowFilter } from "pixi-filters";
+import { eventBus } from "../EventBus";
 
 export class Card extends Container {
   // General settings of the card
@@ -32,10 +34,6 @@ export class Card extends Container {
     A - Ace
     */
   value: string;
-  /* Textures:
-    - default
-    */
-  texture: string;
 
   /* Animation properties */
   /*  end_animation_point_x / y
@@ -63,73 +61,53 @@ export class Card extends Container {
   private dragStartPosition = new Point();
   private wasDragged = false;
   private isDialogActive = false;
-  useOriginOfCard: boolean;
+  private _useOriginOfCard: boolean = false;
   spriteContainer: any;
+  bounds!: Bounds;
 
   /* Card has to be created in async - therefore factory is used*/
   public static async create(
     type: string,
     value: string,
     texture_name: string = "default",
+    useOriginOfCard: boolean = GameSettings.useOriginOfCard,
   ): Promise<Card> {
     const texture = await Card.load_texture(type, value, texture_name);
     const sprite = new Sprite(texture);
-    return new Card(type, value, sprite);
+    return new Card(type, value, sprite, useOriginOfCard);
   }
 
   private constructor(
     type: string,
     value: string,
     sprite: Sprite,
-    texture: string = "default",
+    useOriginOfCard: boolean = true,
   ) {
     super();
 
     this.type = type;
     this.value = value;
     this.card_sprite = sprite;
-    this.texture = texture;
 
     this.setDefaultSize();
     this.end_animation_point_x = 0;
     this.end_animation_point_y = 0;
     this.rotation_angle = 0;
     this.animation_duration = 1;
-    this.useOriginOfCard = true;
-
-    // This is a point to which i set the position of whole container
-    const background = new Graphics();
-    background.rect(0, 0, 10, 10).fill(0xff0000);
-    // this.addChild(background)
+    this.interactive = true;
 
     // This is the container for rotating and transforming sprite itself
     this.spriteContainer = new Container();
 
-    if (this.useOriginOfCard) {
-      this.card_sprite.anchor.set(0.5);
-      this.spriteContainer.x = this.card_sprite.width / 2;
-      this.spriteContainer.y = this.card_sprite.height / 2;
-    }
+    this.useOriginOfCard = useOriginOfCard; // needs to be defined after spriteContainer
 
     this.playCardCommand = (_type: string, _value: string, _nextcard) => {
       console.warn("playCardCommand not defined");
     };
 
-    this.interactive = true;
 
-    this.on("pointerdown", this.onDragStart, this);
-    this.on("pointerup", this.onDragEnd, this);
-    this.on("pointerupoutside", this.onDragEnd, this);
-    this.on("pointermove", this.onDragMove, this);
-
-    sprite.filters = [
-      new DropShadowFilter({
-        offset: { x: 10, y: 10 },
-        alpha: 0.6,
-        blur: 6,
-        color: 0x000000,
-      }),
-    ];
+    this.makeButtonMovable()
+    this.addShade();
 
     this.spriteContainer.addChild(sprite);
     this.addChild(this.spriteContainer);
@@ -138,9 +116,8 @@ export class Card extends Container {
   public play(
     duration?: number,
     rotation?: number,
-    onFinish: () => void = () => {},
+    onFinish: () => void = () => { },
   ) {
-    console.log("End:", this.end_animation_point_x, this.end_animation_point_y);
     if (this.useOriginOfCard) {
       gsap.to(this, {
         x: this.end_animation_point_x,
@@ -178,61 +155,87 @@ export class Card extends Container {
   }
 
   public setGlobalEndOfAnimation(x: number, y: number, rotation: number) {
-    const topLeftEdge = new Point(
-      -this.card_sprite.width / 2,
-      -this.card_sprite.height / 2,
-    );
-
-    // Simulate end of rotation in order to get the end point
-    const prevRotation = this.spriteContainer.rotation;
-    this.spriteContainer.rotation = rotation;
-    const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
-    this.spriteContainer.rotation = prevRotation;
-
-    const testGraphics = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(topLeftEdge.x, topLeftEdge.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.spriteContainer.addChild(testGraphics)
-
-    const testGraphics2 = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(globalDiff.x, globalDiff.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.addChild(testGraphics2)
-
-    this.end_animation_point_x = x - globalDiff.x;
-    this.end_animation_point_y = y - globalDiff.y;
     this.rotation_angle = rotation;
+    if (!this.useOriginOfCard) {
+      this.end_animation_point_x = x;
+      this.end_animation_point_y = y;
+    }
+    else {
+      const topLeftEdge = new Point(
+        -this.card_sprite.width / 2,
+        -this.card_sprite.height / 2,
+      );
+
+      // Simulate end of rotation in order to get the end point
+      const prevRotation = this.spriteContainer.rotation;
+      this.spriteContainer.rotation = rotation;
+      const globalDiff = this.spriteContainer.toGlobal(topLeftEdge);
+      this.spriteContainer.rotation = prevRotation;
+
+      const testGraphics = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(topLeftEdge.x, topLeftEdge.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.spriteContainer.addChild(testGraphics)
+
+      const testGraphics2 = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(globalDiff.x, globalDiff.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.addChild(testGraphics2)
+
+      this.end_animation_point_x = x - globalDiff.x;
+      this.end_animation_point_y = y - globalDiff.y;
+    }
   }
 
   public setLocalEndOfAnimation(x: number, y: number, rotation: number): void {
-    const topLeftEdge = new Point(
-      -this.card_sprite.width / 2,
-      -this.card_sprite.height / 2,
-    );
-
-    // Simulate end of rotation in order to get the end point
-    const prevRotation = this.spriteContainer.rotation;
-    this.spriteContainer.rotation = rotation;
-    const localDiff = this.spriteContainer.parent.toLocal(
-      this.spriteContainer.toGlobal(topLeftEdge),
-    );
-    this.spriteContainer.rotation = prevRotation;
-
-    const testGraphics = new Graphics()
-      .moveTo(0, 0)
-      .lineTo(topLeftEdge.x, topLeftEdge.y)
-      .stroke({ width: 2, color: 0x000000 });
-    // this.spriteContainer.addChild(testGraphics)
-    this.end_animation_point_x = x - localDiff.x;
-    this.end_animation_point_y = y - localDiff.y;
     this.rotation_angle = rotation;
+    if (!this.useOriginOfCard) {
+      this.end_animation_point_x = x;
+      this.end_animation_point_y = y;
+    }
+    else {
+      const topLeftEdge = new Point(
+        -this.card_sprite.width / 2,
+        -this.card_sprite.height / 2,
+      );
+
+      // Simulate end of rotation in order to get the end point
+      const prevRotation = this.spriteContainer.rotation;
+      this.spriteContainer.rotation = rotation;
+      const localDiff = this.spriteContainer.parent.toLocal(
+        this.spriteContainer.toGlobal(topLeftEdge),
+      );
+      this.spriteContainer.rotation = prevRotation;
+
+      const testGraphics = new Graphics()
+        .moveTo(0, 0)
+        .lineTo(topLeftEdge.x, topLeftEdge.y)
+        .stroke({ width: 2, color: 0x000000 });
+      this.spriteContainer.addChild(testGraphics)
+      this.end_animation_point_x = x - localDiff.x;
+      this.end_animation_point_y = y - localDiff.y;
+    }
   }
 
   public setDefaultSize() {
     this.card_sprite.width = GameSettings.card_width;
     this.card_sprite.height = GameSettings.card_height;
+  }
+
+  public makeButtonMovable() {
+    this.on("pointerdown", this.onDragStart, this);
+    this.on("pointerup", this.onDragEnd, this);
+    this.on("pointerupoutside", this.onDragEnd, this);
+    this.on("pointermove", this.onDragMove, this);
+  }
+
+  public removeButtonMovable() {
+    this.off("pointerdown", this.onDragStart, this);
+    this.off("pointerup", this.onDragEnd, this);
+    this.off("pointerupoutside", this.onDragEnd, this);
+    this.off("pointermove", this.onDragMove, this);
   }
 
   private onDragStart(event: FederatedPointerEvent): void {
@@ -242,6 +245,7 @@ export class Card extends Container {
     this.dragStartPosition = event.getLocalPosition(this.parent);
     this.zIndex = 1000;
     this.alpha = 0.7;
+    this.bounds = this.parent.getBounds()
   }
 
   private onDragMove(event: FederatedPointerEvent): void {
@@ -252,8 +256,21 @@ export class Card extends Container {
     const dy = currentPosition.y - this.dragStartPosition.y;
 
     // Set as dragged if movement is beyond threshold
-    if (!this.wasDragged && Math.sqrt(dx * dx + dy * dy) > 5) {
+    if (!this.wasDragged && Math.sqrt(dx * dx + dy * dy) > 500) {
       this.wasDragged = true;
+    }
+
+    if (currentPosition.x - this.dragOffset.x < -GameSettings.get_player_hand_width() * 0.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y < -GameSettings.get_player_hand_height() * 0.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_width() * 1.1) {
+      return;
+    }
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_height() * 1.1) {
+      return;
     }
 
     this.position.set(
@@ -274,6 +291,11 @@ export class Card extends Container {
       this.onCardClick();
     } else {
       // Drag finished — optional: snap back or drop logic here
+      console.log("snapping back")
+      this.position.set(
+        this.dragStartPosition.x - this.dragOffset.x,
+        this.dragStartPosition.y - this.dragOffset.y,
+      );
     }
   }
   private async onCardClick() {
@@ -295,7 +317,7 @@ export class Card extends Container {
       this.parent.removeChild(dialog);
       this.isDialogActive = false;
     }
-    this.playCardCommand(this.type, this.value, nextColor);
+    eventBus.emit("Command:PLAY_CARD", {type: this.type, value: this.value, nextColor})
   }
 
   private static async load_texture(
@@ -309,5 +331,34 @@ export class Card extends Container {
     } catch {
       return await Assets.load(`assets/default/back.png`);
     }
+  }
+
+  private addShade() {
+    this.card_sprite.filters = [
+      new DropShadowFilter({
+        offset: { x: 10, y: 10 },
+        alpha: 0.6,
+        blur: 6,
+        color: 0x000000,
+      }),
+    ];
+  }
+
+  set useOriginOfCard(useOriginOfCard: boolean) {
+    this._useOriginOfCard = useOriginOfCard
+    if (useOriginOfCard) {
+      this.card_sprite.anchor.set(0.5);
+      this.spriteContainer.x = this.card_sprite.width / 2;
+      this.spriteContainer.y = this.card_sprite.height / 2;
+    }
+    else {
+      this.card_sprite.anchor.set(0);
+      this.spriteContainer.x = 0;
+      this.spriteContainer.y = 0;
+    }
+  }
+
+  get useOriginOfCard() {
+    return this._useOriginOfCard;
   }
 }
