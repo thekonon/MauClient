@@ -343,7 +343,8 @@ export class WebSocketHandle {
         if (!msg.playerRank)
           return console.error("Players was not specified in RANK action");
         console.log("Game ended");
-        console.warn("Not implemented");
+        eventBus.emit("Action:PLAYER_RANK", {playersOrder: msg.playerRank})
+        eventBus.emit("Action:END_GAME", undefined)
       },
       REMOVE_PLAYER: (msg) => {
         if (!msg.playerDto)

@@ -205,6 +205,10 @@ export class Game extends Container {
     eventBus.on("Action:PLAY_CARD", payload => {
       this.playCard(payload.playerName, payload.type, payload.value, payload.newColor)
     })
+    eventBus.on("Action:END_GAME", async () => {
+      await new Promise((res) => setTimeout(res, 1000));
+      this.hide();
+    })
   }
 
   private expires(expireAtMs: number) {

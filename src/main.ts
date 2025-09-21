@@ -66,7 +66,6 @@ async function testing(
 }
 
 (async () => {
-  let endScreen!: EndScreen;
   const loading_screen = new LoadingScreen();
   loading_screen.show();
   const web_socket = new WebSocketHandle();
@@ -81,20 +80,10 @@ async function testing(
   cardManager.createFallingCards(50);
 
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
-  const game = new Game(app);
-  endScreen = new EndScreen(app);
+  new Game(app);
+  new EndScreen(app);
 
   // web_socket.start_game = async () => {
-    // When game stats, hide loading screen
-    // loading_screen.hide();
-    // cardManager.removeFallingCards()
-    
-    // web_socket.start_pile = game.startPileAction.bind(game);
-    // web_socket.drawCardAction = game.drawCardAction.bind(game);
-    // web_socket.playCardAction = game.playCard.bind(game);
-    // web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
-    // web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
-
 
     // web_socket.gameEndAction = async () => {
     //   await new Promise((res) => setTimeout(res, 1000));
@@ -103,11 +92,6 @@ async function testing(
     // };
 
     // web_socket.rankPlayerAction = endScreen.setWinners.bind(endScreen);
-
-    
-    // 
-
-    // game.startGame();
   // };
   // Bypapass for testing
   // testing(web_socket, loading_screen);
