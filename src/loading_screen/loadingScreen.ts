@@ -183,11 +183,7 @@ export class LoadingScreen {
   }
 
   private readyPlayerButtonClicked() {
-    if (this.mainPlayer.isReady) {
-      this.playerReadyCommand(false);
-    } else {
-      this.playerReadyCommand(true);
-    }
+    eventBus.emit("Command:PLAYER_READY", {playerReady: !this.mainPlayer.isReady!})
   }
 
   private registerPlayer() {
@@ -215,7 +211,7 @@ export class LoadingScreen {
       return;
     }
     this.mainPlayer = new Player(playerName);
-    this.on_register_player?.(playerName, ip, port);
+    eventBus.emit("Command:REGISTER_PLAYER", {playerName: playerName, ip: ip, port: port})
   }
 
   private reconnectPlayer() {

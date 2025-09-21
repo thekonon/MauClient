@@ -70,25 +70,6 @@ async function testing(
   loading_screen.show();
   const web_socket = new WebSocketHandle();
 
-  // Create websocket connection after providing a name under which is user connected to WS
-  loading_screen.on_register_player = (
-    playerName: string,
-    ip: string,
-    port: string,
-  ) => {
-    web_socket.setUser(playerName);
-    web_socket.setIPPort(ip, port);
-    web_socket.createConnection();
-  };
-
-  loading_screen.playerReadyCommand =
-    web_socket.sendReadyCommand.bind(web_socket);
-  loading_screen.reconnectCommand = (ip: string, port: string) => {
-    web_socket.setIPPort(ip, port);
-    web_socket.reconnect();
-  };
-
-  /* These are messages that goes from server */
   /* Loading screen callbacks - server sends */
   web_socket.update_player_list =
     loading_screen.updatePlayerList.bind(loading_screen);
@@ -125,10 +106,6 @@ async function testing(
     web_socket.playCardAction = game.playCard.bind(game);
     web_socket.shiftPlayerAction = game.shiftPlayerAction.bind(game);
     web_socket.hiddenDrawAction = game.hiddenDrawAction.bind(game);
-
-    /* User callbacks - user want to send */
-    game.drawCardCommand = web_socket.drawCardCommand.bind(web_socket);
-    game.passCommand = web_socket.playPassCommand.bind(web_socket);
 
     endScreen = new EndScreen(app);
 

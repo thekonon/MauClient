@@ -20,19 +20,19 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -77,7 +77,7 @@ export class WebSocketHandle {
   );
 
   // Game actions
-  public drawCardAction: (card: Card) => void = (_: Card) => {};
+  public drawCardAction: (card: Card) => void = (_: Card) => { };
   public update_player_list!: (player_list: string[]) => void;
   public add_player!: (player: string) => void;
   public removePlayerAction: (player: string) => void = (_: string) => {
@@ -119,9 +119,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
   game_started: boolean;
@@ -142,6 +142,7 @@ export class WebSocketHandle {
     this.url = "";
     this.userName = "";
     this.userID = "";
+    this.addEventListerners()
   }
 
   public setIPPort(ip: string, port: string) {
@@ -228,8 +229,44 @@ export class WebSocketHandle {
     }
   }
 
+  private addEventListerners(): void {
+    /* Event listers are added here
+    - Register player
+    - Reconnect player
+    - Player ready
+    - Player playCard
+    - Player drawCard
+    - Player pass*/
+
+    eventBus.on("Command:REGISTER_PLAYER", payload => {
+      this.setUser(payload.playerName);
+      this.setIPPort(payload.ip, payload.port);
+      this.createConnection();
+    })
+
+    eventBus.on("Command:RECONNECT", () => {
+      console.warn("Reconnect player event is not implemented yet in websocket")
+    })
+
+    eventBus.on("Command:PLAYER_READY", payload => {
+      this.sendReadyCommand(payload.playerReady);
+    })
+
+    eventBus.on("Command:PLAY_CARD", payload => {
+      this.playCardCommand(payload.type, payload.value, payload.nextColor);
+    })
+
+    eventBus.on("Command:DRAW", () => {
+      this.drawCardCommand();
+    })
+
+    eventBus.on("Command:PASS", () => {
+      this.playPassCommand()
+    })
+  }
+
   // Call this method when there is a draw card request
-  public drawCardCommand() {
+  private drawCardCommand() {
     const draw_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -239,7 +276,7 @@ export class WebSocketHandle {
     this.send(draw_command);
   }
 
-  public playCardCommand(type: string, value: string, nextColor: string = "") {
+  private playCardCommand(type: string, value: string, nextColor: string = "") {
     const move: Move = {
       moveType: "PLAY",
       card: {
@@ -260,7 +297,7 @@ export class WebSocketHandle {
     this.send(message);
   }
 
-  public playPassCommand() {
+  private playPassCommand() {
     const pass_command = JSON.stringify({
       requestType: "MOVE",
       move: {
@@ -407,7 +444,7 @@ export class WebSocketHandle {
       this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
-    eventBus.emit("Action:ADD_PLAYER", {playerName: player})
+    eventBus.emit("Action:ADD_PLAYER", { playerName: player })
     // this.add_player(player);
   }
 
@@ -441,13 +478,6 @@ export class WebSocketHandle {
         this.cardNameMap.get(type)!,
         "pythonGen",
       );
-      card.playCardCommand = (
-        type: string,
-        value: string,
-        nextColor: string,
-      ) => {
-        this.playCardCommand(type, value, nextColor);
-      };
       this.drawCardAction(card);
     }
   }

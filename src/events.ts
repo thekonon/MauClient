@@ -2,10 +2,11 @@ import { Card } from "./game/card";
 
 // events.ts
 export interface AppEvents {
-    "Command:PLAYER_READY": void;
+    "Command:REGISTER_PLAYER": { playerName: string, ip: string, port: string };
+    "Command:PLAYER_READY": {playerReady: boolean};
     "Command:RECONNECT": void;
     "Action:PLAYERS": { playerName: string };
-    "Action:REGISTER_PLAYER": { playerName: string };
+    "Action:REGISTER_PLAYER": {playerName: string};
     "Action:ADD_PLAYER": {playerName: string};
     "Action:START_GAME": void;
     "Action:START_PILE": Card;
@@ -18,6 +19,7 @@ export interface AppEvents {
     "Action:LOSE": void;
     "Action:END_GAME": void;
     "Action:REMOVE_PLAYER": { playerName: string };
-    "Command:DRAW_CARD": Card;
-    "Command:PASS_CARD": Card;
+    "Command:PLAY_CARD": {type: string, value: string, nextColor: string}
+    "Command:DRAW": void;
+    "Command:PASS": void;
 }
