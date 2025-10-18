@@ -20,19 +20,19 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -80,9 +80,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
   game_started: boolean;
@@ -107,12 +107,21 @@ export class WebSocketHandle {
   }
 
   public setIPPort(ip: string, port: string) {
+    if (ip.length == 0) {
+      throw new Error("IP can not be empty")
+    }
+    if (port.length == 0) {
+      throw new Error("port can not be empty")
+    }
     this.ip = ip;
     this.port = port;
   }
 
-  public setUser(user_name: string) {
-    this.userName = user_name;
+  public setUser(userName: string) {
+    if (userName.length > 21) {
+      throw new Error("Username have to be shorter than 20 characters")
+    }
+    this.userName = userName;
   }
 
   public createConnection() {
@@ -155,6 +164,7 @@ export class WebSocketHandle {
     });
     this.send(readyCommand);
   }
+  
   private createSocket(): WebSocket {
     const socket = new WebSocket(this.url);
     socket.addEventListener("open", () => {
@@ -192,12 +202,12 @@ export class WebSocketHandle {
 
   private addEventListerners(): void {
     /* Event listers are added here
-    - Register player
-    - Reconnect player
-    - Player ready
-    - Player playCard
-    - Player drawCard
-    - Player pass*/
+        - Register player
+            - Reconnect player
+                - Player ready
+                    - Player playCard
+                        - Player drawCard
+                            - Player pass*/
 
     eventBus.on("Command:REGISTER_PLAYER", (payload) => {
       this.setUser(payload.playerName);
@@ -440,6 +450,10 @@ export class WebSocketHandle {
       );
       eventBus.emit("Action:DRAW", card);
     }
+  }
+
+  public getUrl(): string{
+    return this.url;
   }
 
   private shiftPlayer(activePlayerName: string, expireAtMs: number) {

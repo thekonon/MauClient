@@ -1,32 +1,9 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { Application } from "pixi.js";
+import { describe, it, expect } from "vitest";
 import { Card } from "../../src/game/card";
-import { GameSettings } from "../../src/gameSettings";
+import { app } from "../../setupTests";
 
 const suits = ["C", "D", "H", "S"] as const;
 const values = ["A", "2", "3", "4", "5", "K", "Q", "J"] as const;
-
-let app: Application;
-
-beforeAll(async () => {
-  const canvasWidth = 414;
-  const canvasHeight = 896;
-
-  GameSettings.setScreenDimensions(canvasHeight, canvasWidth);
-
-  app = new Application();
-  await app.init({
-    background: "#1099bb",
-    width: canvasWidth,
-    height: canvasHeight,
-  });
-
-  document.body.appendChild(app.canvas);
-});
-
-// afterAll(async () => {
-//     app.destroy(true, { children: true, texture: false });
-// });
 
 describe("card.ts assertions tests", () => {
   it.each(suits)("creates card with type %s", async (testedType) => {
@@ -100,12 +77,14 @@ describe("card.ts unit tests", () => {
     expect(card.end_animation_point_x).toBeCloseTo(expectedX);
     expect(card.end_animation_point_y).toBeCloseTo(expectedY);
 
-    await new Promise((res) => setTimeout(res, 5));
+    const duration = 0.0001;
 
-    const duration = 0.01;
-    card.play(duration);
+    const cardAnimationFinished = new Promise<void>(async (resolve) => {
+      card.play(duration, undefined, resolve);
+    })
+    await cardAnimationFinished
 
-    await new Promise((res) => setTimeout(res, 1000 * duration * 1.05));
+    // await new Promise((res) => setTimeout(res, 1000 * duration * 1.05));
 
     expect(card.x).toBeCloseTo(expectedX);
     expect(card.y).toBeCloseTo(expectedY);

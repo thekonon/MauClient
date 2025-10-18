@@ -1,4 +1,4 @@
-import { describe, it, test, expect, beforeEach, vi } from "vitest";
+import { describe, test, expect, beforeEach, vi } from "vitest";
 import { GameSettings } from '../src/gameSettings';
 
 describe('GameSettings', () => {
