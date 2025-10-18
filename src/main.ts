@@ -77,8 +77,8 @@ async function testing(
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
-  new WebSocketHandle();
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
   // Bypapass for testing
