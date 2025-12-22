@@ -224,6 +224,8 @@ export class LoadingScreen {
       playerName: playerName,
       ip: ip,
       port: port,
+      newLobby: false,
+      privateLobby: false,
     });
   }
 
@@ -242,7 +244,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.reconnectCommand(ip, port);
+    //this.reconnectCommand(ip, port);
   }
 
   private updateConnectedPlayers() {

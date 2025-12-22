@@ -100,6 +100,10 @@ export class WebSocketHandle {
   private socket!: WebSocket;
   private url: string;
 
+  private lobby: string = "";
+  private new: boolean = false;
+  private private: boolean = false;
+
   constructor() {
     this.ip = "";
     this.port = "";
@@ -139,6 +143,7 @@ export class WebSocketHandle {
     if (this.port == "") {
       throw new Error("Port must be set first");
     }
+
     this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
     this.socket = this.createSocket();
   }
