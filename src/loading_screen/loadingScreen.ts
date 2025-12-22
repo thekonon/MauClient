@@ -53,6 +53,27 @@ export class LoadingScreen {
       this.registerPlayer();
     });
 
+    const createLobbyButton = document.getElementById("createLobbyButton") as HTMLInputElement | null;
+    const createPrivateLobbyButton = document.getElementById("createPrivateLobbyButton") as HTMLInputElement | null;
+
+    if (createLobbyButton) {
+      createLobbyButton.addEventListener("click", () => {
+        this.createLobby()
+      })
+    }
+    else {
+      console.log("createLobby button was not found")
+    }
+
+    if (createPrivateLobbyButton) {
+      createPrivateLobbyButton.addEventListener("click", () => {
+        this.createPrivateLobby()
+      })
+    }
+    else {
+      console.log("createPrivateLobby button was not found")
+    }
+
     const reconnectButton = document.getElementById(
       "reconnectButton",
     ) as HTMLButtonElement;
@@ -245,6 +266,78 @@ export class LoadingScreen {
       return;
     }
     //this.reconnectCommand(ip, port);
+  }
+
+  private createLobby() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
+    const playerName = playerNameInput.value.trim();
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
+
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.mainPlayer = new Player(playerName);
+    console.log("Createing new lobby")
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+      lobbyName: lobbyNane.value,
+      newLobby: true,
+      privateLobby: false,
+    });
+  }
+
+  private createPrivateLobby() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const playerName = playerNameInput.value.trim();
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
+
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.mainPlayer = new Player(playerName);
+    console.log("Createing private lobby")
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+      newLobby: true,
+      privateLobby: true,
+    });
   }
 
   private updateConnectedPlayers() {

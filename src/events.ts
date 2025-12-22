@@ -2,7 +2,7 @@ import { Card } from "./game/card";
 
 // events.ts
 export interface AppEvents {
-  "Command:REGISTER_PLAYER": { playerName: string; ip: string; port: string; newLobby: boolean; privateLobby: boolean };
+  "Command:REGISTER_PLAYER": { playerName: string; ip: string; lobbyName:string; port: string; newLobby: boolean; privateLobby: boolean };
   "Command:PLAYER_READY": { playerReady: boolean };
   "Command:RECONNECT": void;
   "ServerMessage:PLAYER_READY": { ready: boolean; playerName: string };

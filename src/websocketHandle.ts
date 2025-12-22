@@ -100,9 +100,9 @@ export class WebSocketHandle {
   private socket!: WebSocket;
   private url: string;
 
-  private lobby: string = "";
-  private new: boolean = false;
-  private private: boolean = false;
+  private lobbyName: string = "";
+  private newLobby: boolean = false;
+  private privateLobby: boolean = false;
 
   constructor() {
     this.ip = "";
@@ -145,6 +145,17 @@ export class WebSocketHandle {
     }
 
     this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
+
+    if (this.lobbyName) {
+      this.url += `&lobby=${this.lobbyName}`
+    }
+    if (this.newLobby) {
+      this.url += `&new=${this.newLobby}`
+    }
+    if (this.privateLobby) {
+      this.url += `&private=${this.privateLobby}`
+    }
+    
     this.socket = this.createSocket();
   }
 
@@ -176,6 +187,7 @@ export class WebSocketHandle {
   }
   
   private createSocket(): WebSocket {
+    console.log(this.url)
     const socket = new WebSocket(this.url);
     socket.addEventListener("open", () => {
       console.log("WebSocket connected");
@@ -222,6 +234,9 @@ export class WebSocketHandle {
     eventBus.on("Command:REGISTER_PLAYER", (payload) => {
       this.setUser(payload.playerName);
       this.setIPPort(payload.ip, payload.port);
+      this.setLobbyName(payload.lobbyName);
+      this.setNewLobby(payload.newLobby);
+      this.setPrivateLobby(payload.privateLobby);
       this.createConnection();
     });
 
@@ -476,6 +491,18 @@ export class WebSocketHandle {
 
   public getUrl(): string{
     return this.url;
+  }
+
+  private setLobbyName(lobbyName: string){
+    this.lobbyName = lobbyName
+  }
+
+  private setNewLobby(newLobby: boolean){
+    this.newLobby = newLobby;
+  }
+
+  private setPrivateLobby(privateLobby: boolean){
+    this.privateLobby = privateLobby;
   }
 
   private shiftPlayer(activePlayerName: string, expireAtMs: number) {
