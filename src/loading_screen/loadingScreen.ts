@@ -222,6 +222,7 @@ export class LoadingScreen {
     ) as HTMLInputElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
     const ip = IPInput.value.trim();
     const port = PORTInput.value.trim();
@@ -244,6 +245,7 @@ export class LoadingScreen {
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
+      lobbyName: lobbyNane.value, 
       port: port,
       newLobby: false,
       privateLobby: false,
@@ -311,6 +313,7 @@ export class LoadingScreen {
     ) as HTMLInputElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
     const ip = IPInput.value.trim();
     const port = PORTInput.value.trim();
@@ -334,6 +337,7 @@ export class LoadingScreen {
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
+      lobbyName: lobbyNane.value, 
       port: port,
       newLobby: true,
       privateLobby: true,
