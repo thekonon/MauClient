@@ -3,7 +3,7 @@ import { AppEvents } from "./events";
 
 type EventHandler<T> = (payload: T) => void;
 
-class EventBus<EventMap extends Record<string, unknown>> {
+class EventBus<EventMap extends Record<PropertyKey, any>> {
   private listeners: {
     [K in keyof EventMap]?: EventHandler<EventMap[K]>[];
   } = {};
