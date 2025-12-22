@@ -1,5 +1,6 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./EventBus.ts";
+import { M } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 interface Move {
   moveType: "PLAY";
@@ -32,7 +33,9 @@ export interface GameAction {
   | "WIN"
   | "LOSE"
   | "END_GAME"
-  | "REMOVE_PLAYER";
+  | "REMOVE_PLAYER"
+  | "READY"     // moved from server message
+  | "UNREADY";  // moved from server message
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -48,6 +51,8 @@ export interface GameAction {
 
   count?: number;
   nextColor?: string;
+
+  username?: string; // for ready event
 }
 
 export interface ServerMessageBody {
@@ -365,6 +370,18 @@ export class WebSocketHandle {
           playerName: msg.playerDto.username,
         });
       },
+      READY: (msg) => {
+        if (!msg.username){
+          return console.error("username field in the ready_player was not specified")
+        }
+        eventBus.emit("ServerMessage:PLAYER_READY", {ready: true, playerName: msg.username})
+      },
+      UNREADY: (msg) => {
+        if (!msg.username){
+          return console.error("username field in the unready_player was not specified")
+        }
+        eventBus.emit("ServerMessage:PLAYER_READY", {ready: false, playerName: msg.username})
+      }
     };
 
     const handler = handlers[message.type];
