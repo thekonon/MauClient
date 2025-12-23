@@ -12,7 +12,7 @@ import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
 import { DropShadowFilter } from "pixi-filters";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class Card extends Container {
   // General settings of the card

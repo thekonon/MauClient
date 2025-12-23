@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class PlayerHand extends Container {
   cards_list: Card[];

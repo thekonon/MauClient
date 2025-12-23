@@ -1,6 +1,6 @@
 import { Assets, Container, Sprite } from "pixi.js";
 import { GameSettings } from "../gameSettings";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class Deck extends Container {
   sprite!: Sprite;

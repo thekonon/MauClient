@@ -5,7 +5,7 @@ import { PlayerHand } from "./playerHand";
 import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class Game extends Container {
   private app: Application;

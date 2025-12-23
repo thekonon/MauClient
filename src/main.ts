@@ -1,10 +1,10 @@
 import { Application } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
-import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
+import { LoadingScreen } from "./loadingScreen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
-import { CardManager } from "./loading_screen/CardManage.ts";
+import { CardManager } from "./loadingScreen/CardManage.ts";
 
 (async () => {
   const loading_screen = new LoadingScreen();

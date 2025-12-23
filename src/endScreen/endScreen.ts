@@ -8,7 +8,7 @@ import {
   Text,
 } from "pixi.js";
 import { GameSettings } from "../gameSettings";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class EndScreen extends Container {
   app: Application;

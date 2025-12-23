@@ -1,5 +1,5 @@
 import { Card } from "./game/card.ts";
-import { eventBus } from "./EventBus.ts";
+import { eventBus } from "./eventBus.ts";
 import { M } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 interface Move {
