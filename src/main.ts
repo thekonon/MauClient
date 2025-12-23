@@ -8,19 +8,24 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
 
 (async () => {
   const loading_screen = new LoadingScreen();
-  loading_screen.show();
+  //loading_screen.show();
 
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
 
-  document.getElementById("pixi-container")!.appendChild(app.canvas);
-  const cardManager = new CardManager(app);
-  await cardManager.loadCardTextures();
-  cardManager.createFallingCards(50);
+  // document.getElementById("pixi-container")!.appendChild(app.canvas);
+  // const cardManager = new CardManager(app);
+  // await cardManager.loadCardTextures();
+  // cardManager.createFallingCards(50);
 
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  
   new WebSocketHandle();
   new Game(app);
-  new EndScreen(app);
+  const endScreen = new EndScreen(app);
+  
+  // endScreen.setWinners(["player1", "player2"])
+
+  // endScreen.show()
 })();

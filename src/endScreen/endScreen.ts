@@ -30,7 +30,7 @@ export class EndScreen extends Container {
   public async show() {
     await this.textureLoaded;
     if (this.playersSet === undefined) {
-      console.error("Report this bug to Pepa thanks");
+      console.error("Report this bug to Pepa thanks, player order is unknown");
       return;
     }
     await this.playersSet;
@@ -114,7 +114,5 @@ export class EndScreen extends Container {
     );
     this.x = GameSettings.get_mid_x();
     this.y = GameSettings.get_mid_y();
-    console.log(this.sprite.width / GameSettings.screen_width);
-    console.log(this.sprite.height / GameSettings.screen_height);
   }
 }

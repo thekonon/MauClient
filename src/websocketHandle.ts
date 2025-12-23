@@ -1,6 +1,5 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./eventBus.ts";
-import { M } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 interface Move {
   moveType: "PLAY";
@@ -367,6 +366,7 @@ export class WebSocketHandle {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
         console.log("One of the playes ended");
+        alert("PLAYER_RANK not implemented");
       },
       WIN: () => {
         console.log("You won");
