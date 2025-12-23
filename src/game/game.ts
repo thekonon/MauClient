@@ -79,7 +79,7 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value, "pythonGen");
+      played_card = await Card.create(type, value, "custom");
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
           if (played_card) player.addChild(played_card);
@@ -151,7 +151,7 @@ export class Game extends Container {
     // Create cards
     const cards: Card[] = [];
     for (let i = 0; i < cardCount; i++) {
-      const card = await Card.create("", "back", "pythonGen");
+      const card = await Card.create("", "back", "custom");
       card.position.x = GameSettings.get_deck_top_x();
       card.position.y = GameSettings.get_deck_top_y();
       card.zIndex = -1;

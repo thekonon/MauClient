@@ -41,7 +41,7 @@ export class CardManager {
     // Prepare asset list
     const assets = cardNames.map((name) => ({
       alias: name,
-      src: `assets/pythonGen/${name}.png`,
+      src: `assets/custom/${name}.png`,
     }));
 
     await Assets.load(assets);

@@ -469,7 +469,7 @@ export class WebSocketHandle {
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
-      "pythonGen",
+      "custom",
     );
     eventBus.emit("Action:START_PILE", card);
   }
@@ -483,7 +483,7 @@ export class WebSocketHandle {
       const card = await Card.create(
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
-        "pythonGen",
+        "custom",
       );
       eventBus.emit("Action:DRAW", card);
     }
