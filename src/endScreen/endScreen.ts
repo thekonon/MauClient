@@ -3,9 +3,7 @@ import {
   Assets,
   Container,
   Sprite,
-  TextStyle,
   Texture,
-  Text,
 } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../eventBus";
@@ -14,72 +12,55 @@ export class EndScreen extends Container {
   app: Application;
   sprite!: Sprite;
   texture!: Texture;
-  textureLoaded?: Promise<unknown>;
-  playersSet?: Promise<void>;
 
   winners: string[];
+  totalScore: Record<string, number>;
 
   constructor(app: Application) {
     super();
-    this.draw();
     this.app = app;
     this.winners = [];
+    this.totalScore = {};
     this.addEventListeners();
   }
 
   public async show() {
-    await this.textureLoaded;
-    if (this.playersSet === undefined) {
-      console.error("Report this bug to Pepa thanks, player order is unknown");
-      return;
+    const endScreen = document.getElementById("endScreen") as HTMLInputElement;
+
+    if (endScreen) {
+      endScreen.style.display = "flex";
     }
-    await this.playersSet;
-    this.addChild(this.sprite);
-    this.app.stage.addChild(this);
+
+    const elementIds = [
+      "first-place",
+      "second-place",
+      "third-place",
+      "fourth-place",
+      "fifth-place",
+    ];
+
+    const paddedWinners = [...this.winners, ...Array(5).fill("")].slice(0, 5);
+
+    paddedWinners.forEach((winner, index) => {
+      const elementId = elementIds[index];
+      const htmlElement = document.getElementById(elementId);
+
+      if (htmlElement) {
+        htmlElement.textContent = winner;
+      }
+    });
+  }
+
+  public async hide() {
+    const endScreen = document.getElementById("endScreen") as HTMLInputElement;
+
+    if (endScreen) {
+      endScreen.style.display = "none";
+    }
   }
 
   public async setWinners(winners: string[]) {
-    // Create a promise that will resolve after winners are processed
-    this.playersSet = new Promise<void>((resolve) => {
-      (async () => {
-        await this.textureLoaded; // Wait until sprite is ready
-        this.winners = winners;
-
-        const positions = [
-          { x: -this.sprite.width * 0.075, y: -this.sprite.height * 0.58 },
-          { x: -this.sprite.width * 0.3, y: -this.sprite.height * 0.25 },
-          { x: this.sprite.width * 0.15, y: -this.sprite.height * 0.05 },
-        ];
-
-        // Create text nodes for winners
-        winners.forEach((winner, index) => {
-          if (index >= 3) return; // Limit to max 3 winners
-          const pos = positions[index];
-          const text = createText(winner, pos.x, pos.y);
-          this.addChild(text);
-        });
-
-        resolve(); // ✅ resolve once all players are set
-      })();
-    });
-
-    function createText(playerName: string, x: number, y: number) {
-      const style = new TextStyle({
-        fontFamily: "Impact",
-        fontSize: GameSettings.fontSize,
-        fill: "#000000",
-      });
-
-      const text = new Text({
-        text: playerName,
-        style,
-      });
-
-      text.x = x;
-      text.y = y;
-      text.zIndex = 1;
-      return text;
-    }
+    this.winners = winners
   }
 
   private addEventListeners(): void {
@@ -90,29 +71,5 @@ export class EndScreen extends Container {
     eventBus.on("Action:PLAYER_RANK", (payload) => {
       this.setWinners(payload.playersOrder);
     });
-  }
-
-  private async draw() {
-    this.textureLoaded = new Promise((resolve, reject) => {
-      (async () => {
-        try {
-          this.texture = await Assets.load(
-            "assets/other/endScreen/winners.png",
-          );
-          resolve(true);
-        } catch (err) {
-          console.error("loading failed");
-          reject(err);
-        }
-      })();
-    });
-    await this.textureLoaded;
-    this.sprite = new Sprite(this.texture);
-    this.sprite.anchor.set(0.5);
-    this.sprite.scale.set(
-      (GameSettings.screen_width * 0.51) / this.sprite.width,
-    );
-    this.x = GameSettings.get_mid_x();
-    this.y = GameSettings.get_mid_y();
   }
 }
