@@ -22,6 +22,14 @@ export class EndScreen extends Container {
     this.winners = [];
     this.totalScore = {};
     this.addEventListeners();
+
+    const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
+
+    playAgainButton.onclick = () => {
+      eventBus.emit("Command:PLAYER_READY", {
+        playerReady: true
+      });
+    }
   }
 
   public async show() {
@@ -49,6 +57,8 @@ export class EndScreen extends Container {
         htmlElement.textContent = winner;
       }
     });
+
+
   }
 
   public async hide() {

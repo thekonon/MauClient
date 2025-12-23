@@ -8,7 +8,7 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
 
 (async () => {
   const loading_screen = new LoadingScreen();
-  loading_screen.show();
+  //loading_screen.show();
 
   // Create a game instance
   const app = new Application();
@@ -23,6 +23,8 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
   
   new WebSocketHandle();
   new Game(app);
-  new EndScreen(app);
-  
+  const ends  = new EndScreen(app);
+  ends.setWinners(["k", "m"])
+  ends.show()
+  // implement ready state
 })();
