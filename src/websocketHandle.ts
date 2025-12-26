@@ -54,6 +54,7 @@ export interface GameAction {
   nextColor?: string;
 
   username?: string; // for ready event
+  gameId?: string
 }
 
 export interface ServerMessageBody {
@@ -460,7 +461,9 @@ export class WebSocketHandle {
     }
     const player = message.playerDto.username;
     eventBus.emit("Action:ADD_PLAYER", { playerName: player });
-    // this.add_player(player);
+    if(message.playerDto.playerId && message.gameId){
+      eventBus.emit("Helper:SET_IDS", {lobbyID: message.gameId, playerID: message.playerDto.playerId})
+    }
   }
 
   public players_action(message: GameAction) {

@@ -31,4 +31,5 @@ export interface AppEvents {
   "Command:PASS": void;
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
+  "Helper:SET_IDS": {lobbyID: string, playerID: string};
 }

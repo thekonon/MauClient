@@ -1,14 +1,15 @@
 import { eventBus } from "../eventBus";
-import { Player } from "./player";
+import { Player, MainPlayer } from "./player";
 
 export class LoadingScreen {
-  mainPlayer: Player;
+  mainPlayer: MainPlayer;
   connectedPlayers: Player[];
 
   constructor() {
-    this.mainPlayer = new Player("");
+    this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
     this.addEvents();
+    this.updateConnectionInfo()
   }
 
   public show() {
@@ -107,6 +108,11 @@ export class LoadingScreen {
     eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
       this.readyPlayerMessage(payload.playerName, payload.ready);
     });
+    eventBus.on("Helper:SET_IDS", (payload) => {
+      this.mainPlayer.lobbyID = payload.lobbyID
+      this.mainPlayer.playerID = payload.playerID
+      this.updateConnectionInfo()
+    })
   }
 
   public getPlayersList(): string[] {
@@ -233,7 +239,8 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = new Player(playerName);
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value)
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
@@ -259,7 +266,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    //this.reconnectCommand(ip, port);
+    this.reconnectCommand(ip, port);
   }
 
   private createLobby() {
@@ -287,7 +294,8 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = new Player(playerName);
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value)
     console.log("Createing new lobby")
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
@@ -324,7 +332,8 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = new Player(playerName);
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value)
     console.log("Createing private lobby")
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
@@ -401,5 +410,30 @@ export class LoadingScreen {
     });
     this.hide();
     eventBus.off("Action:START_GAME", this.startGameHandler)
+  }
+
+  private reconnectCommand(ip: string, port: string){
+    console.log("Reconnecting is not implemented")
+    alert("Reconnecting is not implemented")
+  }
+
+  private updateConnectionInfo(){
+    const container = document.getElementById("connectionInfo") as HTMLDivElement;
+    const stringsToDisplay = [
+      `PlayerID: ${this.mainPlayer.playerID}`,
+      `Lobby name: ${this.mainPlayer.lobbyName}`,
+      `LobbyID: ${this.mainPlayer.lobbyID}`,
+    
+    ]
+    container.textContent = ``
+    
+
+    stringsToDisplay.forEach(element => {
+      const div = document.createElement('div')
+      div.textContent = element
+      container.appendChild(div)
+    });
+    
+
   }
 }

@@ -5,7 +5,6 @@ import { LoadingScreen } from "./loadingScreen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
-import { eventBus } from "./eventBus.ts";
 
 (async () => {
   const loading_screen = new LoadingScreen();
