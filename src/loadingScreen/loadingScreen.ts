@@ -103,15 +103,7 @@ export class LoadingScreen {
     eventBus.on("Action:REMOVE_PLAYER", (payload) => {
       this.removePlayerFromList(payload.playerName);
     });
-    eventBus.on("Action:START_GAME", () => {
-      eventBus.emit("Helper:SET_MAIN_PLAYER", {
-        playerName: this.getMainPlayer(),
-      });
-      eventBus.emit("Helper:REGISTER_PLAYERS", {
-        playerNames: this.getPlayersList(),
-      });
-      this.hide();
-    });
+    eventBus.on("Action:START_GAME", this.startGameHandler);
     eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
       this.readyPlayerMessage(payload.playerName, payload.ready);
     });
@@ -391,5 +383,16 @@ export class LoadingScreen {
         connectButton.classList.add("disabled");
       }
     }
+  }
+
+  private startGameHandler = () => {
+    eventBus.emit("Helper:SET_MAIN_PLAYER", {
+        playerName: this.getMainPlayer(),
+      });
+      eventBus.emit("Helper:REGISTER_PLAYERS", {
+        playerNames: this.getPlayersList(),
+      });
+      this.hide();
+      eventBus.off("Action:START_GAME", this.startGameHandler)
   }
 }

@@ -21,6 +21,7 @@ export class Game extends Container {
   mainPlayer: string;
   readyPlayers?: Promise<unknown>;
   private intervalId?: ReturnType<typeof setInterval>;
+  private isShown: boolean = false;
 
   constructor(app: Application) {
     super();
@@ -44,7 +45,9 @@ export class Game extends Container {
     }
     await this.readyPlayers;
     // Create a deck - place where user can request drawing card
-    this.deck = await Deck.create();
+    if (this.deck === undefined) {
+      this.deck = await Deck.create();
+    }
     this.show();
   }
 
@@ -171,12 +174,18 @@ export class Game extends Container {
   }
   public show() {
     // Add player hand and deck to app
-    this.addAllChildren();
-    this.app.stage.addChild(this);
+    if (!this.isShown) {
+      this.isShown = true
+      this.addAllChildren();
+      this.app.stage.addChild(this);
+    }
   }
 
   public hide(): void {
-    this.app.stage.removeChild(this);
+    if (this.isShown) {
+      this.isShown = false
+      this.app.stage.removeChild(this);
+    }
   }
 
   private addEventListerners() {
@@ -210,6 +219,7 @@ export class Game extends Container {
     });
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
+      this.resetGame();
       this.hide();
     });
   }
@@ -237,5 +247,9 @@ export class Game extends Container {
     this.otherPlayers.forEach((player) => {
       this.addChild(player);
     });
+  }
+
+  private resetGame(): void {
+    this.playerHand.restart()
   }
 }

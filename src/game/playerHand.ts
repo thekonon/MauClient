@@ -127,6 +127,15 @@ export class PlayerHand extends Container {
     return null;
   }
 
+  public restart(): void {
+    this.cards_list.forEach(card => {
+      card.card_sprite.destroy();
+      card.spriteContainer.destroy();
+      card.destroy();
+    });
+    this.cards_list = [];
+  }
+
   private addEventListeners(): void {
     eventBus.on("Action:DRAW", (card) => {
       this.draw_card(card);
