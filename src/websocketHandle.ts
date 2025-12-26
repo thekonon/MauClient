@@ -35,7 +35,8 @@ export interface GameAction {
   | "REMOVE_PLAYER"
   | "READY"     // moved from server message
   | "UNREADY"  // moved from server message
-  | "DESTROY";
+  | "DESTROY"
+  | "DISQUALIFIED";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -405,6 +406,9 @@ export class WebSocketHandle {
       },
       DESTROY: (msg) => {
         eventBus.emit("Action:DESTROY", undefined);
+      },
+      DISQUALIFIED: () => {
+        window.location.reload();
       }
     };
 
