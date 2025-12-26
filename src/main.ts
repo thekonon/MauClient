@@ -27,7 +27,7 @@ import { eventBus } from "./eventBus.ts";
   new EndScreen(app);
 
   // TODO:
-  // add disconnect
+  // add disconnect from lobby
   // show lobby/game id + (name)
   // freeze form when connected
   // try to reconnect try

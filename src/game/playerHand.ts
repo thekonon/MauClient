@@ -111,7 +111,8 @@ export class PlayerHand extends Container {
 
     this.cards_list.push(card);
     this.addChild(card);
-    card.play();
+    card.play(undefined, undefined, ()=>{this.reorder_cards()});
+    
   }
 
   public playCard(type: string, value: string): Card | null {
