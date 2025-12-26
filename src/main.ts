@@ -27,10 +27,10 @@ import { eventBus } from "./eventBus.ts";
   const ends  = new EndScreen(app);
   // eventBus.emit('Action:START_GAME', undefined);
   // ends.setWinners(["k", "m"])
-  // await new Promise((res) => setTimeout(res, 1000));
+  // await new Promise((res) => setTimeout(res, 100));
   // eventBus.emit('Action:END_GAME', undefined);
-  // await new Promise((res) => setTimeout(res, 1000));
-  // eventBus.emit('Action:START_GAME', undefined);
+  // await new Promise((res) => setTimeout(res, 100));
+  // eventBus.emit('Action:DESTROY', undefined);
 
   // implement ready state
   // show lobby/game id + (name)

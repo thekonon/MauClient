@@ -611,3 +611,20 @@ input.max-reached {
     0 0 80px #f06a7e;
   transform: scale(1.05);
 }
+
+.endScreen-controlPanel-subcontainer button.disabled {
+  pointer-events: none;
+  /* Disable clicking */
+  opacity: 0.5;
+  /* Dim the button */
+  color: #999;
+  /* Optional: change text color */
+  background: #222;
+  /* Optional: darker background */
+  border-color: #555;
+  /* Optional: muted border */
+  box-shadow: none;
+  /* Remove glow */
+  transform: none;
+  /* Remove hover scale effect */
+}

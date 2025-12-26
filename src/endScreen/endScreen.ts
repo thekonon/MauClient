@@ -75,11 +75,25 @@ export class EndScreen extends Container {
     eventBus.on("Action:PLAYER_RANK", (payload) => {
       this.setWinners(payload.playersOrder);
     });
-    eventBus.on("Action:START_GAME", () =>{
+    eventBus.on("Action:START_GAME", () => {
       this.hide()
     })
     eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
       this.setPlayerReady(payload.playerName, payload.ready)
+    })
+
+    eventBus.on('Action:DESTROY', () => {
+      console.log(
+        "Destoying"
+      )
+      const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
+      // playAgainButton.disabled = true;
+      if (playAgainButton) {
+        playAgainButton.disabled = true;
+        if (!playAgainButton.classList.contains("disabled")) {
+          playAgainButton.classList.add("disabled");
+        }
+      }
     })
   }
 
@@ -94,8 +108,8 @@ export class EndScreen extends Container {
     }
 
     returnToLobbyButton.onclick = () => {
-        // refresh page
-        window.location.reload();
+      // refresh page
+      window.location.reload();
     }
   }
 

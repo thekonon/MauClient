@@ -34,7 +34,8 @@ export interface GameAction {
   | "END_GAME"
   | "REMOVE_PLAYER"
   | "READY"     // moved from server message
-  | "UNREADY";  // moved from server message
+  | "UNREADY"  // moved from server message
+  | "DESTROY";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -401,6 +402,9 @@ export class WebSocketHandle {
           return console.error("username field in the unready_player was not specified")
         }
         eventBus.emit("ServerMessage:PLAYER_READY", {ready: false, playerName: msg.username})
+      },
+      DESTROY: (msg) => {
+        eventBus.emit("Action:DESTROY", undefined);
       }
     };
 
