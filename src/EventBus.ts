@@ -30,7 +30,7 @@ class EventBus<EventMap extends Record<PropertyKey, any>> {
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
     const handlers = this.listeners[event];
     if (!handlers) return;
-    console.log(`Event: ${event} triggered`)
+    // console.log(`Event: ${event} triggered`)
     handlers.forEach((handler) => handler(payload));
   }
 }

@@ -24,24 +24,21 @@ import { eventBus } from "./eventBus.ts";
   
   new WebSocketHandle();
   new Game(app);
-  const ends  = new EndScreen(app);
-  // eventBus.emit('Action:START_GAME', undefined);
-  // ends.setWinners(["k", "m"])
-  // await new Promise((res) => setTimeout(res, 100));
-  // eventBus.emit('Action:END_GAME', undefined);
-  // await new Promise((res) => setTimeout(res, 100));
-  // eventBus.emit('Action:DESTROY', undefined);
+  new EndScreen(app);
 
-  // implement ready state
-  // show lobby/game id + (name)
-  // DESTROY = disable playagain
-  // remaining time na sekundy
-  // on disqualified - reload page
-  // show player rank in the middle of game 
-  // disable connect buttons after connecting
+  // TODO:
   // add disconnect
+  // show lobby/game id + (name)
   // freeze form when connected
   // try to reconnect try
   // cglobal card skin selection
   // card stacking
+
+  // Done:
+  // implement ready state
+  // DESTROY = disable playagain
+  // remaining pagetime na sekundy
+  // on disqualified - reload 
+  // show player rank in the middle of game 
+  // disable connect buttons after connecting
 })();
