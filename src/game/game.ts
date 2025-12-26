@@ -237,7 +237,8 @@ export class Game extends Container {
     const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
 
     // Format as mm:ss:ms
-    return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    // return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
   }
 
   private addAllChildren(): void {
