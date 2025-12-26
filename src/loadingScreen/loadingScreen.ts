@@ -252,11 +252,19 @@ export class LoadingScreen {
   }
 
   private reconnectPlayer() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const ip = IPInput.value.trim();
     const port = PORTInput.value.trim();
+    const playerName = playerNameInput.value.trim();
 
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
     if (ip === "") {
       alert("Kindof strange ip, don't you think?");
       return;
@@ -266,7 +274,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.reconnectCommand(ip, port);
+    this.reconnectCommand(playerName, ip, port);
   }
 
   private createLobby() {
@@ -382,7 +390,7 @@ export class LoadingScreen {
   }
 
   private disableConnectButton(): void {
-    const buttonsIDs = ["connectButton", "createLobbyButton", "createPrivateLobbyButton","reconnectButton"]
+    const buttonsIDs = ["connectButton", "createLobbyButton", "createPrivateLobbyButton", "reconnectButton"]
     buttonsIDs.forEach(id => {
       this.disableButton(id)
     });
@@ -412,28 +420,28 @@ export class LoadingScreen {
     eventBus.off("Action:START_GAME", this.startGameHandler)
   }
 
-  private reconnectCommand(ip: string, port: string){
+  private reconnectCommand(playerName: string, ip: string, port: string) {
     console.log("Reconnecting is not implemented")
-    alert("Reconnecting is not implemented")
+    eventBus.emit("Command:RECONNECT", { playerName: playerName, ip: ip, port: port })
   }
 
-  private updateConnectionInfo(){
+  private updateConnectionInfo() {
     const container = document.getElementById("connectionInfo") as HTMLDivElement;
     const stringsToDisplay = [
       `PlayerID: ${this.mainPlayer.playerID}`,
       `Lobby name: ${this.mainPlayer.lobbyName}`,
       `LobbyID: ${this.mainPlayer.lobbyID}`,
-    
+
     ]
     container.textContent = ``
-    
+
 
     stringsToDisplay.forEach(element => {
       const div = document.createElement('div')
       div.textContent = element
       container.appendChild(div)
     });
-    
+
 
   }
 }

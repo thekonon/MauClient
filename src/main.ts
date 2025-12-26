@@ -27,13 +27,13 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
 
   // TODO:
   // add disconnect from lobby
-  // show lobby/game id + (name)
   // freeze form when connected
   // try to reconnect try
   // cglobal card skin selection
   // card stacking
-
+  
   // Done:
+  // show lobby/game id + (name)
   // implement ready state
   // DESTROY = disable playagain
   // remaining pagetime na sekundy

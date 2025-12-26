@@ -157,11 +157,15 @@ export class WebSocketHandle {
     if (this.privateLobby) {
       this.url += `&private=${this.privateLobby}`
     }
-    
+
     this.socket = this.createSocket();
   }
 
   public reconnect() {
+    if (this.userName == "") {
+      alert("In order to reconnect playerName have to be given")
+      throw new Error("UserName must be set first");
+    }
     if (this.ip == "") {
       alert("IP must be set first");
       throw new Error("IP must be set first");
@@ -174,7 +178,7 @@ export class WebSocketHandle {
     if (UUID === null) {
       alert("No user UUID is saved");
     }
-    this.url = `ws://${this.ip}:${this.port}/game?playerId=${UUID}`;
+    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}&playerId=${UUID}`;
     this.socket = this.createSocket();
   }
 
@@ -187,7 +191,7 @@ export class WebSocketHandle {
     });
     this.send(readyCommand);
   }
-  
+
   private createSocket(): WebSocket {
     console.log(this.url)
     const socket = new WebSocket(this.url);
@@ -242,10 +246,10 @@ export class WebSocketHandle {
       this.createConnection();
     });
 
-    eventBus.on("Command:RECONNECT", () => {
-      console.warn(
-        "Reconnect player event is not implemented yet in websocket",
-      );
+    eventBus.on("Command:RECONNECT", (payload) => {
+      this.setUser(payload.playerName);
+      this.setIPPort(payload.ip, payload.port);
+      this.reconnect();
     });
 
     eventBus.on("Command:PLAYER_READY", (payload) => {
@@ -394,16 +398,16 @@ export class WebSocketHandle {
         });
       },
       READY: (msg) => {
-        if (!msg.username){
+        if (!msg.username) {
           return console.error("username field in the ready_player was not specified")
         }
-        eventBus.emit("ServerMessage:PLAYER_READY", {ready: true, playerName: msg.username})
+        eventBus.emit("ServerMessage:PLAYER_READY", { ready: true, playerName: msg.username })
       },
       UNREADY: (msg) => {
-        if (!msg.username){
+        if (!msg.username) {
           return console.error("username field in the unready_player was not specified")
         }
-        eventBus.emit("ServerMessage:PLAYER_READY", {ready: false, playerName: msg.username})
+        eventBus.emit("ServerMessage:PLAYER_READY", { ready: false, playerName: msg.username })
       },
       DESTROY: (msg) => {
         eventBus.emit("Action:DESTROY", undefined);
@@ -461,8 +465,8 @@ export class WebSocketHandle {
     }
     const player = message.playerDto.username;
     eventBus.emit("Action:ADD_PLAYER", { playerName: player });
-    if(message.playerDto.playerId && message.gameId){
-      eventBus.emit("Helper:SET_IDS", {lobbyID: message.gameId, playerID: message.playerDto.playerId})
+    if (message.playerDto.playerId && message.gameId) {
+      eventBus.emit("Helper:SET_IDS", { lobbyID: message.gameId, playerID: message.playerDto.playerId })
     }
   }
 
@@ -500,19 +504,19 @@ export class WebSocketHandle {
     }
   }
 
-  public getUrl(): string{
+  public getUrl(): string {
     return this.url;
   }
 
-  private setLobbyName(lobbyName: string){
+  private setLobbyName(lobbyName: string) {
     this.lobbyName = lobbyName
   }
 
-  private setNewLobby(newLobby: boolean){
+  private setNewLobby(newLobby: boolean) {
     this.newLobby = newLobby;
   }
 
-  private setPrivateLobby(privateLobby: boolean){
+  private setPrivateLobby(privateLobby: boolean) {
     this.privateLobby = privateLobby;
   }
 
