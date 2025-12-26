@@ -21,15 +21,9 @@ export class EndScreen extends Container {
     this.app = app;
     this.winners = [];
     this.totalScore = {};
+
     this.addEventListeners();
-
-    const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
-
-    playAgainButton.onclick = () => {
-      eventBus.emit("Command:PLAYER_READY", {
-        playerReady: true
-      });
-    }
+    this.setButtonEvents();
   }
 
   public async show() {
@@ -81,5 +75,26 @@ export class EndScreen extends Container {
     eventBus.on("Action:PLAYER_RANK", (payload) => {
       this.setWinners(payload.playersOrder);
     });
+    eventBus.on("Action:START_GAME", () =>{
+      this.hide()
+    })
+    eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
+      this.setPlayerReady(payload.playerName, payload.ready)
+    })
+  }
+
+
+  private setButtonEvents(): void {
+    const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
+    playAgainButton.onclick = () => {
+      eventBus.emit("Command:PLAYER_READY", {
+        playerReady: true
+      });
+    }
+  }
+
+  private setPlayerReady(playerName: string, playerReady: boolean): void {
+    // TODO: implement this
+    // make circle green / red based on player name and ready state
   }
 }
