@@ -86,10 +86,16 @@ export class EndScreen extends Container {
 
   private setButtonEvents(): void {
     const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
+    const returnToLobbyButton = document.getElementById("returnToLobbyButton") as HTMLButtonElement;
     playAgainButton.onclick = () => {
       eventBus.emit("Command:PLAYER_READY", {
         playerReady: true
       });
+    }
+
+    returnToLobbyButton.onclick = () => {
+        // refresh page
+        window.location.reload();
     }
   }
 
