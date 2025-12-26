@@ -237,7 +237,7 @@ export class LoadingScreen {
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
-      lobbyName: lobbyNane.value, 
+      lobbyName: lobbyNane.value,
       port: port,
       newLobby: false,
       privateLobby: false,
@@ -329,7 +329,7 @@ export class LoadingScreen {
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
-      lobbyName: lobbyNane.value, 
+      lobbyName: lobbyNane.value,
       port: port,
       newLobby: true,
       privateLobby: true,
@@ -373,26 +373,33 @@ export class LoadingScreen {
   }
 
   private disableConnectButton(): void {
-    const connectButton = document.getElementById(
-      "connectButton",
+    const buttonsIDs = ["connectButton", "createLobbyButton", "createPrivateLobbyButton","reconnectButton"]
+    buttonsIDs.forEach(id => {
+      this.disableButton(id)
+    });
+  }
+
+  private disableButton(buttonID: string): void {
+    const button = document.getElementById(
+      buttonID,
     ) as HTMLButtonElement | null;
 
-    if (connectButton) {
-      connectButton.disabled = true;
-      if (!connectButton.classList.contains("disabled")) {
-        connectButton.classList.add("disabled");
+    if (button) {
+      button.disabled = true;
+      if (!button.classList.contains("disabled")) {
+        button.classList.add("disabled");
       }
     }
   }
 
   private startGameHandler = () => {
     eventBus.emit("Helper:SET_MAIN_PLAYER", {
-        playerName: this.getMainPlayer(),
-      });
-      eventBus.emit("Helper:REGISTER_PLAYERS", {
-        playerNames: this.getPlayersList(),
-      });
-      this.hide();
-      eventBus.off("Action:START_GAME", this.startGameHandler)
+      playerName: this.getMainPlayer(),
+    });
+    eventBus.emit("Helper:REGISTER_PLAYERS", {
+      playerNames: this.getPlayersList(),
+    });
+    this.hide();
+    eventBus.off("Action:START_GAME", this.startGameHandler)
   }
 }
