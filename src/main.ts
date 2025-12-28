@@ -20,24 +20,26 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
   cardManager.createFallingCards(50);
 
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
-  
+
   new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
 
   // TODO:
+  // player rank + ready state
   // add disconnect from lobby
   // freeze form when connected
-  // try to reconnect try
   // cglobal card skin selection
   // card stacking
-  
+  // show player rank in the middle of game
+  // fix card count after reseting
+
   // Done:
+  // try to reconnect try
   // show lobby/game id + (name)
   // implement ready state
   // DESTROY = disable playagain
   // remaining pagetime na sekundy
-  // on disqualified - reload 
-  // show player rank in the middle of game 
+  // on disqualified - reload
   // disable connect buttons after connecting
 })();

@@ -111,8 +111,9 @@ export class PlayerHand extends Container {
 
     this.cards_list.push(card);
     this.addChild(card);
-    card.play(undefined, undefined, ()=>{this.reorder_cards()});
-    
+    card.play(undefined, undefined, () => {
+      this.reorder_cards();
+    });
   }
 
   public playCard(type: string, value: string): Card | null {
@@ -129,7 +130,7 @@ export class PlayerHand extends Container {
   }
 
   public restart(): void {
-    this.cards_list.forEach(card => {
+    this.cards_list.forEach((card) => {
       card.card_sprite.destroy();
       card.spriteContainer.destroy();
       card.destroy();

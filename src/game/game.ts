@@ -175,7 +175,7 @@ export class Game extends Container {
   public show() {
     // Add player hand and deck to app
     if (!this.isShown) {
-      this.isShown = true
+      this.isShown = true;
       this.addAllChildren();
       this.app.stage.addChild(this);
     }
@@ -183,7 +183,7 @@ export class Game extends Container {
 
   public hide(): void {
     if (this.isShown) {
-      this.isShown = false
+      this.isShown = false;
       this.app.stage.removeChild(this);
     }
   }
@@ -234,7 +234,7 @@ export class Game extends Container {
     // Convert to minutes, seconds, milliseconds
     const minutes = Math.floor(remainingMs / 1000 / 60);
     const seconds = Math.floor((remainingMs / 1000) % 60);
-    const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
+    // const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
 
     // Format as mm:ss:ms
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
@@ -251,6 +251,6 @@ export class Game extends Container {
   }
 
   private resetGame(): void {
-    this.playerHand.restart()
+    this.playerHand.restart();
   }
 }

@@ -1,11 +1,4 @@
-import {
-  Application,
-  Assets,
-  Container,
-  Sprite,
-  Texture,
-} from "pixi.js";
-import { GameSettings } from "../gameSettings";
+import { Application, Container, Sprite, Texture } from "pixi.js";
 import { eventBus } from "../eventBus";
 
 export class EndScreen extends Container {
@@ -51,8 +44,6 @@ export class EndScreen extends Container {
         htmlElement.textContent = winner;
       }
     });
-
-
   }
 
   public async hide() {
@@ -64,7 +55,7 @@ export class EndScreen extends Container {
   }
 
   public async setWinners(winners: string[]) {
-    this.winners = winners
+    this.winners = winners;
   }
 
   private addEventListeners(): void {
@@ -76,17 +67,17 @@ export class EndScreen extends Container {
       this.setWinners(payload.playersOrder);
     });
     eventBus.on("Action:START_GAME", () => {
-      this.hide()
-    })
+      this.hide();
+    });
     eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
-      this.setPlayerReady(payload.playerName, payload.ready)
-    })
+      this.setPlayerReady(payload.playerName, payload.ready);
+    });
 
-    eventBus.on('Action:DESTROY', () => {
-      console.log(
-        "Destoying"
-      )
-      const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
+    eventBus.on("Action:DESTROY", () => {
+      console.log("Destoying");
+      const playAgainButton = document.getElementById(
+        "playAgainButton",
+      ) as HTMLButtonElement;
       // playAgainButton.disabled = true;
       if (playAgainButton) {
         playAgainButton.disabled = true;
@@ -94,26 +85,29 @@ export class EndScreen extends Container {
           playAgainButton.classList.add("disabled");
         }
       }
-    })
+    });
   }
 
-
   private setButtonEvents(): void {
-    const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
-    const returnToLobbyButton = document.getElementById("returnToLobbyButton") as HTMLButtonElement;
+    const playAgainButton = document.getElementById(
+      "playAgainButton",
+    ) as HTMLButtonElement;
+    const returnToLobbyButton = document.getElementById(
+      "returnToLobbyButton",
+    ) as HTMLButtonElement;
     playAgainButton.onclick = () => {
       eventBus.emit("Command:PLAYER_READY", {
-        playerReady: true
+        playerReady: true,
       });
-    }
+    };
 
     returnToLobbyButton.onclick = () => {
       // refresh page
       window.location.reload();
-    }
+    };
   }
 
-  private setPlayerReady(playerName: string, playerReady: boolean): void {
+  private setPlayerReady(_playerName: string, _playerReady: boolean): void {
     // TODO: implement this
     // make circle green / red based on player name and ready state
   }

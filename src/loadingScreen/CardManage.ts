@@ -62,7 +62,7 @@ export class CardManager {
       const tex =
         this.cardTextures[Math.floor(Math.random() * this.cardTextures.length)];
       const card = new Sprite(tex) as FallingCard;
-      card.alpha = 0.4
+      card.alpha = 0.4;
 
       // Random size
       const width = Math.random() * 40 + 30;

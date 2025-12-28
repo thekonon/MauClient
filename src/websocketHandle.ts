@@ -20,23 +20,23 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-  | "PLAYERS"
-  | "REGISTER_PLAYER"
-  | "START_GAME"
-  | "START_PILE"
-  | "DRAW"
-  | "PLAY_CARD"
-  | "PLAYER_SHIFT"
-  | "HIDDEN_DRAW"
-  | "PLAYER_RANK"
-  | "WIN"
-  | "LOSE"
-  | "END_GAME"
-  | "REMOVE_PLAYER"
-  | "READY"     // moved from server message
-  | "UNREADY"  // moved from server message
-  | "DESTROY"
-  | "DISQUALIFIED";
+    | "PLAYERS"
+    | "REGISTER_PLAYER"
+    | "START_GAME"
+    | "START_PILE"
+    | "DRAW"
+    | "PLAY_CARD"
+    | "PLAYER_SHIFT"
+    | "HIDDEN_DRAW"
+    | "PLAYER_RANK"
+    | "WIN"
+    | "LOSE"
+    | "END_GAME"
+    | "REMOVE_PLAYER"
+    | "READY" // moved from server message
+    | "UNREADY" // moved from server message
+    | "DESTROY"
+    | "DISQUALIFIED";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -54,7 +54,7 @@ export interface GameAction {
   nextColor?: string;
 
   username?: string; // for ready event
-  gameId?: string
+  gameId?: string;
 }
 
 export interface ServerMessageBody {
@@ -87,9 +87,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void { }
-  public onClose(): void { }
-  public onError(_: Event): void { }
+  public onOpen(): void {}
+  public onClose(): void {}
+  public onError(_: Event): void {}
 
   // Game state
   game_started: boolean;
@@ -119,10 +119,10 @@ export class WebSocketHandle {
 
   public setIPPort(ip: string, port: string) {
     if (ip.length == 0) {
-      throw new Error("IP can not be empty")
+      throw new Error("IP can not be empty");
     }
     if (port.length == 0) {
-      throw new Error("port can not be empty")
+      throw new Error("port can not be empty");
     }
     this.ip = ip;
     this.port = port;
@@ -130,7 +130,7 @@ export class WebSocketHandle {
 
   public setUser(userName: string) {
     if (userName.length > 21) {
-      throw new Error("Username have to be shorter than 20 characters")
+      throw new Error("Username have to be shorter than 20 characters");
     }
     this.userName = userName;
   }
@@ -149,13 +149,13 @@ export class WebSocketHandle {
     this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
 
     if (this.lobbyName) {
-      this.url += `&lobby=${this.lobbyName}`
+      this.url += `&lobby=${this.lobbyName}`;
     }
     if (this.newLobby) {
-      this.url += `&new=${this.newLobby}`
+      this.url += `&new=${this.newLobby}`;
     }
     if (this.privateLobby) {
-      this.url += `&private=${this.privateLobby}`
+      this.url += `&private=${this.privateLobby}`;
     }
 
     this.socket = this.createSocket();
@@ -163,7 +163,7 @@ export class WebSocketHandle {
 
   public reconnect() {
     if (this.userName == "") {
-      alert("In order to reconnect playerName have to be given")
+      alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
     }
     if (this.ip == "") {
@@ -193,7 +193,7 @@ export class WebSocketHandle {
   }
 
   private createSocket(): WebSocket {
-    console.log(this.url)
+    console.log(this.url);
     const socket = new WebSocket(this.url);
     socket.addEventListener("open", () => {
       console.log("WebSocket connected");
@@ -399,22 +399,32 @@ export class WebSocketHandle {
       },
       READY: (msg) => {
         if (!msg.username) {
-          return console.error("username field in the ready_player was not specified")
+          return console.error(
+            "username field in the ready_player was not specified",
+          );
         }
-        eventBus.emit("ServerMessage:PLAYER_READY", { ready: true, playerName: msg.username })
+        eventBus.emit("ServerMessage:PLAYER_READY", {
+          ready: true,
+          playerName: msg.username,
+        });
       },
       UNREADY: (msg) => {
         if (!msg.username) {
-          return console.error("username field in the unready_player was not specified")
+          return console.error(
+            "username field in the unready_player was not specified",
+          );
         }
-        eventBus.emit("ServerMessage:PLAYER_READY", { ready: false, playerName: msg.username })
+        eventBus.emit("ServerMessage:PLAYER_READY", {
+          ready: false,
+          playerName: msg.username,
+        });
       },
-      DESTROY: (msg) => {
+      DESTROY: (_msg) => {
         eventBus.emit("Action:DESTROY", undefined);
       },
       DISQUALIFIED: () => {
         window.location.reload();
-      }
+      },
     };
 
     const handler = handlers[message.type];
@@ -466,7 +476,10 @@ export class WebSocketHandle {
     const player = message.playerDto.username;
     eventBus.emit("Action:ADD_PLAYER", { playerName: player });
     if (message.playerDto.playerId && message.gameId) {
-      eventBus.emit("Helper:SET_IDS", { lobbyID: message.gameId, playerID: message.playerDto.playerId })
+      eventBus.emit("Helper:SET_IDS", {
+        lobbyID: message.gameId,
+        playerID: message.playerDto.playerId,
+      });
     }
   }
 
@@ -509,7 +522,7 @@ export class WebSocketHandle {
   }
 
   private setLobbyName(lobbyName: string) {
-    this.lobbyName = lobbyName
+    this.lobbyName = lobbyName;
   }
 
   private setNewLobby(newLobby: boolean) {

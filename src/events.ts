@@ -2,9 +2,16 @@ import { Card } from "./game/card";
 
 // events.ts
 export interface AppEvents {
-  "Command:REGISTER_PLAYER": { playerName: string; ip: string; lobbyName:string; port: string; newLobby: boolean; privateLobby: boolean };
+  "Command:REGISTER_PLAYER": {
+    playerName: string;
+    ip: string;
+    lobbyName: string;
+    port: string;
+    newLobby: boolean;
+    privateLobby: boolean;
+  };
   "Command:PLAYER_READY": { playerReady: boolean };
-  "Command:RECONNECT": {playerName: string, ip: string; port: string};
+  "Command:RECONNECT": { playerName: string; ip: string; port: string };
   "ServerMessage:PLAYER_READY": { ready: boolean; playerName: string };
   "Action:PLAYERS": { playerNames: string[] };
   "Action:REGISTER_PLAYER": { playerName: string };
@@ -31,5 +38,5 @@ export interface AppEvents {
   "Command:PASS": void;
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
-  "Helper:SET_IDS": {lobbyID: string, playerID: string};
+  "Helper:SET_IDS": { lobbyID: string; playerID: string };
 }

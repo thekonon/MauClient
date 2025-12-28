@@ -1,9 +1,8 @@
-// EventBus.ts
 import { AppEvents } from "./events";
 
 type EventHandler<T> = (payload: T) => void;
 
-class EventBus<EventMap extends Record<PropertyKey, any>> {
+class EventBus<EventMap extends object> {
   private listeners: {
     [K in keyof EventMap]?: EventHandler<EventMap[K]>[];
   } = {};
@@ -12,10 +11,7 @@ class EventBus<EventMap extends Record<PropertyKey, any>> {
     event: K,
     handler: EventHandler<EventMap[K]>,
   ): void {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
-    this.listeners[event]!.push(handler);
+    (this.listeners[event] ??= []).push(handler);
   }
 
   off<K extends keyof EventMap>(
@@ -30,7 +26,6 @@ class EventBus<EventMap extends Record<PropertyKey, any>> {
   emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): void {
     const handlers = this.listeners[event];
     if (!handlers) return;
-    // console.log(`Event: ${event} triggered`)
     handlers.forEach((handler) => handler(payload));
   }
 }

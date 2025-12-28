@@ -9,17 +9,16 @@ export class Player {
 }
 
 export class MainPlayer extends Player {
+  lobbyName: string;
+  lobbyID: string;
+  playerID: string;
 
-  lobbyName: string
-  lobbyID: string
-  playerID: string
+  constructor(name: string) {
+    super(name);
 
-  constructor(name: string){
-    super(name)
-
-    this.lobbyName = ""
-    this.lobbyID = ""
-    this.playerID = ""
+    this.lobbyName = "";
+    this.lobbyID = "";
+    this.playerID = "";
   }
 
   public setLobbyName(lobbyName: string) {
@@ -27,10 +26,9 @@ export class MainPlayer extends Player {
   }
 
   public setLobbyID(lobbyID: string) {
-    this.lobbyID = lobbyID
-
+    this.lobbyID = lobbyID;
   }
   public setPlayerID(playerID: string) {
-    this.playerID = playerID
+    this.playerID = playerID;
   }
 }

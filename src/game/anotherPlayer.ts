@@ -31,7 +31,7 @@ export class AnotherPlayer extends Container {
     });
     this.addChild(this.sprite);
     this.addChild(this.createText());
-    console.log("Creating new text")
+    console.log("Creating new text");
   }
 
   public setCardCount(cardCount: number) {
@@ -76,7 +76,7 @@ export class AnotherPlayer extends Container {
   }
 
   public restart() {
-    this.sprite.destroy()
+    this.sprite.destroy();
   }
 
   private createText(): Container {

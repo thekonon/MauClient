@@ -9,7 +9,7 @@ export class LoadingScreen {
     this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
     this.addEvents();
-    this.updateConnectionInfo()
+    this.updateConnectionInfo();
   }
 
   public show() {
@@ -54,25 +54,27 @@ export class LoadingScreen {
       this.registerPlayer();
     });
 
-    const createLobbyButton = document.getElementById("createLobbyButton") as HTMLInputElement | null;
-    const createPrivateLobbyButton = document.getElementById("createPrivateLobbyButton") as HTMLInputElement | null;
+    const createLobbyButton = document.getElementById(
+      "createLobbyButton",
+    ) as HTMLInputElement | null;
+    const createPrivateLobbyButton = document.getElementById(
+      "createPrivateLobbyButton",
+    ) as HTMLInputElement | null;
 
     if (createLobbyButton) {
       createLobbyButton.addEventListener("click", () => {
-        this.createLobby()
-      })
-    }
-    else {
-      console.log("createLobby button was not found")
+        this.createLobby();
+      });
+    } else {
+      console.log("createLobby button was not found");
     }
 
     if (createPrivateLobbyButton) {
       createPrivateLobbyButton.addEventListener("click", () => {
-        this.createPrivateLobby()
-      })
-    }
-    else {
-      console.log("createPrivateLobby button was not found")
+        this.createPrivateLobby();
+      });
+    } else {
+      console.log("createPrivateLobby button was not found");
     }
 
     const reconnectButton = document.getElementById(
@@ -109,10 +111,10 @@ export class LoadingScreen {
       this.readyPlayerMessage(payload.playerName, payload.ready);
     });
     eventBus.on("Helper:SET_IDS", (payload) => {
-      this.mainPlayer.lobbyID = payload.lobbyID
-      this.mainPlayer.playerID = payload.playerID
-      this.updateConnectionInfo()
-    })
+      this.mainPlayer.lobbyID = payload.lobbyID;
+      this.mainPlayer.playerID = payload.playerID;
+      this.updateConnectionInfo();
+    });
   }
 
   public getPlayersList(): string[] {
@@ -240,7 +242,7 @@ export class LoadingScreen {
       return;
     }
     this.mainPlayer = new MainPlayer(playerName);
-    this.mainPlayer.setLobbyName(lobbyNane.value)
+    this.mainPlayer.setLobbyName(lobbyNane.value);
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
@@ -303,8 +305,8 @@ export class LoadingScreen {
       return;
     }
     this.mainPlayer = new MainPlayer(playerName);
-    this.mainPlayer.setLobbyName(lobbyNane.value)
-    console.log("Createing new lobby")
+    this.mainPlayer.setLobbyName(lobbyNane.value);
+    console.log("Createing new lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
@@ -341,8 +343,8 @@ export class LoadingScreen {
       return;
     }
     this.mainPlayer = new MainPlayer(playerName);
-    this.mainPlayer.setLobbyName(lobbyNane.value)
-    console.log("Createing private lobby")
+    this.mainPlayer.setLobbyName(lobbyNane.value);
+    console.log("Createing private lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
       ip: ip,
@@ -390,9 +392,14 @@ export class LoadingScreen {
   }
 
   private disableConnectButton(): void {
-    const buttonsIDs = ["connectButton", "createLobbyButton", "createPrivateLobbyButton", "reconnectButton"]
-    buttonsIDs.forEach(id => {
-      this.disableButton(id)
+    const buttonsIDs = [
+      "connectButton",
+      "createLobbyButton",
+      "createPrivateLobbyButton",
+      "reconnectButton",
+    ];
+    buttonsIDs.forEach((id) => {
+      this.disableButton(id);
     });
   }
 
@@ -417,31 +424,33 @@ export class LoadingScreen {
       playerNames: this.getPlayersList(),
     });
     this.hide();
-    eventBus.off("Action:START_GAME", this.startGameHandler)
-  }
+    eventBus.off("Action:START_GAME", this.startGameHandler);
+  };
 
   private reconnectCommand(playerName: string, ip: string, port: string) {
-    console.log("Reconnecting is not implemented")
-    eventBus.emit("Command:RECONNECT", { playerName: playerName, ip: ip, port: port })
+    console.log("Reconnecting is not implemented");
+    eventBus.emit("Command:RECONNECT", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+    });
   }
 
   private updateConnectionInfo() {
-    const container = document.getElementById("connectionInfo") as HTMLDivElement;
+    const container = document.getElementById(
+      "connectionInfo",
+    ) as HTMLDivElement;
     const stringsToDisplay = [
       `PlayerID: ${this.mainPlayer.playerID}`,
       `Lobby name: ${this.mainPlayer.lobbyName}`,
       `LobbyID: ${this.mainPlayer.lobbyID}`,
+    ];
+    container.textContent = ``;
 
-    ]
-    container.textContent = ``
-
-
-    stringsToDisplay.forEach(element => {
-      const div = document.createElement('div')
-      div.textContent = element
-      container.appendChild(div)
+    stringsToDisplay.forEach((element) => {
+      const div = document.createElement("div");
+      div.textContent = element;
+      container.appendChild(div);
     });
-
-
   }
 }
