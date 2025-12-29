@@ -93,15 +93,15 @@ async function dummy() {
   // dummy()
 
   // TODO:
-  // player rank + ready state
   // add disconnect from lobby
   // freeze form when connected
   // cglobal card skin selection
   // card stacking
-  // show player rank in the middle of game
-  // fix card count after reseting
-
+  
   // Done:
+  // fix card count after reseting
+  // show player rank in the middle of game
+  // player rank + ready state
   // try to reconnect try
   // show lobby/game id + (name)
   // implement ready state

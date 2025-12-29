@@ -7,6 +7,7 @@ export class EndScreen extends Container {
   sprite!: Sprite;
   texture!: Texture;
 
+  isReady:boolean;
   players: Player[];
   totalScore: Record<string, number>;
 
@@ -15,6 +16,7 @@ export class EndScreen extends Container {
     this.app = app;
     this.players = [];
     this.totalScore = {};
+    this.isReady = false;
 
     this.addEventListeners();
     this.setButtonEvents();
@@ -96,8 +98,10 @@ export class EndScreen extends Container {
       "returnToLobbyButton",
     ) as HTMLButtonElement;
     playAgainButton.onclick = () => {
+      if (this.isReady) this.isReady = false
+      else this.isReady = true
       eventBus.emit("Command:PLAYER_READY", {
-        playerReady: true,
+        playerReady: this.isReady,
       });
     };
 
