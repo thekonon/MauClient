@@ -5,12 +5,11 @@ import { PlayerHand } from "./playerHand";
 import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
+import { Player } from "src/loadingScreen/player";
 
 export class Game extends Container {
   private app: Application;
-  public drawCardCommand!: () => void;
-  public passCommand!: () => void;
 
   playerHand: PlayerHand;
   pile: Pile;
@@ -40,7 +39,7 @@ export class Game extends Container {
 
   public async startGame() {
     if (this.readyPlayers === undefined) {
-      console.error("Report this bug to Pepa thanks");
+      console.error("Register players first");
       return;
     }
     await this.readyPlayers;
@@ -48,6 +47,7 @@ export class Game extends Container {
     if (this.deck === undefined) {
       this.deck = await Deck.create();
     }
+    this.addAllChildren();
     this.show();
   }
 
@@ -69,6 +69,14 @@ export class Game extends Container {
         }
       })();
     });
+  }
+  
+  public show() {
+    // Add player hand and deck to app
+    if (!this.isShown) {
+      this.isShown = true;
+      this.app.stage.addChild(this);
+    }
   }
 
   public async playCard(
@@ -172,14 +180,6 @@ export class Game extends Container {
       await new Promise((res) => setTimeout(res, 100));
     }
   }
-  public show() {
-    // Add player hand and deck to app
-    if (!this.isShown) {
-      this.isShown = true;
-      this.addAllChildren();
-      this.app.stage.addChild(this);
-    }
-  }
 
   public hide(): void {
     if (this.isShown) {
@@ -190,11 +190,6 @@ export class Game extends Container {
 
   private addEventListerners() {
     eventBus.on("Action:START_GAME", async () => {
-      if (this.readyPlayers === undefined) {
-        console.error("Report this bug to Pepa thanks");
-        return;
-      }
-      await this.readyPlayers;
       this.startGame();
     });
     eventBus.on("Helper:SET_MAIN_PLAYER", (payload) => {
@@ -218,10 +213,18 @@ export class Game extends Container {
       );
     });
     eventBus.on("Action:END_GAME", async () => {
-      await new Promise((res) => setTimeout(res, 1000));
+      await new Promise((res) => setTimeout(res, 300));
       this.resetGame();
       this.hide();
     });
+    eventBus.on("Action:PLAYER_RANK", (payload)=>{
+      const latestWinner = payload.playersOrder.at(-1);
+      this.otherPlayers.forEach(player => {
+        if(player.playerName === latestWinner){
+          player.playerWon()
+        }
+      });
+    })
   }
 
   private expires(expireAtMs: number) {
@@ -252,5 +255,8 @@ export class Game extends Container {
 
   private resetGame(): void {
     this.playerHand.restart();
+    this.otherPlayers.forEach(player => {
+      player.restart()
+    });
   }
 }

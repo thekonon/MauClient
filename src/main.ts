@@ -5,6 +5,71 @@ import { LoadingScreen } from "./loadingScreen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
+import { eventBus } from "./EventBus.ts";
+
+async function dummy() {
+  console.log("works");
+
+  eventBus.emit("Command:REGISTER_PLAYER", {
+    "playerName": "konon1",
+    "ip": "localhost",
+    "lobbyName": "",
+    "port": "8080",
+    "newLobby": false,
+    "privateLobby": false
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:ADD_PLAYER", {
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:SET_IDS", {
+    "lobbyID": "2a6a5757-bd9c-4795-8bc7-2c9fe5dc416b",
+    "playerID": "01KDMVS89ESVAJ7MVXKTZ3P4EB"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:PLAYERS", {
+    "playerNames": [
+      "konon1"
+    ]
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:ADD_PLAYER", {
+    "playerName": "konon2"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("ServerMessage:PLAYER_READY", {
+    "ready": true,
+    "playerName": "konon2"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Command:PLAYER_READY", {
+    "playerReady": true
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("ServerMessage:PLAYER_READY", {
+    "ready": true,
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:SET_MAIN_PLAYER", {
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:REGISTER_PLAYERS", {
+    "playerNames": [
+      "konon2"
+    ]
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:START_GAME", undefined)
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:HIDDEN_DRAW", {
+    "playerName": "konon1",
+    "cardCount": 4
+  })
+
+};
 
 (async () => {
   const loading_screen = new LoadingScreen();
@@ -24,6 +89,8 @@ import { CardManager } from "./loadingScreen/CardManage.ts";
   new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
+
+  // dummy()
 
   // TODO:
   // player rank + ready state

@@ -27,6 +27,12 @@ class EventBus<EventMap extends object> {
     const handlers = this.listeners[event];
     if (!handlers) return;
     handlers.forEach((handler) => handler(payload));
+    // const payloadText =
+    //   payload === undefined
+    //     ? "undefined"
+    //     : JSON.stringify(payload, null, 2);   // pretty-print
+
+    // console.log(`eventBus.emit(${String(event)}, ${payloadText})`);
   }
 }
 
