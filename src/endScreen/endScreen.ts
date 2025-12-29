@@ -1,18 +1,19 @@
 import { Application, Container, Sprite, Texture } from "pixi.js";
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
+import { Player } from "../loadingScreen/player";
 
 export class EndScreen extends Container {
   app: Application;
   sprite!: Sprite;
   texture!: Texture;
 
-  winners: string[];
+  players: Player[];
   totalScore: Record<string, number>;
 
   constructor(app: Application) {
     super();
     this.app = app;
-    this.winners = [];
+    this.players = [];
     this.totalScore = {};
 
     this.addEventListeners();
@@ -34,7 +35,9 @@ export class EndScreen extends Container {
       "fifth-place",
     ];
 
-    const paddedWinners = [...this.winners, ...Array(5).fill("")].slice(0, 5);
+    const playerNames: string[] = this.players.map(player => player.name)
+
+    const paddedWinners = [...playerNames, ...Array(5).fill("")].slice(0, 5);
 
     paddedWinners.forEach((winner, index) => {
       const elementId = elementIds[index];
@@ -54,17 +57,10 @@ export class EndScreen extends Container {
     }
   }
 
-  public async setWinners(winners: string[]) {
-    this.winners = winners;
-  }
-
   private addEventListeners(): void {
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
       this.show();
-    });
-    eventBus.on("Action:PLAYER_RANK", (payload) => {
-      this.setWinners(payload.playersOrder);
     });
     eventBus.on("Action:START_GAME", () => {
       this.hide();
@@ -86,6 +82,10 @@ export class EndScreen extends Container {
         }
       }
     });
+
+    eventBus.on("Helper:SET_SCORE", (payload) => {
+      this.setScore(payload.playerRank, payload.score)
+    })
   }
 
   private setButtonEvents(): void {
@@ -105,6 +105,37 @@ export class EndScreen extends Container {
       // refresh page
       window.location.reload();
     };
+  }
+
+  private updateLeaderBoard() {
+    const container = document.getElementById(
+      "endScreen-leaderboard-display",
+    ) as HTMLDivElement;
+
+    container.innerHTML = "";
+    this.players.forEach((player) => {
+      const div = document.createElement("div");
+      let symbol = "";
+      if (player.isReady) {
+        symbol = "🟢";
+      } else {
+        symbol = "🔴";
+      }
+      div.textContent = `${symbol} -  ${player.name}: ${player.score}`;
+      div.style.color = "black";
+      div.style.marginBottom = "5px";
+      container.appendChild(div);
+    });
+  }
+
+  private setScore(playerRank: string[], playerScore: Record<string, number>) {
+    for (let index = 0; index < playerRank.length; index++) {
+      const name = playerRank[index];
+      const score = playerScore[name];
+      this.players.push(new Player(name, score))
+    }
+
+    this.updateLeaderBoard()
   }
 
   private setPlayerReady(_playerName: string, _playerReady: boolean): void {

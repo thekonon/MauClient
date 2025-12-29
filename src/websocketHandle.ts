@@ -42,6 +42,7 @@ export interface GameAction {
   playerDto?: { username: string; playerId: string };
   expireAtMs?: number;
   playerRank?: string[];
+  scores?: Record<string, number>;
 
   card?: {
     color: string;
@@ -386,8 +387,11 @@ export class WebSocketHandle {
       END_GAME: (msg) => {
         if (!msg.playerRank)
           return console.error("Players was not specified in RANK action");
+        if (!msg.scores)
+          return console.error("Score was not provided in the end-game event")
         console.log("Game ended");
         eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.playerRank });
+        eventBus.emit("Helper:SET_SCORE", { playerRank: msg.playerRank, score: msg.scores });
         eventBus.emit("Action:END_GAME", undefined);
       },
       REMOVE_PLAYER: (msg) => {
