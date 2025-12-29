@@ -76,6 +76,7 @@ export class AnotherPlayer extends Container {
 
   public restart() {
     this.setCardCount(0);
+    this.addChild(this.textContainer);
   }
 
   public playerWon() {
