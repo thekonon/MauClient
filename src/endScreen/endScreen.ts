@@ -133,6 +133,7 @@ export class EndScreen extends Container {
   }
 
   private setScore(playerRank: string[], playerScore: Record<string, number>) {
+    this.players = [];
     for (let index = 0; index < playerRank.length; index++) {
       const name = playerRank[index];
       const score = playerScore[name];

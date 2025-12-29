@@ -97,6 +97,8 @@ async function dummy() {
   // freeze form when connected
   // cglobal card skin selection
   // card stacking
+  // endscreen ready state
+  // player remove after end
   
   // Done:
   // fix card count after reseting
