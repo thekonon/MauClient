@@ -138,8 +138,12 @@ export class EndScreen extends Container {
     this.updateLeaderBoard()
   }
 
-  private setPlayerReady(_playerName: string, _playerReady: boolean): void {
-    // TODO: implement this
-    // make circle green / red based on player name and ready state
+  private setPlayerReady(playerName: string, playerReady: boolean): void {
+    this.players.forEach(player => {
+      if(player.name === playerName){
+        player.isReady = playerReady
+      }
+    });
+    this.updateLeaderBoard()
   }
 }
