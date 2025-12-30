@@ -94,7 +94,7 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value, "custom");
+      played_card = await Card.create(type, value, GameSettings.getTexturePack());
       const player = this.otherPlayers.find(p => p.playerName === playerName);
       if (player && played_card) {
         player.addChild(played_card);
@@ -183,7 +183,7 @@ export class Game extends Container {
     // Create cards
     const cards: Card[] = [];
     for (let i = 0; i < cardCount; i++) {
-      const card = await Card.create("", "back", "custom");
+      const card = await Card.create("", "back", GameSettings.getTexturePack());
       card.position.x = GameSettings.get_deck_top_x();
       card.position.y = GameSettings.get_deck_top_y();
       card.zIndex = -1;

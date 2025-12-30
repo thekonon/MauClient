@@ -1,5 +1,6 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./EventBus.ts";
+import { GameSettings } from "./gameSettings.ts";
 
 interface Move {
   moveType: "PLAY";
@@ -506,7 +507,7 @@ export class WebSocketHandle {
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
-      "custom",
+      GameSettings.getTexturePack(),
     );
     eventBus.emit("Action:START_PILE", card);
   }
@@ -520,7 +521,7 @@ export class WebSocketHandle {
       const card = await Card.create(
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
-        "custom",
+        GameSettings.getTexturePack(),
       );
       eventBus.emit("Action:DRAW", card);
     }

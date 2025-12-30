@@ -1,13 +1,17 @@
 import { eventBus } from "../EventBus";
 import { Player, MainPlayer } from "./player";
+import { SettingsMenu } from "./setttingsMenu";
 
 export class LoadingScreen {
   mainPlayer: MainPlayer;
   connectedPlayers: Player[];
 
+  settingsMenu: SettingsMenu;
+
   constructor() {
     this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
+    this.settingsMenu = new SettingsMenu()
     this.addEvents();
     this.updateConnectionInfo();
   }
@@ -89,6 +93,13 @@ export class LoadingScreen {
     ) as HTMLButtonElement;
     readyButton.addEventListener("click", () => {
       this.readyPlayerButtonClicked();
+    });
+
+    const settingsButton = document.getElementById(
+      "settingsBtn",
+    ) as HTMLButtonElement;
+    settingsButton.addEventListener("click", () => {
+      this.settingsMenu.open();
     });
 
     window.addEventListener("keydown", (e) => {

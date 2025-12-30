@@ -86,7 +86,7 @@ async function dummy() {
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
-  GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  GameSettings.basicInit()
 
   new WebSocketHandle();
   new Game(app);
@@ -102,6 +102,7 @@ async function dummy() {
   // problikonout pass p5i pass
   // player rank onlz for player rank
   // use onlz score for display score
+  // display next color until new card is played
   
   // Done:
   // endscreen ready state
