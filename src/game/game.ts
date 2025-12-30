@@ -6,12 +6,10 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../EventBus";
-import { Player } from "src/loading_screen/player";
+import { Player } from "src/loadingScreen/player";
 
 export class Game extends Container {
   private app: Application;
-  public drawCardCommand!: () => void;
-  public passCommand!: () => void;
 
   playerHand: PlayerHand;
   pile: Pile;
@@ -22,6 +20,7 @@ export class Game extends Container {
   mainPlayer: string;
   readyPlayers?: Promise<unknown>;
   private intervalId?: ReturnType<typeof setInterval>;
+  private isShown: boolean = false;
 
   constructor(app: Application) {
     super();
@@ -35,17 +34,20 @@ export class Game extends Container {
 
     this.mainPlayer = "";
     this.otherPlayers = [];
-    this.addEventListerners()
+    this.addEventListerners();
   }
 
   public async startGame() {
     if (this.readyPlayers === undefined) {
-      console.error("Report this bug to Pepa thanks");
+      console.error("Register players first");
       return;
     }
     await this.readyPlayers;
     // Create a deck - place where user can request drawing card
-    this.deck = await Deck.create();
+    if (this.deck === undefined) {
+      this.deck = await Deck.create();
+    }
+    this.addAllChildren();
     this.show();
   }
 
@@ -68,6 +70,14 @@ export class Game extends Container {
       })();
     });
   }
+  
+  public show() {
+    // Add player hand and deck to app
+    if (!this.isShown) {
+      this.isShown = true;
+      this.app.stage.addChild(this);
+    }
+  }
 
   public async playCard(
     playerName: string,
@@ -80,7 +90,7 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value, "pythonGen");
+      played_card = await Card.create(type, value, "custom");
       this.otherPlayers.forEach((player) => {
         if (player.playerName === playerName) {
           if (played_card) player.addChild(played_card);
@@ -152,7 +162,7 @@ export class Game extends Container {
     // Create cards
     const cards: Card[] = [];
     for (let i = 0; i < cardCount; i++) {
-      const card = await Card.create("", "back", "pythonGen");
+      const card = await Card.create("", "back", "custom");
       card.position.x = GameSettings.get_deck_top_x();
       card.position.y = GameSettings.get_deck_top_y();
       card.zIndex = -1;
@@ -170,44 +180,50 @@ export class Game extends Container {
       await new Promise((res) => setTimeout(res, 100));
     }
   }
-  public show() {
-    // Add player hand and deck to app
-    this.addAllChildren();
-    this.app.stage.addChild(this);
-  }
 
   public hide(): void {
-    this.app.stage.removeChild(this);
+    if (this.isShown) {
+      this.isShown = false;
+      this.app.stage.removeChild(this);
+    }
   }
 
   private addEventListerners() {
     eventBus.on("Action:START_GAME", async () => {
-      console.log("starting game")
-      if (this.readyPlayers === undefined) {
-        console.error("Report this bug to Pepa thanks");
-        return;
-      }
-      await this.readyPlayers;
-      this.startGame()
-    })
-    eventBus.on("Helper:SET_MAIN_PLAYER", payload => {
+      this.startGame();
+    });
+    eventBus.on("Helper:SET_MAIN_PLAYER", (payload) => {
       this.mainPlayer = payload.playerName;
-    })
-    eventBus.on("Helper:REGISTER_PLAYERS", payload => {
-      this.registerPlayers(payload.playerNames)
-    })
-    eventBus.on("Action:PLAYER_SHIFT", payload => {
-      this.shiftPlayerAction(payload.playerName, payload.expireAtMs)
-    })
-    eventBus.on("Action:HIDDEN_DRAW", payload => {
-      this.hiddenDrawAction(payload.playerName, payload.cardCount)
-    })
-    eventBus.on("Action:PLAY_CARD", payload => {
-      this.playCard(payload.playerName, payload.type, payload.value, payload.newColor)
-    })
+    });
+    eventBus.on("Helper:REGISTER_PLAYERS", (payload) => {
+      this.registerPlayers(payload.playerNames);
+    });
+    eventBus.on("Action:PLAYER_SHIFT", (payload) => {
+      this.shiftPlayerAction(payload.playerName, payload.expireAtMs);
+    });
+    eventBus.on("Action:HIDDEN_DRAW", (payload) => {
+      this.hiddenDrawAction(payload.playerName, payload.cardCount);
+    });
+    eventBus.on("Action:PLAY_CARD", (payload) => {
+      this.playCard(
+        payload.playerName,
+        payload.type,
+        payload.value,
+        payload.newColor,
+      );
+    });
     eventBus.on("Action:END_GAME", async () => {
-      await new Promise((res) => setTimeout(res, 1000));
+      await new Promise((res) => setTimeout(res, 300));
+      this.resetGame();
       this.hide();
+    });
+    eventBus.on("Action:PLAYER_RANK", (payload)=>{
+      const latestWinner = payload.playersOrder.at(-1);
+      this.otherPlayers.forEach(player => {
+        if(player.playerName === latestWinner){
+          player.playerWon()
+        }
+      });
     })
   }
 
@@ -221,10 +237,11 @@ export class Game extends Container {
     // Convert to minutes, seconds, milliseconds
     const minutes = Math.floor(remainingMs / 1000 / 60);
     const seconds = Math.floor((remainingMs / 1000) % 60);
-    const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
+    // const milliseconds = ((remainingMs % 1000) / 10).toFixed(0); // 2 decimal places
 
     // Format as mm:ss:ms
-    return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    // return `${minutes}:${seconds.toString().padStart(2, "0")}:${milliseconds.padStart(2, "0")}`;
   }
 
   private addAllChildren(): void {
@@ -233,6 +250,13 @@ export class Game extends Container {
     this.addChild(this.pile);
     this.otherPlayers.forEach((player) => {
       this.addChild(player);
+    });
+  }
+
+  private resetGame(): void {
+    this.playerHand.restart();
+    this.otherPlayers.forEach(player => {
+      player.restart()
     });
   }
 }

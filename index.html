@@ -7,45 +7,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@500&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" />
   <title>MňauMňauGame</title>
 </head>
 
 <body>
   <div id="app">
     <div id="pixi-container"></div>
+    <!-- lobby -->
     <div id="loginMenu" class="login-menu">
       <div class="container">
         <div class="form">
           <div class="title">Mňau Mňau Game</div>
           <div class="form-group">
             <label for="playerName">Player Name:</label>
-            <input type="text" id="playerName" name="playerName" maxLength="20" autocomplete="additional-name">
-
+            <input type="text" id="playerName" name="playerName" maxlength="20" autocomplete="additional-name" />
           </div>
           <div class="form-group">
             <label for="ip">IP:</label>
-            <input type="text" id="IP" name="ip">
+            <input type="text" id="IP" name="ip" />
           </div>
 
           <div class="form-group">
             <label for="port">PORT:</label>
-            <input type="text" id="PORT" name="port" value="8080">
+            <input type="text" id="PORT" name="port" value="8080" />
           </div>
 
           <div class="form-group">
-            <label for="port">Lobies:</label>
-            <select name="cars" id="cars">
-              <option value="volvo">Random</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
-            </select>
-            <button class="btn-refresh">Refresh lobbies</button>
+            <label for="port">Lobby name: </label>
+            <input type="text" class="notImplemented" id="lobbyName" />
+
           </div>
           <div class="buttons">
             <button class="btn" id="connectButton">Connect to lobby!</button>
-            <button class="btn" id="reconnectButton">Try to reconnect!</button>
+            <button class="btn" id="createLobbyButton">Create new lobby!</button>
+            <button class="btn" id="createPrivateLobbyButton">Create new private lobby!</button>
+            <button class="btn" id="reconnectButton">
+              Try to reconnect!
+            </button>
           </div>
         </div>
         <div class="players">
@@ -53,10 +52,86 @@
           <div class="players-box" id="connectedPlayersList">
             No players connected yet.
           </div>
+          <div>
+            <h1>
+              Connection details
+            </h1>
+            <div class="players-box" id="connectionInfo">
+              No connection info
+          </div>
+          </div>
           <button class="btn" id="readyButton">MAKE ME READY</button>
         </div>
       </div>
     </div>
+
+    <!-- end screen -->
+    <div id="endScreen">
+      <div id="endScreen-container">
+        <!-- Leaderboard -->
+        <div class="endScreen-subcontainer" id="endScreen-leaderboard">
+          <h1>
+            leaderboard
+          </h1>
+          <div id="endScreen-leaderboard-display">
+            -Bayraktar1 <br>
+            -Bayraktar2 <br>
+            -Bayraktar3 <br>
+          </div>
+
+        </div>
+
+        <!-- winners -->
+        <div class="endScreen-subcontainer" id="endScreen-winners">
+          <div class="podium">
+
+            <!-- 2nd -->
+            <div class="podium-step second">
+              <div class="name" id="second-place">Aliadse</div>
+              <div class="place">2</div>
+            </div>
+
+            <!-- 1st -->
+            <div class="podium-step first">
+              <div class="name" id="first-place">Boas</div>
+              <div class="place">1</div>
+            </div>
+
+            <!-- 3rd -->
+            <div class="podium-step third">
+              <div class="name" id="third-place">Bayraktar</div>
+              <div class="place">3</div>
+            </div>
+          </div>
+
+          <!-- 4th & 5th -->
+          <div class="others">
+            <div class="other">
+              <span class="place">4</span>
+              <span class="name" id="fourth-place">Daniel</span>
+            </div>
+            <div class="other">
+              <span class="place">5</span>
+              <span class="name" id="fifth-place">Eva</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- control panel -->
+        <div class="endScreen-subcontainer" id="endScreen-controlPanel">
+          <div class="endScreen-controlPanel-subcontainer">
+            <button class="endScreenButton" id="playAgainButton">
+              play again
+            </button>
+            <button class="endScreenButton" id="returnToLobbyButton">
+              return to homepage
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>¨
+
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

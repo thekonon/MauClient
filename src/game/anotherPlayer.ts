@@ -7,7 +7,7 @@ export class AnotherPlayer extends Container {
   sprite!: Sprite;
   private cardCount: number;
   private cardCountText!: Text;
-  private isActive: boolean = false;
+  private textContainer!: Container;
   auraContainer!: Graphics;
 
   constructor(playerName: string) {
@@ -29,7 +29,8 @@ export class AnotherPlayer extends Container {
       alert(`Don't disturb player ${this.playerName}`);
     });
     this.addChild(this.sprite);
-    this.addChild(this.createText());
+    this.textContainer = this.createText()
+    this.addChild(this.textContainer);
   }
 
   public setCardCount(cardCount: number) {
@@ -71,6 +72,15 @@ export class AnotherPlayer extends Container {
       return;
     }
     this.auraContainer.clear();
+  }
+
+  public restart() {
+    this.setCardCount(0);
+    this.addChild(this.textContainer);
+  }
+
+  public playerWon() {
+    this.removeChild(this.textContainer)
   }
 
   private createText(): Container {

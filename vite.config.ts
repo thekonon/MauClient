@@ -11,18 +11,18 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // environment: "jsdom",
     browser: {
-      provider: "playwright",
       enabled: true,
+      provider: "playwright",
       instances: [
         {
           browser: "firefox", // must be "browser", not "name"
-          headless: true,     // headless in CI
+          headless: true, // headless in CI
         },
-        // you can add more instances if needed
-        // { browser: "chromium", headless: true }
       ],
     },
+    // setupFiles: ["./setupTests.ts"],
     include: ["tests/**/*.test.ts"],
   },
 });

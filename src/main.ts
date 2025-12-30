@@ -1,88 +1,114 @@
 import { Application } from "pixi.js";
 import { GameSettings } from "./gameSettings.ts";
 import { Game } from "./game/game.ts";
-import { LoadingScreen } from "./loading_screen/loadingScreen.ts";
+import { LoadingScreen } from "./loadingScreen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
-import { CardManager } from "./loading_screen/CardManage.ts";
+import { CardManager } from "./loadingScreen/CardManage.ts";
+import { eventBus } from "./EventBus.ts";
 
+async function dummy() {
+  console.log("works");
 
-async function testing(
-  web_socket: WebSocketHandle,
-  loading_screen: LoadingScreen,
-) {
-  loading_screen.on_register_player?.("aa", "localhost", "8080");
-  loading_screen.mainPlayer.name = "aa";
+  eventBus.emit("Command:REGISTER_PLAYER", {
+    "playerName": "konon1",
+    "ip": "localhost",
+    "lobbyName": "",
+    "port": "8080",
+    "newLobby": false,
+    "privateLobby": false
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:ADD_PLAYER", {
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:SET_IDS", {
+    "lobbyID": "2a6a5757-bd9c-4795-8bc7-2c9fe5dc416b",
+    "playerID": "01KDMVS89ESVAJ7MVXKTZ3P4EB"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:PLAYERS", {
+    "playerNames": [
+      "konon1"
+    ]
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:ADD_PLAYER", {
+    "playerName": "konon2"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("ServerMessage:PLAYER_READY", {
+    "ready": true,
+    "playerName": "konon2"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Command:PLAYER_READY", {
+    "playerReady": true
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("ServerMessage:PLAYER_READY", {
+    "ready": true,
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:SET_MAIN_PLAYER", {
+    "playerName": "konon1"
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:REGISTER_PLAYERS", {
+    "playerNames": [
+      "konon2"
+    ]
+  })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:START_GAME", undefined)
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Action:HIDDEN_DRAW", {
+    "playerName": "konon1",
+    "cardCount": 4
+  })
 
-  const initMsgs = [
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"playerId":"01K2VK4H3V09M6VKM1K68D955H","username":"aa","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYERS","players":["aa"]}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"bb","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"cc","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"dd","active":true}}}',
-    '{"messageType":"ACTION","action":{"type":"REGISTER_PLAYER","playerDto":{"username":"ee","active":true}}}',
-  ];
-  const expireTimeMs = Date.now() + 60000;
-  const startGameMsgs = [
-    '{"messageType":"ACTION","action":{"type":"START_GAME","gameId":"2c28f719-9cb8-4ce6-adb9-319913ec0150"}}',
-    '{"messageType":"ACTION","action":{"type":"START_PILE","card":{"type":"SEVEN","color":"HEARTS"}}}',
-    `{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"aa","active":true},"expireAtMs":${expireTimeMs}}}`,
-  ];
-  const midMsgs = [
-    '{"messageType":"ACTION","action":{"type":"DRAW","cards":[{"type":"EIGHT","color":"HEARTS"},{"type":"SEVEN","color":"DIAMONDS"},{"type":"QUEEN","color":"CLUBS"},{"type":"EIGHT","color":"CLUBS"}]}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"bb","active":true},"expireAtMs":1756045736534}}',
-    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"bb","active":true},"count":4}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"cc","active":true},"expireAtMs":1756045736534}}',
-    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"cc","active":true},"count":4}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"dd","active":true},"expireAtMs":1756045736534}}',
-    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"dd","active":true},"count":4}}',
-    '{"messageType":"ACTION","action":{"type":"PLAYER_SHIFT","playerDto":{"username":"ee","active":true},"expireAtMs":1756045736534}}',
-    '{"messageType":"ACTION","action":{"type":"HIDDEN_DRAW","playerDto":{"username":"ee","active":true},"count":4}}',
-    '{"messageType":"ACTION","action":{"type":"PLAY_CARD","playerDto":{"username":"aa","active":true},"card":{"type":"SEVEN","color":"DIAMONDS"}}}',
-  ];
-  const endMsgs = [
-    '{"messageType":"ACTION","action":{"type":"WIN","playerDto":{"username":"a","active":false}}}',
-    '{"messageType":"ACTION","action":{"type":"END_GAME","playerRank":["aa","bb", "cc", "dd", "Ee"]}}',
-  ];
-
-  await new Promise((res) => setTimeout(res, 3000));
-  for (const msgStr of initMsgs) {
-    web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 50));
-  }
-  for (const msgStr of startGameMsgs) {
-    web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 200));
-  }
-  for (const msgStr of midMsgs) {
-    web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 200));
-  }
-  for (const msgStr of endMsgs) {
-    web_socket.onMessage(msgStr);
-    await new Promise((res) => setTimeout(res, 500));
-  }
-  return;
-}
+};
 
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
-  
+
   // Create a game instance
   const app = new Application();
   await app.init({ background: "#1099bb", resizeTo: window });
-  
+
   document.getElementById("pixi-container")!.appendChild(app.canvas);
   const cardManager = new CardManager(app);
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
-  
-  
-  new WebSocketHandle();
+
   GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+
+  new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
-  // Bypapass for testing
-  // testing(web_socket, loading_screen);
+
+  // dummy()
+
+  // TODO:
+  // add disconnect from lobby
+  // freeze form when connected
+  // cglobal card skin selection
+  // card stacking
+  // endscreen ready state
+  // player remove after end
+  
+  // Done:
+  // fix card count after reseting
+  // show player rank in the middle of game
+  // player rank + ready state
+  // try to reconnect try
+  // show lobby/game id + (name)
+  // implement ready state
+  // DESTROY = disable playagain
+  // remaining pagetime na sekundy
+  // on disqualified - reload
+  // disable connect buttons after connecting
 })();

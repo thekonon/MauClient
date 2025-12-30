@@ -1,14 +1,15 @@
-import { eventBus } from "../EventBus";
-import { Player } from "./player";
+import { eventBus } from "../eventBus";
+import { Player, MainPlayer } from "./player";
 
 export class LoadingScreen {
-  mainPlayer: Player;
+  mainPlayer: MainPlayer;
   connectedPlayers: Player[];
 
   constructor() {
-    this.mainPlayer = new Player("");
+    this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
     this.addEvents();
+    this.updateConnectionInfo();
   }
 
   public show() {
@@ -53,6 +54,29 @@ export class LoadingScreen {
       this.registerPlayer();
     });
 
+    const createLobbyButton = document.getElementById(
+      "createLobbyButton",
+    ) as HTMLInputElement | null;
+    const createPrivateLobbyButton = document.getElementById(
+      "createPrivateLobbyButton",
+    ) as HTMLInputElement | null;
+
+    if (createLobbyButton) {
+      createLobbyButton.addEventListener("click", () => {
+        this.createLobby();
+      });
+    } else {
+      console.log("createLobby button was not found");
+    }
+
+    if (createPrivateLobbyButton) {
+      createPrivateLobbyButton.addEventListener("click", () => {
+        this.createPrivateLobby();
+      });
+    } else {
+      console.log("createPrivateLobby button was not found");
+    }
+
     const reconnectButton = document.getElementById(
       "reconnectButton",
     ) as HTMLButtonElement;
@@ -73,23 +97,24 @@ export class LoadingScreen {
       }
     });
 
-    eventBus.on("Action:ADD_PLAYER", payload =>{
-      this.addPlayerToList(payload.playerName)
-    })
-    eventBus.on("Action:PLAYERS", payload => {
-      this.updatePlayerList(payload.playerNames)
-    })
-    eventBus.on("Action:REMOVE_PLAYER", payload => {
+    eventBus.on("Action:ADD_PLAYER", (payload) => {
+      this.addPlayerToList(payload.playerName);
+    });
+    eventBus.on("Action:PLAYERS", (payload) => {
+      this.updatePlayerList(payload.playerNames);
+    });
+    eventBus.on("Action:REMOVE_PLAYER", (payload) => {
       this.removePlayerFromList(payload.playerName);
-    })
-    eventBus.on("Action:START_GAME", () => {
-      eventBus.emit("Helper:SET_MAIN_PLAYER", {playerName: this.getMainPlayer()})
-      eventBus.emit("Helper:REGISTER_PLAYERS", {playerNames: this.getPlayersList()})
-      this.hide()
-    })
-    eventBus.on("ServerMessage:PLAYER_READY", payload => {
-      this.readyPlayerMessage(payload.playerName, payload.ready)
-    })
+    });
+    eventBus.on("Action:START_GAME", this.startGameHandler);
+    eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
+      this.readyPlayerMessage(payload.playerName, payload.ready);
+    });
+    eventBus.on("Helper:SET_IDS", (payload) => {
+      this.mainPlayer.lobbyID = payload.lobbyID;
+      this.mainPlayer.playerID = payload.playerID;
+      this.updateConnectionInfo();
+    });
   }
 
   public getPlayersList(): string[] {
@@ -186,7 +211,9 @@ export class LoadingScreen {
   }
 
   private readyPlayerButtonClicked() {
-    eventBus.emit("Command:PLAYER_READY", {playerReady: !this.mainPlayer.isReady!})
+    eventBus.emit("Command:PLAYER_READY", {
+      playerReady: !this.mainPlayer.isReady!,
+    });
   }
 
   private registerPlayer() {
@@ -195,6 +222,7 @@ export class LoadingScreen {
     ) as HTMLInputElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
     const ip = IPInput.value.trim();
     const port = PORTInput.value.trim();
@@ -213,15 +241,59 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.mainPlayer = new Player(playerName);
-    eventBus.emit("Command:REGISTER_PLAYER", {playerName: playerName, ip: ip, port: port})
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value);
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      lobbyName: lobbyNane.value,
+      port: port,
+      newLobby: false,
+      privateLobby: false,
+    });
   }
 
   private reconnectPlayer() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
     const IPInput = document.getElementById("IP") as HTMLInputElement;
     const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const ip = IPInput.value.trim();
     const port = PORTInput.value.trim();
+    const playerName = playerNameInput.value.trim();
+
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.reconnectCommand(playerName, ip, port);
+  }
+
+  private createLobby() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
+    const playerName = playerNameInput.value.trim();
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
 
     if (ip === "") {
       alert("Kindof strange ip, don't you think?");
@@ -232,7 +304,55 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.reconnectCommand(ip, port);
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value);
+    console.log("Createing new lobby");
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+      lobbyName: lobbyNane.value,
+      newLobby: true,
+      privateLobby: false,
+    });
+  }
+
+  private createPrivateLobby() {
+    const playerNameInput = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement;
+    const IPInput = document.getElementById("IP") as HTMLInputElement;
+    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
+    const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
+    const playerName = playerNameInput.value.trim();
+    const ip = IPInput.value.trim();
+    const port = PORTInput.value.trim();
+
+    if (playerName === "") {
+      alert("Please enter a player name.");
+      return;
+    }
+
+    if (ip === "") {
+      alert("Kindof strange ip, don't you think?");
+      return;
+    }
+
+    if (port === "") {
+      alert("Kindof strange port, don't you think?");
+      return;
+    }
+    this.mainPlayer = new MainPlayer(playerName);
+    this.mainPlayer.setLobbyName(lobbyNane.value);
+    console.log("Createing private lobby");
+    eventBus.emit("Command:REGISTER_PLAYER", {
+      playerName: playerName,
+      ip: ip,
+      lobbyName: lobbyNane.value,
+      port: port,
+      newLobby: true,
+      privateLobby: true,
+    });
   }
 
   private updateConnectedPlayers() {
@@ -272,15 +392,65 @@ export class LoadingScreen {
   }
 
   private disableConnectButton(): void {
-    const connectButton = document.getElementById(
+    const buttonsIDs = [
       "connectButton",
+      "createLobbyButton",
+      "createPrivateLobbyButton",
+      "reconnectButton",
+    ];
+    buttonsIDs.forEach((id) => {
+      this.disableButton(id);
+    });
+  }
+
+  private disableButton(buttonID: string): void {
+    const button = document.getElementById(
+      buttonID,
     ) as HTMLButtonElement | null;
 
-    if (connectButton) {
-      connectButton.disabled = true;
-      if (!connectButton.classList.contains("disabled")) {
-        connectButton.classList.add("disabled");
+    if (button) {
+      button.disabled = true;
+      if (!button.classList.contains("disabled")) {
+        button.classList.add("disabled");
       }
     }
+  }
+
+  private startGameHandler = () => {
+    eventBus.emit("Helper:SET_MAIN_PLAYER", {
+      playerName: this.getMainPlayer(),
+    });
+    eventBus.emit("Helper:REGISTER_PLAYERS", {
+      playerNames: this.getPlayersList(),
+    });
+    this.hide();
+    eventBus.off("Action:START_GAME", this.startGameHandler);
+  };
+
+  private reconnectCommand(playerName: string, ip: string, port: string) {
+    console.log("Reconnecting is not implemented");
+    eventBus.emit("Command:RECONNECT", {
+      playerName: playerName,
+      ip: ip,
+      port: port,
+    });
+  }
+
+  private updateConnectionInfo() {
+    const container = document.getElementById(
+      "connectionInfo",
+    ) as HTMLDivElement;
+    const stringsToDisplay = [
+      `PlayerID: ${this.mainPlayer.playerID}`,
+      `Lobby name: ${this.mainPlayer.lobbyName}`,
+      `LobbyID: ${this.mainPlayer.lobbyID}`,
+    ];
+    container.textContent = ``;
+
+    stringsToDisplay.forEach((element) => {
+      const div = document.createElement("div");
+      div.textContent = element;
+      container.appendChild(div);
+    });
   }
 }

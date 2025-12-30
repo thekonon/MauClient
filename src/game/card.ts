@@ -12,7 +12,7 @@ import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
 import { DropShadowFilter } from "pixi-filters";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class Card extends Container {
   // General settings of the card
@@ -62,7 +62,7 @@ export class Card extends Container {
   private wasDragged = false;
   private isDialogActive = false;
   private _useOriginOfCard: boolean = false;
-  spriteContainer: any;
+  spriteContainer: Container;
   bounds!: Bounds;
 
   /* Card has to be created in async - therefore factory is used*/
@@ -105,8 +105,7 @@ export class Card extends Container {
       console.warn("playCardCommand not defined");
     };
 
-
-    this.makeButtonMovable()
+    this.makeButtonMovable();
     this.addShade();
 
     this.spriteContainer.addChild(sprite);
@@ -116,7 +115,7 @@ export class Card extends Container {
   public play(
     duration?: number,
     rotation?: number,
-    onFinish: () => void = () => { },
+    onFinish: () => void = () => {},
   ) {
     if (this.useOriginOfCard) {
       gsap.to(this, {
@@ -159,8 +158,7 @@ export class Card extends Container {
     if (!this.useOriginOfCard) {
       this.end_animation_point_x = x;
       this.end_animation_point_y = y;
-    }
-    else {
+    } else {
       const topLeftEdge = new Point(
         -this.card_sprite.width / 2,
         -this.card_sprite.height / 2,
@@ -176,13 +174,13 @@ export class Card extends Container {
         .moveTo(0, 0)
         .lineTo(topLeftEdge.x, topLeftEdge.y)
         .stroke({ width: 2, color: 0x000000 });
-      this.spriteContainer.addChild(testGraphics)
+      this.spriteContainer.addChild(testGraphics);
 
       const testGraphics2 = new Graphics()
         .moveTo(0, 0)
         .lineTo(globalDiff.x, globalDiff.y)
         .stroke({ width: 2, color: 0x000000 });
-      this.addChild(testGraphics2)
+      this.addChild(testGraphics2);
 
       this.end_animation_point_x = x - globalDiff.x;
       this.end_animation_point_y = y - globalDiff.y;
@@ -194,8 +192,7 @@ export class Card extends Container {
     if (!this.useOriginOfCard) {
       this.end_animation_point_x = x;
       this.end_animation_point_y = y;
-    }
-    else {
+    } else {
       const topLeftEdge = new Point(
         -this.card_sprite.width / 2,
         -this.card_sprite.height / 2,
@@ -213,7 +210,7 @@ export class Card extends Container {
         .moveTo(0, 0)
         .lineTo(topLeftEdge.x, topLeftEdge.y)
         .stroke({ width: 2, color: 0x000000 });
-      this.spriteContainer.addChild(testGraphics)
+      this.spriteContainer.addChild(testGraphics);
       this.end_animation_point_x = x - localDiff.x;
       this.end_animation_point_y = y - localDiff.y;
     }
@@ -245,7 +242,7 @@ export class Card extends Container {
     this.dragStartPosition = event.getLocalPosition(this.parent);
     this.zIndex = 1000;
     this.alpha = 0.7;
-    this.bounds = this.parent.getBounds()
+    this.bounds = this.parent.getBounds();
   }
 
   private onDragMove(event: FederatedPointerEvent): void {
@@ -260,16 +257,28 @@ export class Card extends Container {
       this.wasDragged = true;
     }
 
-    if (currentPosition.x - this.dragOffset.x < -GameSettings.get_player_hand_width() * 0.1) {
+    if (
+      currentPosition.x - this.dragOffset.x <
+      -GameSettings.get_player_hand_width() * 0.1
+    ) {
       return;
     }
-    if (currentPosition.y - this.dragOffset.y < -GameSettings.get_player_hand_height() * 0.1) {
+    if (
+      currentPosition.y - this.dragOffset.y <
+      -GameSettings.get_player_hand_height() * 0.1
+    ) {
       return;
     }
-    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_width() * 1.1) {
+    if (
+      currentPosition.y - this.dragOffset.y + this.card_sprite.height >
+      GameSettings.get_player_hand_width() * 1.1
+    ) {
       return;
     }
-    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_height() * 1.1) {
+    if (
+      currentPosition.y - this.dragOffset.y + this.card_sprite.height >
+      GameSettings.get_player_hand_height() * 1.1
+    ) {
       return;
     }
 
@@ -291,7 +300,7 @@ export class Card extends Container {
       this.onCardClick();
     } else {
       // Drag finished — optional: snap back or drop logic here
-      console.log("snapping back")
+      console.log("snapping back");
       this.position.set(
         this.dragStartPosition.x - this.dragOffset.x,
         this.dragStartPosition.y - this.dragOffset.y,
@@ -317,7 +326,11 @@ export class Card extends Container {
       this.parent.removeChild(dialog);
       this.isDialogActive = false;
     }
-    eventBus.emit("Command:PLAY_CARD", {type: this.type, value: this.value, nextColor})
+    eventBus.emit("Command:PLAY_CARD", {
+      type: this.type,
+      value: this.value,
+      nextColor,
+    });
   }
 
   private static async load_texture(
@@ -345,13 +358,12 @@ export class Card extends Container {
   }
 
   set useOriginOfCard(useOriginOfCard: boolean) {
-    this._useOriginOfCard = useOriginOfCard
+    this._useOriginOfCard = useOriginOfCard;
     if (useOriginOfCard) {
       this.card_sprite.anchor.set(0.5);
       this.spriteContainer.x = this.card_sprite.width / 2;
       this.spriteContainer.y = this.card_sprite.height / 2;
-    }
-    else {
+    } else {
       this.card_sprite.anchor.set(0);
       this.spriteContainer.x = 0;
       this.spriteContainer.y = 0;

@@ -11,8 +11,7 @@ export default [
 
   // Custom project rules
   {
-    files: ["**/*.{js,jsx,ts,tsx}"], // include JS + TS
-    ignores: ["dist", "node_modules"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
 
     languageOptions: {
       parser: tseslint.parser,
@@ -27,8 +26,16 @@ export default [
     },
 
     rules: {
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
       "prettier/prettier": "error",
     },
+  },
+
+  // 👇 Global ignores go here
+  {
+    ignores: ["dist/**", "node_modules/**"],
   },
 ];

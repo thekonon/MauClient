@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
-import { eventBus } from "../EventBus";
+import { eventBus } from "../eventBus";
 
 export class PlayerHand extends Container {
   cards_list: Card[];
@@ -47,7 +47,7 @@ export class PlayerHand extends Container {
       GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     passButton.on("pointerdown", () => {
-      eventBus.emit("Command:PASS", undefined)
+      eventBus.emit("Command:PASS", undefined);
     });
 
     // button for pass action
@@ -111,7 +111,9 @@ export class PlayerHand extends Container {
 
     this.cards_list.push(card);
     this.addChild(card);
-    card.play();
+    card.play(undefined, undefined, () => {
+      this.reorder_cards();
+    });
   }
 
   public playCard(type: string, value: string): Card | null {
@@ -127,10 +129,19 @@ export class PlayerHand extends Container {
     return null;
   }
 
+  public restart(): void {
+    this.cards_list.forEach((card) => {
+      card.card_sprite.destroy();
+      card.spriteContainer.destroy();
+      card.destroy();
+    });
+    this.cards_list = [];
+  }
+
   private addEventListeners(): void {
-    eventBus.on("Action:DRAW", card => {
-      this.draw_card(card)
-    })
+    eventBus.on("Action:DRAW", (card) => {
+      this.draw_card(card);
+    });
   }
 
   private reorder_cards() {

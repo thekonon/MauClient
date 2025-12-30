@@ -1,121 +1,154 @@
-import {
-  Application,
-  Assets,
-  Container,
-  Sprite,
-  TextStyle,
-  Texture,
-  Text,
-} from "pixi.js";
-import { GameSettings } from "../gameSettings";
+import { Application, Container, Sprite, Texture } from "pixi.js";
 import { eventBus } from "../EventBus";
+import { Player } from "../loadingScreen/player";
 
 export class EndScreen extends Container {
   app: Application;
   sprite!: Sprite;
   texture!: Texture;
-  textureLoaded?: Promise<unknown>;
-  playersSet?: Promise<void>
 
-  winners: string[];
+  isReady:boolean;
+  players: Player[];
+  totalScore: Record<string, number>;
 
   constructor(app: Application) {
     super();
-    this.draw();
     this.app = app;
-    this.winners = [];
-    this.addEventListeners()
+    this.players = [];
+    this.totalScore = {};
+    this.isReady = false;
+
+    this.addEventListeners();
+    this.setButtonEvents();
   }
 
   public async show() {
-    await this.textureLoaded;
-    if (this.playersSet === undefined) {
-      console.error("Report this bug to Pepa thanks");
-      return;
+    const endScreen = document.getElementById("endScreen") as HTMLInputElement;
+
+    if (endScreen) {
+      endScreen.style.display = "flex";
     }
-    await this.playersSet;
-    this.addChild(this.sprite);
-    this.app.stage.addChild(this);
+
+    const elementIds = [
+      "first-place",
+      "second-place",
+      "third-place",
+      "fourth-place",
+      "fifth-place",
+    ];
+
+    const playerNames: string[] = this.players.map(player => player.name)
+
+    const paddedWinners = [...playerNames, ...Array(5).fill("")].slice(0, 5);
+
+    paddedWinners.forEach((winner, index) => {
+      const elementId = elementIds[index];
+      const htmlElement = document.getElementById(elementId);
+
+      if (htmlElement) {
+        htmlElement.textContent = winner;
+      }
+    });
   }
 
-  public async setWinners(winners: string[]) {
-    // Create a promise that will resolve after winners are processed
-    this.playersSet = new Promise<void>((resolve) => {
-      (async () => {
-        await this.textureLoaded; // Wait until sprite is ready
-        this.winners = winners;
+  public async hide() {
+    const endScreen = document.getElementById("endScreen") as HTMLInputElement;
 
-        const positions = [
-          { x: -this.sprite.width * 0.075, y: -this.sprite.height * 0.58 },
-          { x: -this.sprite.width * 0.3, y: -this.sprite.height * 0.25 },
-          { x: this.sprite.width * 0.15, y: -this.sprite.height * 0.05 },
-        ];
-
-        // Create text nodes for winners
-        winners.forEach((winner, index) => {
-          if (index >= 3) return; // Limit to max 3 winners
-          const pos = positions[index];
-          const text = createText(winner, pos.x, pos.y);
-          this.addChild(text);
-        });
-
-        resolve(); // ✅ resolve once all players are set
-      })();
-    });
-
-
-    function createText(playerName: string, x: number, y: number) {
-      const style = new TextStyle({
-        fontFamily: "Impact",
-        fontSize: GameSettings.fontSize,
-        fill: "#000000",
-      });
-
-      const text = new Text({
-        text: playerName,
-        style,
-      });
-
-      text.x = x;
-      text.y = y;
-      text.zIndex = 1;
-      return text;
+    if (endScreen) {
+      endScreen.style.display = "none";
     }
   }
 
   private addEventListeners(): void {
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
-      this.show()
+      this.show();
     });
-    eventBus.on("Action:PLAYER_RANK", payload => {
-      this.setWinners(payload.playersOrder)
+    eventBus.on("Action:START_GAME", () => {
+      this.hide();
+    });
+    eventBus.on("ServerMessage:PLAYER_READY", (payload) => {
+      this.setPlayerReady(payload.playerName, payload.ready);
+    });
+
+    eventBus.on("Action:DESTROY", () => {
+      console.log("Destoying");
+      const playAgainButton = document.getElementById(
+        "playAgainButton",
+      ) as HTMLButtonElement;
+      // playAgainButton.disabled = true;
+      if (playAgainButton) {
+        playAgainButton.disabled = true;
+        if (!playAgainButton.classList.contains("disabled")) {
+          playAgainButton.classList.add("disabled");
+        }
+      }
+    });
+
+    eventBus.on("Helper:SET_SCORE", (payload) => {
+      this.setScore(payload.playerRank, payload.score)
     })
   }
 
-  private async draw() {
-    this.textureLoaded = new Promise((resolve, reject) => {
-      (async () => {
-        try {
-          this.texture = await Assets.load(
-            "assets/other/endScreen/winners.png",
-          );
-          resolve(true);
-        } catch (err) {
-          console.error("loading failed");
-          reject(err);
-        }
-      })();
+  private setButtonEvents(): void {
+    const playAgainButton = document.getElementById(
+      "playAgainButton",
+    ) as HTMLButtonElement;
+    const returnToLobbyButton = document.getElementById(
+      "returnToLobbyButton",
+    ) as HTMLButtonElement;
+    playAgainButton.onclick = () => {
+      if (this.isReady) this.isReady = false
+      else this.isReady = true
+      eventBus.emit("Command:PLAYER_READY", {
+        playerReady: this.isReady,
+      });
+    };
+
+    returnToLobbyButton.onclick = () => {
+      // refresh page
+      window.location.reload();
+    };
+  }
+
+  private updateLeaderBoard() {
+    const container = document.getElementById(
+      "endScreen-leaderboard-display",
+    ) as HTMLDivElement;
+
+    container.innerHTML = "";
+    this.players.forEach((player) => {
+      const div = document.createElement("div");
+      let symbol = "";
+      if (player.isReady) {
+        symbol = "🟢";
+      } else {
+        symbol = "🔴";
+      }
+      div.textContent = `${symbol} -  ${player.name}: ${player.score}`;
+      div.style.color = "black";
+      div.style.marginBottom = "5px";
+      container.appendChild(div);
     });
-    await this.textureLoaded;
-    this.sprite = new Sprite(this.texture);
-    this.sprite.anchor.set(0.5);
-    this.sprite.scale.set(
-      (GameSettings.screen_width * 0.51) / this.sprite.width,
-    );
-    this.x = GameSettings.get_mid_x();
-    this.y = GameSettings.get_mid_y();
-    console.log(this.sprite.width / GameSettings.screen_width);
-    console.log(this.sprite.height / GameSettings.screen_height);
+  }
+
+  private setScore(playerRank: string[], playerScore: Record<string, number>) {
+    this.players = [];
+    for (let index = 0; index < playerRank.length; index++) {
+      const name = playerRank[index];
+      const score = playerScore[name];
+      this.players.push(new Player(name, score))
+    }
+
+    this.updateLeaderBoard()
+  }
+
+  private setPlayerReady(playerName: string, playerReady: boolean): void {
+    this.players.forEach(player => {
+      if(player.name === playerName){
+        player.isReady = playerReady
+      }
+    });
+    this.updateLeaderBoard()
   }
 }
