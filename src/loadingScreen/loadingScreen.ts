@@ -1,4 +1,4 @@
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
 import { Player, MainPlayer } from "./player";
 
 export class LoadingScreen {

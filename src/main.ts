@@ -63,14 +63,14 @@ async function dummy() {
   })
   await new Promise((res) => setTimeout(res, 100));
   eventBus.emit("Action:START_GAME", undefined)
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:HIDDEN_DRAW", {
-    "playerName": "konon1",
-    "cardCount": 4
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Helper:SET_SCORE", { playerRank: ["konon1", "konon2"], score: {"konon1": 1, "konon2":2} })
-  eventBus.emit("Action:END_GAME", undefined)
+  // await new Promise((res) => setTimeout(res, 100));
+  // eventBus.emit("Action:HIDDEN_DRAW", {
+  //   "playerName": "konon1",
+  //   "cardCount": 4
+  // })
+  // await new Promise((res) => setTimeout(res, 100));
+  // eventBus.emit("Helper:SET_SCORE", { playerRank: ["konon1", "konon2"], score: {"konon1": 1, "konon2":2} })
+  // eventBus.emit("Action:END_GAME", undefined)
 
 };
 (async () => {
@@ -99,14 +99,14 @@ async function dummy() {
   // freeze form when connected
   // cglobal card skin selection
   // card stacking
+  // problikonout pass p5i pass
+  // player rank onlz for player rank
+  // use onlz score for display score
+  
+  // Done:
   // endscreen ready state
   // player remove after end
-  // problikonout pass p5i pass
-  // use onlz score for display score
-  // player rank onlz for player rank
   // fix unready second games
-
-  // Done:
   // fix card count after reseting
   // show player rank in the middle of game
   // player rank + ready state

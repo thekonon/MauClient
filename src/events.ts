@@ -33,6 +33,7 @@ export interface AppEvents {
   "Action:END_GAME": void;
   "Action:REMOVE_PLAYER": { playerName: string };
   "Action:DESTROY": void;
+  "Action:PASS": void;
   "Command:PLAY_CARD": { type: string; value: string; nextColor: string };
   "Command:DRAW": void;
   "Command:PASS": void;

@@ -1,7 +1,7 @@
 import { Container, TextStyle, Text, Point } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
 
 export class Pile extends Container {
   private card_queue: Card[] = [];

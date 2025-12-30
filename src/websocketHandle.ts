@@ -36,7 +36,9 @@ export interface GameAction {
     | "READY" // moved from server message
     | "UNREADY" // moved from server message
     | "DESTROY"
-    | "DISQUALIFIED";
+    | "DISQUALIFIED"
+    | "PASS";
+
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -429,6 +431,9 @@ export class WebSocketHandle {
       DISQUALIFIED: () => {
         window.location.reload();
       },
+      PASS: () => {
+        eventBus.emit("Action:PASS", undefined);
+      }
     };
 
     const handler = handlers[message.type];
