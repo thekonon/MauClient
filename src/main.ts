@@ -92,7 +92,7 @@ async function dummy() {
   new Game(app);
   new EndScreen(app);
 
-  dummy()
+  // dummy()
 
   // TODO:
   // add disconnect from lobby
