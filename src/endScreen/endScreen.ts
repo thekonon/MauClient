@@ -7,7 +7,7 @@ export class EndScreen extends Container {
   sprite!: Sprite;
   texture!: Texture;
 
-  isReady:boolean;
+  isReady: boolean;
   players: Player[];
   totalScore: Record<string, number>;
 
@@ -62,6 +62,7 @@ export class EndScreen extends Container {
   private addEventListeners(): void {
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
+      this.reset()
       this.show();
     });
     eventBus.on("Action:START_GAME", () => {
@@ -91,18 +92,12 @@ export class EndScreen extends Container {
   }
 
   private setButtonEvents(): void {
-    const playAgainButton = document.getElementById(
-      "playAgainButton",
-    ) as HTMLButtonElement;
+    const playAgainButton = this.getReadyPlayerButton()
     const returnToLobbyButton = document.getElementById(
       "returnToLobbyButton",
     ) as HTMLButtonElement;
     playAgainButton.onclick = () => {
-      if (this.isReady) this.isReady = false
-      else this.isReady = true
-      eventBus.emit("Command:PLAYER_READY", {
-        playerReady: this.isReady,
-      });
+      this.readyButtonOnClick()
     };
 
     returnToLobbyButton.onclick = () => {
@@ -145,10 +140,55 @@ export class EndScreen extends Container {
 
   private setPlayerReady(playerName: string, playerReady: boolean): void {
     this.players.forEach(player => {
-      if(player.name === playerName){
+      if (player.name === playerName) {
         player.isReady = playerReady
       }
     });
     this.updateLeaderBoard()
+  }
+
+  private readyButtonOnClick() {
+    if (this.isReady) {
+      this.isReady = false;
+    }
+    else {
+      this.isReady = true
+    }
+
+    this.updateReadyPlayerButtonStyle()
+
+    eventBus.emit("Command:PLAYER_READY", {
+      playerReady: this.isReady,
+    });
+  }
+
+  private updateReadyPlayerButtonStyle() {
+    const playAgainButton = this.getReadyPlayerButton()
+
+    if (this.isReady) {
+      if (!playAgainButton.classList.contains("ready")) {
+        playAgainButton.classList.add("ready");
+      }
+    }
+    else {
+      if (playAgainButton.classList.contains("ready")) {
+        playAgainButton.classList.remove("ready");
+      }
+    }
+  }
+
+  private getReadyPlayerButton(): HTMLButtonElement {
+    const playAgainButton = document.getElementById(
+      "playAgainButton",
+    ) as HTMLButtonElement;
+    if (!playAgainButton) {
+      throw Error("PlayAgain button not found")
+    }
+    return playAgainButton
+  }
+
+  private reset(){
+    this.isReady = false
+    this.updateReadyPlayerButtonStyle()
   }
 }

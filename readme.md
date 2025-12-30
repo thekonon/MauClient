@@ -2,14 +2,13 @@
 
 Project related to the Cerios's backend for popular Mau Mau game
 
-## Backend and websocket server
+## Backend
 
-https://github.com/pepab0t/maugame.engine \
-https://github.com/pepab0t/maugame.websocket
+https://github.com/pepab0t/maugame
 
 # How to play
 
-In order to play this sh.. very good game you have to have both frontend - that means this repo and Cerios's backend. Good news, the process should be managable by monkey.
+In order to play this sh.. very good game you have to have both frontend - that means this repo and Pepab0t's backend. Good news, the process should be managable by monkey.
 
 ### Prerequisities
 

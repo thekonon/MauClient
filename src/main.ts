@@ -68,9 +68,11 @@ async function dummy() {
     "playerName": "konon1",
     "cardCount": 4
   })
+  await new Promise((res) => setTimeout(res, 100));
+  eventBus.emit("Helper:SET_SCORE", { playerRank: ["konon1", "konon2"], score: {"konon1": 1, "konon2":2} })
+  eventBus.emit("Action:END_GAME", undefined)
 
 };
-
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
@@ -90,7 +92,7 @@ async function dummy() {
   new Game(app);
   new EndScreen(app);
 
-  // dummy()
+  dummy()
 
   // TODO:
   // add disconnect from lobby
@@ -99,7 +101,11 @@ async function dummy() {
   // card stacking
   // endscreen ready state
   // player remove after end
-  
+  // problikonout pass p5i pass
+  // use onlz score for display score
+  // player rank onlz for player rank
+  // fix unready second games
+
   // Done:
   // fix card count after reseting
   // show player rank in the middle of game
