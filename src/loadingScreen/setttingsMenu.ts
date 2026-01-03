@@ -1,3 +1,5 @@
+import { eventBus } from "../EventBus";
+
 export class SettingsMenu {
     private modal?: HTMLDivElement;
 
@@ -96,10 +98,10 @@ export class SettingsMenu {
     }
 
     private kickPlayer(playerName: string) {
-        console.log("Kick player:", playerName);
+        eventBus.emit("Command:KICK", {playerName: playerName})
     }
 
     private addNpc() {
-        console.log("Add NPC");
+        eventBus.emit("Command:REGISTER_NPC", undefined);
     }
 }
