@@ -37,6 +37,8 @@ export interface AppEvents {
   "Command:PLAY_CARD": { type: string; value: string; nextColor: string };
   "Command:DRAW": void;
   "Command:PASS": void;
+  "Command:REGISTER_NPC": void;
+  "Command:KICK": {playerName: string};
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
   "Helper:SET_IDS": { lobbyID: string; playerID: string };

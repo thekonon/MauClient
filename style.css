@@ -793,3 +793,56 @@ input.max-reached {
     0 0 80px #f06a7e;
   transform: scale(1.05);
 }
+
+/* Generic settings button */
+.settings-btn {
+  font-size: 1rem;
+  font-family: var(--main-font-family);
+  padding: 0.5em 1.2em;
+  border-radius: 1em;
+  box-sizing: border-box;
+
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  border: 0.2em solid #b0283c;
+  background: #111;
+  color: #f06a7e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.settings-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(240, 106, 126, 0.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease,
+    opacity 0.6s ease;
+  opacity: 0;
+}
+
+.settings-btn:hover::after {
+  width: 300%;
+  height: 300%;
+  opacity: 1;
+}
+
+.settings-btn:hover {
+  color: white;
+  background: #b0283c;
+  box-shadow:
+    0 0 10px #f06a7e,
+    0 0 20px #f06a7e,
+    0 0 40px #f06a7e,
+    0 0 80px #f06a7e;
+  transform: scale(1.05);
+}

@@ -21,24 +21,24 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER"
-    | "READY" // moved from server message
-    | "UNREADY" // moved from server message
-    | "DESTROY"
-    | "DISQUALIFIED"
-    | "PASS";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER"
+  | "READY" // moved from server message
+  | "UNREADY" // moved from server message
+  | "DESTROY"
+  | "DISQUALIFIED"
+  | "PASS";
 
 
   players?: string[];
@@ -91,9 +91,9 @@ export class WebSocketHandle {
   public port: string;
 
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
   game_started: boolean;
@@ -271,6 +271,14 @@ export class WebSocketHandle {
     eventBus.on("Command:PASS", () => {
       this.playPassCommand();
     });
+
+    eventBus.on("Command:REGISTER_NPC", () => {
+      this.addNPCcommand()
+    })
+
+    eventBus.on("Command:KICK", (payload) => {
+      this.kickCommand(payload.playerName)
+    })
   }
 
   // Call this method when there is a draw card request
@@ -315,6 +323,27 @@ export class WebSocketHandle {
     this.send(pass_command);
   }
 
+  private addNPCcommand() {
+    const addNPCCommand = JSON.stringify({
+      requestType: "CONTROL",
+      control: {
+        controlType: "REGISTER_NPC",
+      },
+    });
+    this.send(addNPCCommand);
+  }
+
+  private kickCommand(userName: string) {
+    const kickCommand = JSON.stringify({
+      requestType: "CONTROL",
+      control: {
+        controlType: "KICK",
+        username: userName
+      },
+    });
+    this.send(kickCommand);
+  }
+
   // Event hooks (can be overridden or assigned externally)
   public async onMessage(data: string): Promise<void> {
     try {
@@ -339,8 +368,8 @@ export class WebSocketHandle {
 
   private handleAction(message: GameAction) {
     const handlers: Record<string, (msg: GameAction) => void> = {
-      PLAYERS: (msg) => this.players_action(msg),
-      REGISTER_PLAYER: (msg) => this.register_player_action(msg),
+      PLAYERS: (msg) => this.playersAction(msg),
+      REGISTER_PLAYER: (msg) => this.registerPlayerAction(msg),
       START_GAME: (_) => {
         this.game_started = true;
         eventBus.emit("Action:START_GAME", undefined);
@@ -348,7 +377,7 @@ export class WebSocketHandle {
       START_PILE: (msg) => {
         if (!this.game_started)
           return console.error("Cannot start pile when game is not started");
-        this.start_pile_action(msg);
+        this.startPileAction(msg);
       },
       DRAW: (msg) => {
         if (!this.game_started)
@@ -377,7 +406,7 @@ export class WebSocketHandle {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
         console.log("One of the playes ended");
-        eventBus.emit("Action:PLAYER_RANK", {playersOrder: msg.players})
+        eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.players })
       },
       WIN: () => {
         console.log("You won");
@@ -477,7 +506,7 @@ export class WebSocketHandle {
     });
   }
 
-  public register_player_action(message: GameAction) {
+  public registerPlayerAction(message: GameAction) {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
     if (message.playerDto.username === this.userName) {
@@ -493,14 +522,14 @@ export class WebSocketHandle {
     }
   }
 
-  public players_action(message: GameAction) {
+  public playersAction(message: GameAction) {
     if (!message.players)
       return console.error("Players field was not specified");
     const players = message.players;
     eventBus.emit("Action:PLAYERS", { playerNames: players });
   }
 
-  public async start_pile_action(message: GameAction) {
+  public async startPileAction(message: GameAction) {
     // TODO: move this to pile
     if (!message.card) return console.error("Card was not specified");
     const card_info = message.card;

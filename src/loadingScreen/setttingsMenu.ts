@@ -1,7 +1,7 @@
 export class SettingsMenu {
     private modal?: HTMLDivElement;
 
-    constructor() { }
+    constructor() {}
 
     public open() {
         if (this.modal) return;
@@ -12,59 +12,72 @@ export class SettingsMenu {
         const content = document.createElement("div");
         content.className = "settings-modal-content";
 
-        // Title
         const title = document.createElement("h2");
         title.innerText = "Settings";
         content.appendChild(title);
 
-        // Dummy input fields
-        const input1 = document.createElement("input");
-        input1.placeholder = "Enter value 1";
-        content.appendChild(input1);
+        // --- Player Kick Dropdown ---
+        const kickLabel = document.createElement("label");
+        kickLabel.innerText = "Select player to kick:";
+        content.appendChild(kickLabel);
 
-        const input2 = document.createElement("input");
-        input2.placeholder = "Enter value 2";
-        content.appendChild(input2);
+        const playerSelect = document.createElement("select");
+        playerSelect.className = "kick-player-select";
 
-        // Dummy checkbox
-        const checkboxLabel = document.createElement("label");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkboxLabel.appendChild(checkbox);
-        checkboxLabel.appendChild(document.createTextNode("Enable feature"));
-        content.appendChild(checkboxLabel);
+        const players = ["Player1", "Player2", "Player3"];
+        players.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p;
+            opt.text = p;
+            playerSelect.appendChild(opt);
+        });
 
-        // Texture pack selection dropdown
+        content.appendChild(playerSelect);
+
+        // Kick button
+        const kickBtn = document.createElement("button");
+        kickBtn.innerText = "Kick Player";
+        kickBtn.className = "settings-btn";
+        kickBtn.addEventListener("click", () => {
+            this.kickPlayer(playerSelect.value);
+        });
+        content.appendChild(kickBtn);
+
+        // Add NPC button
+        const addNpcBtn = document.createElement("button");
+        addNpcBtn.innerText = "Add NPC";
+        addNpcBtn.className = "settings-btn";
+        addNpcBtn.addEventListener("click", () => this.addNpc());
+        content.appendChild(addNpcBtn);
+
+        // Texture pack dropdown
         const texturePackDropDown = document.createElement("select");
-
-        // Add options
         const options = ["custom", "default", "other", "pythonGen"];
+
         options.forEach(opt => {
             const option = document.createElement("option");
             option.value = opt;
-            option.text = opt.charAt(0).toUpperCase() + opt.slice(1); // optional: capitalize first letter
+            option.text = opt.charAt(0).toUpperCase() + opt.slice(1);
             texturePackDropDown.appendChild(option);
         });
 
-        // Append to modal content
         content.appendChild(texturePackDropDown);
-        // Buttons
-        const buttons = document.createElement("div");
-        buttons.className = "settings-modal-buttons";
 
+        // --- Save and Cancel (no wrapper div) ---
         const saveBtn = document.createElement("button");
         saveBtn.innerText = "Save";
-        saveBtn.addEventListener("click", () => {
+        saveBtn.className = "settings-btn";
+        saveBtn.addEventListener("click", () =>
             this.saveButtonClicked(texturePackDropDown.value)
-        });
-        buttons.appendChild(saveBtn);
+        );
+        content.appendChild(saveBtn);
 
         const cancelBtn = document.createElement("button");
         cancelBtn.innerText = "Cancel";
-        cancelBtn.addEventListener("click", () => { this.closeButtonClicked() });
-        buttons.appendChild(cancelBtn);
+        cancelBtn.className = "settings-btn";
+        cancelBtn.addEventListener("click", () => this.close());
+        content.appendChild(cancelBtn);
 
-        content.appendChild(buttons);
         this.modal.appendChild(content);
         document.body.appendChild(this.modal);
     }
@@ -77,12 +90,16 @@ export class SettingsMenu {
     }
 
     private saveButtonClicked(selectedTexturePack: string) {
-        alert(`Selected texture pack: ${selectedTexturePack}`)
+        alert(`Selected texture pack: ${selectedTexturePack}`);
         localStorage.setItem("texturePack", selectedTexturePack);
         this.close();
     }
 
-    private closeButtonClicked() {
-        this.close();
+    private kickPlayer(playerName: string) {
+        console.log("Kick player:", playerName);
+    }
+
+    private addNpc() {
+        console.log("Add NPC");
     }
 }
