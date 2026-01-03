@@ -3,10 +3,15 @@ import { eventBus } from "../EventBus";
 export class SettingsMenu {
     private modal?: HTMLDivElement;
 
-    constructor() {}
+    constructor() { 
+        this.addEvents()
+    }
 
     public open() {
         if (this.modal) return;
+
+        // display currently connected players
+        eventBus.emit("Helper:REQUEST_CONNECTED_PLAYERS", undefined)
 
         this.modal = document.createElement("div");
         this.modal.className = "settings-modal";
@@ -98,10 +103,36 @@ export class SettingsMenu {
     }
 
     private kickPlayer(playerName: string) {
-        eventBus.emit("Command:KICK", {playerName: playerName})
+        eventBus.emit("Command:KICK", { playerName: playerName })
     }
 
     private addNpc() {
         eventBus.emit("Command:REGISTER_NPC", undefined);
+    }
+
+    private addEvents() {
+        eventBus.on("Helper:GET_CONNECTED_PLAYERS", (payload) => {
+            this.updateConnectedPlayers(payload.players)
+        })
+    }
+
+    private updateConnectedPlayers(players: string[]) {
+        console.log('Updating1')
+        const select = document.querySelector<HTMLSelectElement>(".kick-player-select");
+        console.log('Updating2')
+        if (!select) return;
+
+        // Clear old options
+        select.innerHTML = "";
+
+        console.log('Updating3')
+
+        // Add new options
+        players.forEach(name => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.text = name;
+            select.appendChild(opt);
+        });
     }
 }

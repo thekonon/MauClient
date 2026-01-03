@@ -126,6 +126,17 @@ export class LoadingScreen {
       this.mainPlayer.playerID = payload.playerID;
       this.updateConnectionInfo();
     });
+    eventBus.on("Helper:REQUEST_CONNECTED_PLAYERS", () => {
+      console.log("righ")
+      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
+      console.log(playerNames)
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
+      console.log(playerNames)
+    })
+    eventBus.on("Helper:REGISTER_PLAYERS", () => {
+      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
+    })
   }
 
   public getPlayersList(): string[] {

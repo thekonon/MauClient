@@ -42,5 +42,7 @@ export interface AppEvents {
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
   "Helper:SET_IDS": { lobbyID: string; playerID: string };
-  "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;}
+  "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;};
+  "Helper:REQUEST_CONNECTED_PLAYERS": void;
+  "Helper:GET_CONNECTED_PLAYERS": {players: string[]};
 }
