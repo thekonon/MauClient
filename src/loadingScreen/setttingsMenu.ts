@@ -2,16 +2,16 @@ import { eventBus } from "../EventBus";
 
 export class SettingsMenu {
     private modal?: HTMLDivElement;
+    private connectedPlayers: Array<{ id: string; name: string }> = [];
 
-    constructor() { 
-        this.addEvents()
+    constructor() {
+        this.addEvents();
     }
 
     public open() {
         if (this.modal) return;
 
-        // display currently connected players
-        eventBus.emit("Helper:REQUEST_CONNECTED_PLAYERS", undefined)
+        // Request currently connected players
 
         this.modal = document.createElement("div");
         this.modal.className = "settings-modal";
@@ -19,6 +19,7 @@ export class SettingsMenu {
         const content = document.createElement("div");
         content.className = "settings-modal-content";
 
+        // Title
         const title = document.createElement("h2");
         title.innerText = "Settings";
         content.appendChild(title);
@@ -29,16 +30,7 @@ export class SettingsMenu {
         content.appendChild(kickLabel);
 
         const playerSelect = document.createElement("select");
-        playerSelect.className = "kick-player-select";
-
-        const players = ["Player1", "Player2", "Player3"];
-        players.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p;
-            opt.text = p;
-            playerSelect.appendChild(opt);
-        });
-
+        playerSelect.id = "kickPlayerSelection";
         content.appendChild(playerSelect);
 
         // Kick button
@@ -46,7 +38,8 @@ export class SettingsMenu {
         kickBtn.innerText = "Kick Player";
         kickBtn.className = "settings-btn";
         kickBtn.addEventListener("click", () => {
-            this.kickPlayer(playerSelect.value);
+            const playerName = playerSelect.value;
+            if (playerName) this.kickPlayer(playerName);
         });
         content.appendChild(kickBtn);
 
@@ -58,27 +51,26 @@ export class SettingsMenu {
         content.appendChild(addNpcBtn);
 
         // Texture pack dropdown
-        const texturePackDropDown = document.createElement("select");
+        const texturePackDropDown = document.createElement("select") as HTMLSelectElement;
         const options = ["custom", "default", "other", "pythonGen"];
-
         options.forEach(opt => {
             const option = document.createElement("option");
             option.value = opt;
             option.text = opt.charAt(0).toUpperCase() + opt.slice(1);
             texturePackDropDown.appendChild(option);
         });
-
         content.appendChild(texturePackDropDown);
 
-        // --- Save and Cancel (no wrapper div) ---
+        // Save button
         const saveBtn = document.createElement("button");
         saveBtn.innerText = "Save";
         saveBtn.className = "settings-btn";
-        saveBtn.addEventListener("click", () =>
-            this.saveButtonClicked(texturePackDropDown.value)
-        );
+        saveBtn.addEventListener("click", () => {
+            this.saveButtonClicked(texturePackDropDown.value);
+        });
         content.appendChild(saveBtn);
 
+        // Cancel button
         const cancelBtn = document.createElement("button");
         cancelBtn.innerText = "Cancel";
         cancelBtn.className = "settings-btn";
@@ -87,6 +79,9 @@ export class SettingsMenu {
 
         this.modal.appendChild(content);
         document.body.appendChild(this.modal);
+
+        console.log("point1")
+        eventBus.emit("Helper:REQUEST_CONNECTED_PLAYERS", undefined);
     }
 
     public close() {
@@ -103,7 +98,7 @@ export class SettingsMenu {
     }
 
     private kickPlayer(playerName: string) {
-        eventBus.emit("Command:KICK", { playerName: playerName })
+        eventBus.emit("Command:KICK", { playerName: playerName });
     }
 
     private addNpc() {
@@ -111,28 +106,26 @@ export class SettingsMenu {
     }
 
     private addEvents() {
-        eventBus.on("Helper:GET_CONNECTED_PLAYERS", (payload) => {
-            this.updateConnectedPlayers(payload.players)
-        })
+        eventBus.on("Helper:GET_CONNECTED_PLAYERS", async (payload) => {
+            console.log("point3")
+            this.updateConnectedPlayers(payload.players);
+        });
     }
 
-    private updateConnectedPlayers(players: string[]) {
-        console.log('Updating1')
-        const select = document.querySelector<HTMLSelectElement>(".kick-player-select");
-        console.log('Updating2')
+    private async updateConnectedPlayers(players: string[]) {
+        console.log("point4")
+        const select = document.getElementById(
+            "kickPlayerSelection",
+        ) as HTMLSelectElement;
         if (!select) return;
-
-        // Clear old options
+        console.log("point5")
         select.innerHTML = "";
 
-        console.log('Updating3')
-
-        // Add new options
-        players.forEach(name => {
+        players.forEach(player => {
             const opt = document.createElement("option");
-            opt.value = name;
-            opt.text = name;
             select.appendChild(opt);
+            console.log("adding player")
+            opt.text = player;
         });
     }
 }
