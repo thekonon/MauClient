@@ -725,7 +725,7 @@ input.max-reached {
 }
 
 .settings-modal-content h2 {
-  margin: 0 0 0 0;
+  margin: 0;
 }
 
 .settings-modal-content input,
@@ -734,73 +734,14 @@ input.max-reached {
   font-family: var(--main-font-family);
 }
 
-.settings-modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 20px;
-}
-
-.settings-modal-buttons button {
-  /* Your existing settings remain untouched */
-  font-size: 1rem;
-  font-family: var(--main-font-family);
-  padding: 0.5em;
-  height: 100%;
-  border-radius: 1em;
-  box-sizing: border-box;
-
-  /* Effects from the original button */
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s ease;
-  border: 0.2em solid #b0283c;
-  background: #111;
-  color: #f06a7e;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.settings-modal-buttons button::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(240, 106, 126, 0.4);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s ease,
-    height 0.6s ease,
-    opacity 0.6s ease;
-  opacity: 0;
-}
-
-.settings-modal-buttons button:hover::after {
-  width: 300%;
-  height: 300%;
-  opacity: 1;
-}
-
-.settings-modal-buttons button:hover {
-  color: white;
-  background: #b0283c;
-  box-shadow:
-    0 0 10px #f06a7e,
-    0 0 20px #f06a7e,
-    0 0 40px #f06a7e,
-    0 0 80px #f06a7e;
-  transform: scale(1.05);
-}
-
-/* Generic settings button */
+/* Generic settings button (used everywhere) */
 .settings-btn {
   font-size: 1rem;
   font-family: var(--main-font-family);
   padding: 0.5em 1.2em;
   border-radius: 1em;
   box-sizing: border-box;
+  cursor: pointer;
 
   position: relative;
   overflow: hidden;
@@ -810,7 +751,6 @@ input.max-reached {
   color: #f06a7e;
   text-transform: uppercase;
   letter-spacing: 2px;
-  cursor: pointer;
 }
 
 .settings-btn::after {
