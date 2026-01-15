@@ -12,7 +12,7 @@ interface Move {
 }
 
 export interface ServerMessage {
-  messageType: "ACTION" | "ERROR" | string; // expand as needed
+  messageType: "ACTION" | "ERROR" | "SERVER_MESSAGE" | string; // expand as needed
   action?: GameAction; // present when messageType === "ACTION"
   body?: ServerMessageBody;
   error?: string; // you can add more for ERROR, etc.
@@ -62,8 +62,15 @@ export interface GameAction {
 }
 
 export interface ServerMessageBody {
-  bodyType: "READY";
+  bodyType: "READY" | "CHAT_MESSAGE";
+  message?: ChatMessage;
+  username?: string;
+}
+
+interface ChatMessage {
   username: string;
+  message: string;
+  timestamp: string;
 }
 
 export class WebSocketHandle {
@@ -196,6 +203,17 @@ export class WebSocketHandle {
     this.send(readyCommand);
   }
 
+  private sendMessageCommand(message: string) {
+    const readyCommand = JSON.stringify({
+      "requestType": "CHAT",
+      "chat": {
+        "chatType": "MESSAGE",
+        "message": message
+      }
+    });
+    this.send(readyCommand);
+  }
+
   private createSocket(): WebSocket {
     console.log(this.url);
     const socket = new WebSocket(this.url);
@@ -279,6 +297,10 @@ export class WebSocketHandle {
     eventBus.on("Command:KICK", (payload) => {
       this.kickCommand(payload.playerName)
     })
+
+    eventBus.on("Command:SEND_MESSAGE", (payload => {
+      this.sendMessageCommand(payload.message)
+    }))
   }
 
   // Call this method when there is a draw card request
@@ -477,10 +499,22 @@ export class WebSocketHandle {
   private handleServerMessage(message: ServerMessageBody) {
     switch (message.bodyType) {
       case "READY":
+        if (!message.username) {
+          console.error("Username is missing");
+          return
+        }
         eventBus.emit("ServerMessage:PLAYER_READY", {
           ready: true,
           playerName: message.username,
         });
+        break
+      case "CHAT_MESSAGE":
+        if(!message.message?.message){
+          console.error("Message is missing!");
+          return
+        }
+        eventBus.emit("Helper:GET_MESSAGE", {message: message.message?.message})
+        break
     }
   }
 

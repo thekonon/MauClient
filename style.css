@@ -786,3 +786,59 @@ input.max-reached {
     0 0 80px #f06a7e;
   transform: scale(1.05);
 }
+
+#msgBtn {
+  position: fixed;
+  left: 50%;
+  top: 1.3em;
+  transform: translate(-50%, -50%);
+
+  z-index: 9000;
+}
+
+.messages-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.messages-modal-content {
+  background: #ffffff;
+  color: rgb(0, 0, 0);
+  padding: 1.2em;
+  border-radius: 1em;
+  border: 0.1em solid black;
+  width: 50em;
+  max-width: 90%;
+}
+
+.messages-box {
+  margin: 1em 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.messages-btn {
+  width: 100%;
+  padding: 0.6em;
+}
+
+#messages-btn{
+  width: 10em;
+  color: red;
+}
+
+.messages-input-row {
+  display: flex;
+  gap: 1em;
+  margin-top: 0.5em;
+}
+
+.messages-input {
+  flex: 1;
+  padding: 0.4em;
+}

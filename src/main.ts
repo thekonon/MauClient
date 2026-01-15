@@ -6,6 +6,7 @@ import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
 import { eventBus } from "./EventBus.ts";
+import { MessagesMenu } from "./msgMenu.ts";
 
 async function dummy() {
   console.log("works");
@@ -91,6 +92,7 @@ async function dummy() {
   new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
+  new MessagesMenu()
 
   // dummy()
 
@@ -103,6 +105,9 @@ async function dummy() {
   // player rank onlz for player rank
   // use onlz score for display score
   // display next color until new card is played
+  // sounds
+  // remove on endScreen
+
   
   // Done:
   // endscreen ready state

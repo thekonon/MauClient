@@ -45,4 +45,6 @@ export interface AppEvents {
   "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;};
   "Helper:REQUEST_CONNECTED_PLAYERS": void;
   "Helper:GET_CONNECTED_PLAYERS": {players: string[]};
+  "Helper:GET_MESSAGE": {message: string};
+  "Command:SEND_MESSAGE": {message: string};
 }
