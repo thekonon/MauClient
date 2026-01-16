@@ -24,6 +24,10 @@ export class MessagesMenu {
         this.modal = document.createElement("div");
         this.modal.className = "messages-modal";
 
+        this.modal.addEventListener("click", ()=>{
+            this.close()
+        })
+
         const content = document.createElement("div");
         content.className = "messages-modal-content";
 
