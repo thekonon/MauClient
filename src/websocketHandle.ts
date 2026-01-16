@@ -1,6 +1,7 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./EventBus.ts";
 import { GameSettings } from "./gameSettings.ts";
+import { MainPlayer, Player } from "./loadingScreen/player.ts";
 
 interface Move {
   moveType: "PLAY";
@@ -103,12 +104,10 @@ export class WebSocketHandle {
   public onError(_: Event): void { }
 
   // Game state
-  game_started: boolean;
+  gameStarted: boolean;
 
   // User data
-  userName: string;
-  userID: string;
-
+  user!: MainPlayer;
   // Connectio data
   private socket!: WebSocket;
   private url: string;
@@ -121,10 +120,9 @@ export class WebSocketHandle {
     this.ip = "";
     this.port = "";
 
-    this.game_started = false;
+    this.gameStarted = false;
     this.url = "";
-    this.userName = "";
-    this.userID = "";
+    this.user = new MainPlayer("")
     this.addEventListerners();
   }
 
@@ -143,11 +141,11 @@ export class WebSocketHandle {
     if (userName.length > 21) {
       throw new Error("Username have to be shorter than 20 characters");
     }
-    this.userName = userName;
+    this.user.setPlayerName(userName);
   }
 
   public createConnection() {
-    if (this.userName == "") {
+    if (this.user.name == "") {
       throw new Error("UserName must be set first");
     }
     if (this.ip == "") {
@@ -157,7 +155,7 @@ export class WebSocketHandle {
       throw new Error("Port must be set first");
     }
 
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
+    this.url = `ws://${this.ip}:${this.port}/game?user=${this.user.name}`;
 
     if (this.lobbyName) {
       this.url += `&lobby=${this.lobbyName}`;
@@ -173,7 +171,7 @@ export class WebSocketHandle {
   }
 
   public reconnect() {
-    if (this.userName == "") {
+    if (this.user.name == "") {
       alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
     }
@@ -189,7 +187,7 @@ export class WebSocketHandle {
     if (UUID === null) {
       alert("No user UUID is saved");
     }
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}&playerId=${UUID}`;
+    this.url = `ws://${this.ip}:${this.port}/game?user=${this.user.name}&playerId=${UUID}`;
     this.socket = this.createSocket();
   }
 
@@ -242,6 +240,11 @@ export class WebSocketHandle {
   }
 
   public send(data: string): void {
+    if(!this.socket) {
+      alert("Connect to lobby first");
+      console.warn("Can not send message without websocket connection")
+      return
+    };
     if (this.socket.readyState === WebSocket.OPEN) {
       console.log("Sending data", data);
       this.socket.send(data);
@@ -393,21 +396,21 @@ export class WebSocketHandle {
       PLAYERS: (msg) => this.playersAction(msg),
       REGISTER_PLAYER: (msg) => this.registerPlayerAction(msg),
       START_GAME: (_) => {
-        this.game_started = true;
+        this.gameStarted = true;
         eventBus.emit("Action:START_GAME", undefined);
       },
       START_PILE: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot start pile when game is not started");
         this.startPileAction(msg);
       },
       DRAW: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot draw when game is not started");
         this.drawCard(msg);
       },
       PLAY_CARD: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot play card when game is not started");
         this.playCard(msg);
       },
@@ -543,7 +546,7 @@ export class WebSocketHandle {
   public registerPlayerAction(message: GameAction) {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
-    if (message.playerDto.username === this.userName) {
+    if (message.playerDto.username === this.user.name) {
       this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
