@@ -24,8 +24,10 @@ export class MessagesMenu {
         this.modal = document.createElement("div");
         this.modal.className = "messages-modal";
 
-        this.modal.addEventListener("click", ()=>{
-            this.close()
+        this.modal.addEventListener("click", (e) => {
+            if (e.target === this.modal) {
+                this.close();
+            }
         })
 
         const content = document.createElement("div");
@@ -106,13 +108,13 @@ export class MessagesMenu {
 
     private showUnreadMsg() {
         const messageBoxBtn = this.getMsgButton()
-        if(!messageBoxBtn) return;
+        if (!messageBoxBtn) return;
         messageBoxBtn.style.color = "red"
     }
 
     private resetMsgBtn() {
         const messageBoxBtn = this.getMsgButton()
-        if(!messageBoxBtn) return;
+        if (!messageBoxBtn) return;
         messageBoxBtn.style.color = "black"
     }
 
