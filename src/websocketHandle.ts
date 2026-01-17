@@ -189,7 +189,7 @@ export class WebSocketHandle {
     if (UUID === null) {
       alert("No user UUID is saved");
     }
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}&player=${UUID}`;
+    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}&reconnect=true`;
     this.socket = this.createSocket();
   }
 
