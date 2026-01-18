@@ -284,6 +284,8 @@ export class LoadingScreen {
     const port = PORTInput.value.trim();
     const playerName = playerNameInput.value.trim();
 
+    this.mainPlayer = new MainPlayer(playerName);
+
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
@@ -297,7 +299,7 @@ export class LoadingScreen {
       alert("Kindof strange port, don't you think?");
       return;
     }
-    this.reconnectCommand(playerName, ip, port);
+    this.reconnectCommand(this.mainPlayer.name, ip, port);
   }
 
   private createLobby() {
@@ -329,7 +331,7 @@ export class LoadingScreen {
     this.mainPlayer.setLobbyName(lobbyNane.value);
     console.log("Createing new lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
-      playerName: playerName,
+      playerName: this.mainPlayer.name,
       ip: ip,
       port: port,
       lobbyName: lobbyNane.value,
@@ -367,7 +369,7 @@ export class LoadingScreen {
     this.mainPlayer.setLobbyName(lobbyNane.value);
     console.log("Createing private lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
-      playerName: playerName,
+      playerName: this.mainPlayer.name,
       ip: ip,
       lobbyName: lobbyNane.value,
       port: port,
