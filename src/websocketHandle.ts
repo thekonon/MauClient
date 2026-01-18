@@ -145,6 +145,7 @@ export class WebSocketHandle {
   }
 
   public createConnection() {
+    // TODO: user is redundant for registered players
     if (this.user.name == "") {
       throw new Error("UserName must be set first");
     }
@@ -171,6 +172,7 @@ export class WebSocketHandle {
   }
 
   public reconnect() {
+    // TODO: remove player UUID, take changes from reconnect branch
     if (this.user.name == "") {
       alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
