@@ -97,6 +97,9 @@ async function dummy() {
   // dummy()
 
   // TODO:
+  // Reconnect
+  // Register
+  // Remove IP/port move it to config / vibe code it
   // add disconnect from lobby
   // freeze form when connected
   // cglobal card skin selection
