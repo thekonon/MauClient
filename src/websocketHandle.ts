@@ -592,14 +592,4 @@ export class WebSocketHandle {
   private saveUUID(uuid: string) {
     localStorage.setItem("UUID", uuid);
   }
-
-  private getUUID(): string | null {
-    const uuid = localStorage.getItem("UUID");
-    if (!uuid) {
-      return null;
-    } else {
-      console.log("UUID restored!", uuid);
-      return uuid;
-    }
-  }
 }
