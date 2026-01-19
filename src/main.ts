@@ -97,6 +97,11 @@ async function dummy() {
   // dummy()
 
   // TODO:
+  // page open = send /userInfo 
+  //    code: 200 - ackt like user is already logged in
+  //    code: 401 - do nothing
+  //    code: 40x - session expired - send another request /refresh - get 200 again /userInfo
+  // set input to display for player name which is registered
   // Reconnect
   // Register
   // Remove IP/port move it to config / vibe code it
