@@ -18,6 +18,11 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+
+      - name: Run ESLint
+        if: github.event_name == 'pull_request'
+        run: npm run lint
+
       - name: Install Playwright browsers
         run: npx playwright install
       - run: npm run test
