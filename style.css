@@ -691,12 +691,32 @@ input.max-reached {
   color: #000000;
   font-size: 2em;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.2s;;
   padding: 0.5em;
 }
 
 .footer-btn:hover {
   color: #ffffff; /* highlight on hover */
+  transform: scale(1.2); /* make icon bigger on hover */
+}
+
+/* Avatar button tweaks */
+.profile-btn {
+  overflow: hidden;
+}
+
+/* Avatar image */
+.profile-avatar {
+  width: 1.6em;
+  height: 1.6em;
+  object-fit: cover;
+  border-radius: 0.3em;     /* matches your 0.5em button rounding */
+  display: block;
+}
+
+/* Hover effect consistent with icons */
+.profile-btn:hover .profile-avatar {
+  filter: brightness(1.2);
 }
 
 /* Settings modal */
@@ -841,4 +861,41 @@ input.max-reached {
 .messages-input {
   flex: 1;
   padding: 0.4em;
+}
+
+/* Common styling for all input fields */
+.settings-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6em 0.8em;   /* added padding for comfortable typing */
+  margin-bottom: 0.5em;   /* spacing between fields */
+  border: 0.1em solid #000;
+  border-radius: 0.5em;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Focus effect for better UX */
+.settings-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0.2em #007bff33;
+}
+
+/* Password wrapper stays same */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.5em; /* spacing from next button */
+}
+
+/* Toggle password button */
+.toggle-password-btn {
+  position: absolute;
+  right: 0.5em;         /* place at end of input */
+  top: 50%;
+  transform: translateY(-50%) scale(1.5); /* keep previous scaling */
+  background: none;
+  border: none;
+  cursor: pointer;
 }

@@ -1,4 +1,5 @@
 import { eventBus } from "../EventBus";
+import { LoginMenu } from "./loginMenu";
 import { Player, MainPlayer } from "./player";
 import { SettingsMenu } from "./setttingsMenu";
 
@@ -7,11 +8,13 @@ export class LoadingScreen {
   connectedPlayers: Player[];
 
   settingsMenu: SettingsMenu;
+  loginMenu: LoginMenu
 
   constructor() {
     this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
-    this.settingsMenu = new SettingsMenu()
+    this.settingsMenu = new SettingsMenu();
+    this.loginMenu = new LoginMenu();
     this.addEvents();
     this.updateConnectionInfo();
   }
@@ -96,6 +99,10 @@ export class LoadingScreen {
     ) as HTMLButtonElement;
     settingsButton.addEventListener("click", () => {
       this.settingsMenu.open();
+    });
+
+    document.getElementById("profileBtn")?.addEventListener("click", () => {
+      this.loginMenu.open(); // your login/register modal
     });
 
     window.addEventListener("keydown", (e) => {
