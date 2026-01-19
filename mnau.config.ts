@@ -1,8 +1,13 @@
 // Global project settings for MnauMnauGame
 
-const MnauConfig = {
-    ip: "localhost",                  // Backend IP
-    port: "8080",             // Docker container port
+export type MnauConfigType = {
+  ip: string;                 // Backend IP
+  port: string;               // Docker container port
+};
+
+const MnauConfig: MnauConfigType = {
+  ip: "localhost",
+  port: "8080",
 };
 
 export default MnauConfig;
