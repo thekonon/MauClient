@@ -166,6 +166,7 @@ export class LoadingScreen {
       (player) => player.name !== playerName,
     );
     this.updateConnectedPlayers();
+    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: (this.connectedPlayers ?? []).map(p => p.name) })
   }
 
   private updatePlayerList(playerNames: string[]) {

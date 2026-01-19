@@ -111,7 +111,6 @@ export class SettingsMenu {
 
     private addEvents() {
         eventBus.on("Helper:GET_CONNECTED_PLAYERS", async (payload) => {
-            console.log("point3")
             this.updateConnectedPlayers(payload.players);
         });
     }
