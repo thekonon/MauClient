@@ -28,27 +28,6 @@ export class EndScreen extends Container {
     if (endScreen) {
       endScreen.style.display = "flex";
     }
-
-    const elementIds = [
-      "first-place",
-      "second-place",
-      "third-place",
-      "fourth-place",
-      "fifth-place",
-    ];
-
-    const playerNames: string[] = this.players.map(player => player.name)
-
-    const paddedWinners = [...playerNames, ...Array(5).fill("")].slice(0, 5);
-
-    paddedWinners.forEach((winner, index) => {
-      const elementId = elementIds[index];
-      const htmlElement = document.getElementById(elementId);
-
-      if (htmlElement) {
-        htmlElement.textContent = winner;
-      }
-    });
   }
 
   public async hide() {
@@ -87,7 +66,8 @@ export class EndScreen extends Container {
     });
 
     eventBus.on("Helper:SET_SCORE", (payload) => {
-      this.setScore(payload.playerRank, payload.score)
+      this.setWinners(payload.playerRank)
+      this.setScore(payload.score)
     })
   }
 
@@ -127,11 +107,11 @@ export class EndScreen extends Container {
     });
   }
 
-  private setScore(playerRank: string[], playerScore: Record<string, number>) {
+  private setScore(playerScore: Record<string, number>) {
     this.players = [];
-    for (let index = 0; index < playerRank.length; index++) {
-      const name = playerRank[index];
-      const score = playerScore[name];
+
+    for (const name in playerScore) {
+      const score = playerScore[name]
       this.players.push(new Player(name, score))
     }
 
@@ -187,8 +167,29 @@ export class EndScreen extends Container {
     return playAgainButton
   }
 
-  private reset(){
+  private reset() {
     this.isReady = false
     this.updateReadyPlayerButtonStyle()
+  }
+
+  private setWinners(winners: string[]) {
+    const elementIds = [
+      "first-place",
+      "second-place",
+      "third-place",
+      "fourth-place",
+      "fifth-place",
+    ];
+
+    const paddedWinners = [...winners, ...Array(5).fill("")].slice(0, 5);
+
+    paddedWinners.forEach((winner, index) => {
+      const elementId = elementIds[index];
+      const htmlElement = document.getElementById(elementId);
+
+      if (htmlElement) {
+        htmlElement.textContent = winner;
+      }
+    });
   }
 }
