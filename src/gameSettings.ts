@@ -21,21 +21,21 @@ export class GameSettings {
   static otherPlayerMarginsPercent = 1;
   // static otherPLayerGapPercent = 30;
 
-  static basicInit(){
-    const texturePack = localStorage.getItem("texturePack")
-    if(texturePack){
-      GameSettings.setTexturePack(texturePack)
+  static basicInit() {
+    const texturePack = localStorage.getItem("texturePack");
+    if (texturePack) {
+      GameSettings.setTexturePack(texturePack);
     }
 
     GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
   }
 
-  static setTexturePack(texturePack: string){
-    GameSettings.texturePack = texturePack
+  static setTexturePack(texturePack: string) {
+    GameSettings.texturePack = texturePack;
   }
 
-  static getTexturePack(): string{
-    return GameSettings.texturePack
+  static getTexturePack(): string {
+    return GameSettings.texturePack;
   }
 
   static setScreenDimensions(height: number, width: number) {

@@ -41,7 +41,7 @@ export class EndScreen extends Container {
   private addEventListeners(): void {
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 1000));
-      this.reset()
+      this.reset();
       this.show();
     });
     eventBus.on("Action:START_GAME", () => {
@@ -66,18 +66,18 @@ export class EndScreen extends Container {
     });
 
     eventBus.on("Helper:SET_SCORE", (payload) => {
-      this.setWinners(payload.playerRank)
-      this.setScore(payload.score)
-    })
+      this.setWinners(payload.playerRank);
+      this.setScore(payload.score);
+    });
   }
 
   private setButtonEvents(): void {
-    const playAgainButton = this.getReadyPlayerButton()
+    const playAgainButton = this.getReadyPlayerButton();
     const returnToLobbyButton = document.getElementById(
       "returnToLobbyButton",
     ) as HTMLButtonElement;
     playAgainButton.onclick = () => {
-      this.readyButtonOnClick()
+      this.readyButtonOnClick();
     };
 
     returnToLobbyButton.onclick = () => {
@@ -111,31 +111,30 @@ export class EndScreen extends Container {
     this.players = [];
 
     for (const name in playerScore) {
-      const score = playerScore[name]
-      this.players.push(new Player(name, score))
+      const score = playerScore[name];
+      this.players.push(new Player(name, score));
     }
 
-    this.updateLeaderBoard()
+    this.updateLeaderBoard();
   }
 
   private setPlayerReady(playerName: string, playerReady: boolean): void {
-    this.players.forEach(player => {
+    this.players.forEach((player) => {
       if (player.name === playerName) {
-        player.isReady = playerReady
+        player.isReady = playerReady;
       }
     });
-    this.updateLeaderBoard()
+    this.updateLeaderBoard();
   }
 
   private readyButtonOnClick() {
     if (this.isReady) {
       this.isReady = false;
-    }
-    else {
-      this.isReady = true
+    } else {
+      this.isReady = true;
     }
 
-    this.updateReadyPlayerButtonStyle()
+    this.updateReadyPlayerButtonStyle();
 
     eventBus.emit("Command:PLAYER_READY", {
       playerReady: this.isReady,
@@ -143,14 +142,13 @@ export class EndScreen extends Container {
   }
 
   private updateReadyPlayerButtonStyle() {
-    const playAgainButton = this.getReadyPlayerButton()
+    const playAgainButton = this.getReadyPlayerButton();
 
     if (this.isReady) {
       if (!playAgainButton.classList.contains("ready")) {
         playAgainButton.classList.add("ready");
       }
-    }
-    else {
+    } else {
       if (playAgainButton.classList.contains("ready")) {
         playAgainButton.classList.remove("ready");
       }
@@ -162,14 +160,14 @@ export class EndScreen extends Container {
       "playAgainButton",
     ) as HTMLButtonElement;
     if (!playAgainButton) {
-      throw Error("PlayAgain button not found")
+      throw Error("PlayAgain button not found");
     }
-    return playAgainButton
+    return playAgainButton;
   }
 
   private reset() {
-    this.isReady = false
-    this.updateReadyPlayerButtonStyle()
+    this.isReady = false;
+    this.updateReadyPlayerButtonStyle();
   }
 
   private setWinners(winners: string[]) {
