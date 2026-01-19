@@ -100,11 +100,8 @@ async function dummy() {
   //    code: 401 - do nothing
   //    code: 40x - session expired - send another request /refresh - get 200 again /userInfo
   // set input to display for player name which is registered
-  // Reconnect
   // Register
-  // Remove IP/port move it to config / vibe code it
   // add disconnect from lobby
-  // freeze form when connected
   // cglobal card skin selection
   // card stacking
   // problikonout pass p5i pass
@@ -113,9 +110,12 @@ async function dummy() {
   // display next color until new card is played
   // sounds
   // remove on endScreen
-
+  
   
   // Done:
+  // freeze form when connected
+  // Remove IP/port move it to config / vibe code it
+  // Reconnect
   // endscreen ready state
   // player remove after end
   // fix unready second games

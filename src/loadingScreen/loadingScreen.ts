@@ -130,13 +130,12 @@ export class LoadingScreen {
       this.updateConnectionInfo();
     });
     eventBus.on("Helper:REQUEST_CONNECTED_PLAYERS", () => {
-      console.log("point2")
       const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
-      console.log(playerNames)
       eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
     })
     eventBus.on("Helper:REGISTER_PLAYERS", () => {
       const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
     })
   }
 
@@ -337,7 +336,7 @@ export class LoadingScreen {
       container.innerHTML = `<em style="color: #555;">No connection to lobby</em>`;
       return;
     } else {
-      this.disableConnectButton();
+      this.freezeForm()
     }
 
     this.connectedPlayers.forEach((player) => {
@@ -359,30 +358,7 @@ export class LoadingScreen {
     });
   }
 
-  private disableConnectButton(): void {
-    const buttonsIDs = [
-      "connectButton",
-      "createLobbyButton",
-      "createPrivateLobbyButton",
-      "reconnectButton",
-    ];
-    buttonsIDs.forEach((id) => {
-      this.disableButton(id);
-    });
-  }
 
-  private disableButton(buttonID: string): void {
-    const button = document.getElementById(
-      buttonID,
-    ) as HTMLButtonElement | null;
-
-    if (button) {
-      button.disabled = true;
-      if (!button.classList.contains("disabled")) {
-        button.classList.add("disabled");
-      }
-    }
-  }
 
   private startGameHandler = () => {
     eventBus.emit("Helper:SET_MAIN_PLAYER", {
@@ -417,5 +393,58 @@ export class LoadingScreen {
       div.textContent = element;
       container.appendChild(div);
     });
+  }
+
+  private freezeForm() {
+
+    this.disableConnectButton()
+    this.getPlayerNameInput().disabled = true
+    this.getLobbyNameInput().disabled = true
+
+  }
+
+  private disableConnectButton(): void {
+    const buttonsIDs = [
+      "connectButton",
+      "createLobbyButton",
+      "createPrivateLobbyButton",
+      "reconnectButton",
+    ];
+    buttonsIDs.forEach((id) => {
+      this.disableButton(id);
+    });
+  }
+
+  private disableButton(buttonID: string): void {
+    const button = document.getElementById(
+      buttonID,
+    ) as HTMLButtonElement | null;
+
+    if (button) {
+      button.disabled = true;
+      if (!button.classList.contains("disabled")) {
+        button.classList.add("disabled");
+      }
+    }
+  }
+
+  private getPlayerNameInput(): HTMLInputElement {
+    const input = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement | null;
+    if (input === null){
+      throw Error("plz, fix id of player name")
+    }
+    return input
+  }
+
+    private getLobbyNameInput(): HTMLInputElement {
+    const input = document.getElementById(
+      "lobbyName",
+    ) as HTMLInputElement | null;
+    if (input === null){
+      throw Error("plz, fix id of lobby name")
+    }
+    return input
   }
 }
