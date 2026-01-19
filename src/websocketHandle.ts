@@ -96,9 +96,6 @@ export class WebSocketHandle {
     Array.from(this.cardNameMap.entries()).map(([key, value]) => [value, key]),
   );
 
-  public ip: string;
-  public port: string;
-
   // Websocket event
   public onOpen(): void { }
   public onClose(): void { }
@@ -118,24 +115,10 @@ export class WebSocketHandle {
   private privateLobby: boolean = false;
 
   constructor() {
-    this.ip = "";
-    this.port = "";
-
     this.gameStarted = false;
     this.url = "";
     this.user = new MainPlayer("")
     this.addEventListerners();
-  }
-
-  public setIPPort(ip: string, port: string) {
-    if (ip.length == 0) {
-      throw new Error("IP can not be empty");
-    }
-    if (port.length == 0) {
-      throw new Error("port can not be empty");
-    }
-    this.ip = ip;
-    this.port = port;
   }
 
   public setUser(userName: string) {
@@ -261,7 +244,6 @@ export class WebSocketHandle {
 
     eventBus.on("Command:RECONNECT", (payload) => {
       this.setUser(payload.playerName);
-      this.setIPPort(payload.ip, payload.port);
       this.reconnect();
     });
 
