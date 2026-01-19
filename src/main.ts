@@ -13,9 +13,7 @@ async function dummy() {
 
   eventBus.emit("Command:REGISTER_PLAYER", {
     "playerName": "konon1",
-    "ip": "localhost",
     "lobbyName": "",
-    "port": "8080",
     "newLobby": false,
     "privateLobby": false
   })
