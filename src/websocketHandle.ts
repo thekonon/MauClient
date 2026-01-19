@@ -23,25 +23,24 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-  | "PLAYERS"
-  | "REGISTER_PLAYER"
-  | "START_GAME"
-  | "START_PILE"
-  | "DRAW"
-  | "PLAY_CARD"
-  | "PLAYER_SHIFT"
-  | "HIDDEN_DRAW"
-  | "PLAYER_RANK"
-  | "WIN"
-  | "LOSE"
-  | "END_GAME"
-  | "REMOVE_PLAYER"
-  | "READY" // moved from server message
-  | "UNREADY" // moved from server message
-  | "DESTROY"
-  | "DISQUALIFIED"
-  | "PASS";
-
+    | "PLAYERS"
+    | "REGISTER_PLAYER"
+    | "START_GAME"
+    | "START_PILE"
+    | "DRAW"
+    | "PLAY_CARD"
+    | "PLAYER_SHIFT"
+    | "HIDDEN_DRAW"
+    | "PLAYER_RANK"
+    | "WIN"
+    | "LOSE"
+    | "END_GAME"
+    | "REMOVE_PLAYER"
+    | "READY" // moved from server message
+    | "UNREADY" // moved from server message
+    | "DESTROY"
+    | "DISQUALIFIED"
+    | "PASS";
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -97,9 +96,9 @@ export class WebSocketHandle {
   );
 
   // Websocket event
-  public onOpen(): void { }
-  public onClose(): void { }
-  public onError(_: Event): void { }
+  public onOpen(): void {}
+  public onClose(): void {}
+  public onError(_: Event): void {}
 
   // Game state
   gameStarted: boolean;
@@ -117,7 +116,7 @@ export class WebSocketHandle {
   constructor() {
     this.gameStarted = false;
     this.url = "";
-    this.user = new MainPlayer("")
+    this.user = new MainPlayer("");
     this.addEventListerners();
   }
 
@@ -171,11 +170,11 @@ export class WebSocketHandle {
 
   private sendMessageCommand(message: string) {
     const readyCommand = JSON.stringify({
-      "requestType": "CHAT",
-      "chat": {
-        "chatType": "MESSAGE",
-        "message": message
-      }
+      requestType: "CHAT",
+      chat: {
+        chatType: "MESSAGE",
+        message: message,
+      },
     });
     this.send(readyCommand);
   }
@@ -208,11 +207,11 @@ export class WebSocketHandle {
   }
 
   public send(data: string): void {
-    if(!this.socket) {
+    if (!this.socket) {
       alert("Connect to lobby first");
-      console.warn("Can not send message without websocket connection")
-      return
-    };
+      console.warn("Can not send message without websocket connection");
+      return;
+    }
     if (this.socket.readyState === WebSocket.OPEN) {
       console.log("Sending data", data);
       this.socket.send(data);
@@ -260,16 +259,16 @@ export class WebSocketHandle {
     });
 
     eventBus.on("Command:REGISTER_NPC", () => {
-      this.addNPCcommand()
-    })
+      this.addNPCcommand();
+    });
 
     eventBus.on("Command:KICK", (payload) => {
-      this.kickCommand(payload.playerName)
-    })
+      this.kickCommand(payload.playerName);
+    });
 
-    eventBus.on("Command:SEND_MESSAGE", (payload => {
-      this.sendMessageCommand(payload.message)
-    }))
+    eventBus.on("Command:SEND_MESSAGE", (payload) => {
+      this.sendMessageCommand(payload.message);
+    });
   }
 
   // Call this method when there is a draw card request
@@ -329,7 +328,7 @@ export class WebSocketHandle {
       requestType: "CONTROL",
       control: {
         controlType: "KICK",
-        username: userName
+        username: userName,
       },
     });
     this.send(kickCommand);
@@ -397,7 +396,7 @@ export class WebSocketHandle {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
         console.log("One of the playes ended");
-        eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.players })
+        eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.players });
       },
       WIN: () => {
         console.log("You won");
@@ -411,10 +410,13 @@ export class WebSocketHandle {
         if (!msg.playerRank)
           return console.error("Players was not specified in RANK action");
         if (!msg.scores)
-          return console.error("Score was not provided in the end-game event")
+          return console.error("Score was not provided in the end-game event");
         console.log("Game ended");
         eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.playerRank });
-        eventBus.emit("Helper:SET_SCORE", { playerRank: msg.playerRank, score: msg.scores });
+        eventBus.emit("Helper:SET_SCORE", {
+          playerRank: msg.playerRank,
+          score: msg.scores,
+        });
         eventBus.emit("Action:END_GAME", undefined);
       },
       REMOVE_PLAYER: (msg) => {
@@ -454,7 +456,7 @@ export class WebSocketHandle {
       },
       PASS: () => {
         eventBus.emit("Action:PASS", undefined);
-      }
+      },
     };
 
     const handler = handlers[message.type];
@@ -470,20 +472,22 @@ export class WebSocketHandle {
       case "READY":
         if (!message.username) {
           console.error("Username is missing");
-          return
+          return;
         }
         eventBus.emit("ServerMessage:PLAYER_READY", {
           ready: true,
           playerName: message.username,
         });
-        break
+        break;
       case "CHAT_MESSAGE":
-        if(!message.message?.message){
+        if (!message.message?.message) {
           console.error("Message is missing!");
-          return
+          return;
         }
-        eventBus.emit("Helper:GET_MESSAGE", {message: message.message?.message})
-        break
+        eventBus.emit("Helper:GET_MESSAGE", {
+          message: message.message?.message,
+        });
+        break;
     }
   }
 

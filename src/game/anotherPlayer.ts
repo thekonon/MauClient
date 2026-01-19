@@ -29,7 +29,7 @@ export class AnotherPlayer extends Container {
       alert(`Don't disturb player ${this.playerName}`);
     });
     this.addChild(this.sprite);
-    this.textContainer = this.createText()
+    this.textContainer = this.createText();
     this.addChild(this.textContainer);
   }
 
@@ -80,7 +80,7 @@ export class AnotherPlayer extends Container {
   }
 
   public playerWon() {
-    this.removeChild(this.textContainer)
+    this.removeChild(this.textContainer);
   }
 
   private createText(): Container {

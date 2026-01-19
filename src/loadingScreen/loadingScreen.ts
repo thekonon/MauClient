@@ -8,7 +8,7 @@ export class LoadingScreen {
   connectedPlayers: Player[];
 
   settingsMenu: SettingsMenu;
-  loginMenu: LoginMenu
+  loginMenu: LoginMenu;
 
   constructor() {
     this.mainPlayer = new MainPlayer("");
@@ -130,13 +130,13 @@ export class LoadingScreen {
       this.updateConnectionInfo();
     });
     eventBus.on("Helper:REQUEST_CONNECTED_PLAYERS", () => {
-      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
-      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
-    })
+      const playerNames = (this.connectedPlayers ?? []).map((p) => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames });
+    });
     eventBus.on("Helper:REGISTER_PLAYERS", () => {
-      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
-      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
-    })
+      const playerNames = (this.connectedPlayers ?? []).map((p) => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames });
+    });
   }
 
   public getPlayersList(): string[] {
@@ -157,7 +157,9 @@ export class LoadingScreen {
     }
     this.connectedPlayers.push(new Player(player_name));
     this.updateConnectedPlayers();
-    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: (this.connectedPlayers ?? []).map(p => p.name) })
+    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", {
+      players: (this.connectedPlayers ?? []).map((p) => p.name),
+    });
   }
 
   private removePlayerFromList(playerName: string) {
@@ -165,7 +167,9 @@ export class LoadingScreen {
       (player) => player.name !== playerName,
     );
     this.updateConnectedPlayers();
-    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: (this.connectedPlayers ?? []).map(p => p.name) })
+    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", {
+      players: (this.connectedPlayers ?? []).map((p) => p.name),
+    });
   }
 
   private updatePlayerList(playerNames: string[]) {
@@ -336,7 +340,7 @@ export class LoadingScreen {
       container.innerHTML = `<em style="color: #555;">No connection to lobby</em>`;
       return;
     } else {
-      this.freezeForm()
+      this.freezeForm();
     }
 
     this.connectedPlayers.forEach((player) => {
@@ -358,8 +362,6 @@ export class LoadingScreen {
     });
   }
 
-
-
   private startGameHandler = () => {
     eventBus.emit("Helper:SET_MAIN_PLAYER", {
       playerName: this.getMainPlayer(),
@@ -373,7 +375,7 @@ export class LoadingScreen {
 
   private reconnectCommand(playerName: string) {
     eventBus.emit("Command:RECONNECT", {
-      playerName: playerName
+      playerName: playerName,
     });
   }
 
@@ -396,11 +398,9 @@ export class LoadingScreen {
   }
 
   private freezeForm() {
-
-    this.disableConnectButton()
-    this.getPlayerNameInput().disabled = true
-    this.getLobbyNameInput().disabled = true
-
+    this.disableConnectButton();
+    this.getPlayerNameInput().disabled = true;
+    this.getLobbyNameInput().disabled = true;
   }
 
   private disableConnectButton(): void {
@@ -432,19 +432,19 @@ export class LoadingScreen {
     const input = document.getElementById(
       "playerName",
     ) as HTMLInputElement | null;
-    if (input === null){
-      throw Error("plz, fix id of player name")
+    if (input === null) {
+      throw Error("plz, fix id of player name");
     }
-    return input
+    return input;
   }
 
-    private getLobbyNameInput(): HTMLInputElement {
+  private getLobbyNameInput(): HTMLInputElement {
     const input = document.getElementById(
       "lobbyName",
     ) as HTMLInputElement | null;
-    if (input === null){
-      throw Error("plz, fix id of lobby name")
+    if (input === null) {
+      throw Error("plz, fix id of lobby name");
     }
-    return input
+    return input;
   }
 }

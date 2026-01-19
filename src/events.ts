@@ -36,13 +36,13 @@ export interface AppEvents {
   "Command:DRAW": void;
   "Command:PASS": void;
   "Command:REGISTER_NPC": void;
-  "Command:KICK": {playerName: string};
+  "Command:KICK": { playerName: string };
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
   "Helper:SET_IDS": { lobbyID: string; playerID: string };
-  "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;};
+  "Helper:SET_SCORE": { playerRank: string[]; score: Record<string, number> };
   "Helper:REQUEST_CONNECTED_PLAYERS": void;
-  "Helper:GET_CONNECTED_PLAYERS": {players: string[]};
-  "Helper:GET_MESSAGE": {message: string};
-  "Command:SEND_MESSAGE": {message: string};
+  "Helper:GET_CONNECTED_PLAYERS": { players: string[] };
+  "Helper:GET_MESSAGE": { message: string };
+  "Command:SEND_MESSAGE": { message: string };
 }

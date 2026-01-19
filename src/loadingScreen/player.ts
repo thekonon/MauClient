@@ -9,8 +9,8 @@ export class Player {
     this.score = score;
   }
 
-  public setPlayerName(name: string){
-    this.name = name
+  public setPlayerName(name: string) {
+    this.name = name;
   }
 }
 

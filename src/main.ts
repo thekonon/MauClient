@@ -5,73 +5,8 @@ import { LoadingScreen } from "./loadingScreen/loadingScreen.ts";
 import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
-import { eventBus } from "./EventBus.ts";
 import { MessagesMenu } from "./msgMenu.ts";
 
-async function dummy() {
-  console.log("works");
-
-  eventBus.emit("Command:REGISTER_PLAYER", {
-    "playerName": "konon1",
-    "lobbyName": "",
-    "newLobby": false,
-    "privateLobby": false
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:ADD_PLAYER", {
-    "playerName": "konon1"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Helper:SET_IDS", {
-    "lobbyID": "2a6a5757-bd9c-4795-8bc7-2c9fe5dc416b",
-    "playerID": "01KDMVS89ESVAJ7MVXKTZ3P4EB"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:PLAYERS", {
-    "playerNames": [
-      "konon1"
-    ]
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:ADD_PLAYER", {
-    "playerName": "konon2"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("ServerMessage:PLAYER_READY", {
-    "ready": true,
-    "playerName": "konon2"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Command:PLAYER_READY", {
-    "playerReady": true
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("ServerMessage:PLAYER_READY", {
-    "ready": true,
-    "playerName": "konon1"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Helper:SET_MAIN_PLAYER", {
-    "playerName": "konon1"
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Helper:REGISTER_PLAYERS", {
-    "playerNames": [
-      "konon2"
-    ]
-  })
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:START_GAME", undefined)
-  // await new Promise((res) => setTimeout(res, 100));
-  // eventBus.emit("Action:HIDDEN_DRAW", {
-  //   "playerName": "konon1",
-  //   "cardCount": 4
-  // })
-  // await new Promise((res) => setTimeout(res, 100));
-  // eventBus.emit("Helper:SET_SCORE", { playerRank: ["konon1", "konon2"], score: {"konon1": 1, "konon2":2} })
-  // eventBus.emit("Action:END_GAME", undefined)
-
-};
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
@@ -85,17 +20,17 @@ async function dummy() {
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
-  GameSettings.basicInit()
+  GameSettings.basicInit();
 
   new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
-  new MessagesMenu()
+  new MessagesMenu();
 
   // dummy()
 
   // TODO:
-  // page open = send /userInfo 
+  // page open = send /userInfo
   //    code: 200 - ackt like user is already logged in
   //    code: 401 - do nothing
   //    code: 40x - session expired - send another request /refresh - get 200 again /userInfo
@@ -110,8 +45,7 @@ async function dummy() {
   // display next color until new card is played
   // sounds
   // remove on endScreen
-  
-  
+
   // Done:
   // freeze form when connected
   // Remove IP/port move it to config / vibe code it

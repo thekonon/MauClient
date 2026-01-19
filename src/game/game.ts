@@ -6,7 +6,6 @@ import { Pile } from "./pile";
 import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../EventBus";
-import { Player } from "src/loadingScreen/player";
 import { StatusDisplay } from "./statusDisplay";
 
 export class Game extends Container {
@@ -94,8 +93,12 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value, GameSettings.getTexturePack());
-      const player = this.otherPlayers.find(p => p.playerName === playerName);
+      played_card = await Card.create(
+        type,
+        value,
+        GameSettings.getTexturePack(),
+      );
+      const player = this.otherPlayers.find((p) => p.playerName === playerName);
       if (player && played_card) {
         player.addChild(played_card);
         player.addCardCount(-1);
@@ -106,13 +109,13 @@ export class Game extends Container {
       played_card.changeContainer(this.pile);
       this.pile.playCard(played_card);
     }
-    
+
     const suits = ["C", "S", "H", "D"] as const;
-    
-    function isSuit(value: string): value is typeof suits[number] {
-      return suits.includes(value as any);
+
+    function isSuit(value: string): value is (typeof suits)[number] {
+      return (suits as readonly string[]).includes(value);
     }
-    
+
     this.statusDisplay.displayNone();
     // If previous card was queen, display new color
     if (played_card?.value === "Q") {
@@ -128,7 +131,6 @@ export class Game extends Container {
     if (played_card?.value === "7") {
       this.statusDisplay.displaySeven();
     }
-
   }
 
   public async shiftPlayerAction(playerName: string, expireAtMs: number) {
@@ -171,7 +173,7 @@ export class Game extends Container {
   public async hiddenDrawAction(playerName: string, cardCount: number) {
     await this.readyPlayers;
 
-    this.statusDisplay.displayNone()
+    this.statusDisplay.displayNone();
 
     // Find the target player
     const player = this.otherPlayers.find((p) => p.playerName === playerName);
@@ -240,14 +242,18 @@ export class Game extends Container {
     });
     eventBus.on("Action:PLAYER_RANK", (payload) => {
       const latestWinner = payload.playersOrder.at(-1);
-      this.otherPlayers.forEach(player => {
+      this.otherPlayers.forEach((player) => {
         if (player.playerName === latestWinner) {
-          player.playerWon()
+          player.playerWon();
         }
       });
-    })
-    eventBus.on("Action:PASS", () => {this.statusDisplay.displayNone()})
-    eventBus.on("Command:DRAW", () => {this.statusDisplay.displayNone()})
+    });
+    eventBus.on("Action:PASS", () => {
+      this.statusDisplay.displayNone();
+    });
+    eventBus.on("Command:DRAW", () => {
+      this.statusDisplay.displayNone();
+    });
   }
 
   private expires(expireAtMs: number) {
@@ -271,7 +277,7 @@ export class Game extends Container {
     this.addChild(this.playerHand);
     this.addChild(this.deck!);
     this.addChild(this.pile);
-    this.addChild(this.statusDisplay)
+    this.addChild(this.statusDisplay);
     this.otherPlayers.forEach((player) => {
       this.addChild(player);
     });
@@ -279,8 +285,8 @@ export class Game extends Container {
 
   private resetGame(): void {
     this.playerHand.restart();
-    this.otherPlayers.forEach(player => {
-      player.restart()
+    this.otherPlayers.forEach((player) => {
+      player.restart();
     });
   }
 }
