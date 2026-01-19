@@ -3,13 +3,8 @@ import tseslint from "typescript-eslint";
 import prettierPlugin from "eslint-plugin-prettier";
 
 export default [
-  // JavaScript base rules
   js.configs.recommended,
-
-  // TypeScript base rules
   ...tseslint.configs.recommended,
-
-  // Custom project rules
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
 
@@ -33,8 +28,6 @@ export default [
       "prettier/prettier": "error",
     },
   },
-
-  // 👇 Global ignores go here
   {
     ignores: ["dist/**", "node_modules/**"],
   },

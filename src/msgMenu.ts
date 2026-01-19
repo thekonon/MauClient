@@ -5,13 +5,10 @@ export class MessagesMenu {
   private messages: HTMLParagraphElement[];
 
   private messageBox!: HTMLDivElement;
-
-  private unreadMsg: boolean;
   private isOpened: boolean;
 
   constructor() {
     this.messages = [];
-    this.unreadMsg = false;
     this.isOpened = false;
     this.addEvents();
   }
