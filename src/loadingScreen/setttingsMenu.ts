@@ -9,11 +9,16 @@ export class SettingsMenu {
 
     public open() {
         if (this.modal) return;
-
         // Request currently connected players
 
         this.modal = document.createElement("div");
         this.modal.className = "settings-modal";
+
+        this.modal.addEventListener("click", (e) => {
+            if (e.target === this.modal) {
+                this.close();
+            }
+        })
 
         const content = document.createElement("div");
         content.className = "settings-modal-content";
