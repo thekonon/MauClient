@@ -43,7 +43,7 @@ describe("Websocket assigment tests", () => {
     it("assign userName correctly ", async () => {
         const userName = "TestKonon"
         websocket.setUser(userName)
-        expect(websocket.userName).toBe(userName)
+        expect(websocket.user.name).toBe(userName)
     })
     it("fail if userName is too long", async () => {
         const userName = "123456789123456789123456789"
