@@ -84,7 +84,6 @@ export class SettingsMenu {
         this.modal.appendChild(content);
         document.body.appendChild(this.modal);
 
-        console.log("point1")
         eventBus.emit("Helper:REQUEST_CONNECTED_PLAYERS", undefined);
     }
 
@@ -116,12 +115,10 @@ export class SettingsMenu {
     }
 
     private async updateConnectedPlayers(players: string[]) {
-        console.log("point4")
         const select = document.getElementById(
             "kickPlayerSelection",
         ) as HTMLSelectElement;
         if (!select) return;
-        console.log("point5")
         select.innerHTML = "";
 
         players.forEach(player => {
