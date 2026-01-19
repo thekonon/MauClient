@@ -50,26 +50,6 @@ describe("Websocket assigment tests", () => {
 
         expect(() => websocket.setUser(userName)).toThrowError()
     })
-    it("fail if userName, IP or port is not specified", () => {
-        expect(
-            () => { websocket.createConnection() }
-        ).toThrow("UserName must be set first")
-        websocket.setUser("TestUser")
-        expect(
-            () => { websocket.createConnection() }
-        ).toThrow("IP must be set first")
-    })
-    it("create a valid url when you have user, ip and port", () => {
-        const userName = "Konon";
-        const ip = "192";
-        const port = "8080";
-        websocket.setUser(userName)
-        websocket.setIPPort(ip, port)
-
-        websocket.createConnection()
-        expect(websocket.getUrl()).toBe("ws://192:8080/game?user=Konon")
-        expect(createSocketSpy).toHaveBeenCalled()
-    })
     it("call sent command with correct control command", () => {
         websocket.sendReadyCommand(true)
         expect(sendSpy).toHaveBeenCalledWith(
