@@ -592,8 +592,4 @@ export class WebSocketHandle {
       cardCount: count,
     });
   }
-
-  private saveUUID(uuid: string) {
-    localStorage.setItem("UUID", uuid);
-  }
 }

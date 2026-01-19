@@ -26,7 +26,7 @@ export default defineConfig({
         },
       ],
     },
-    // setupFiles: ["./setupTests.ts"],
+    setupFiles: ["./setupTests.ts"],
     include: ["tests/**/*.test.ts"],
   },
 });
