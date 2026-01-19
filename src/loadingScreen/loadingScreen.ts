@@ -396,7 +396,6 @@ export class LoadingScreen {
   };
 
   private reconnectCommand(playerName: string) {
-    console.log("Reconnecting is not implemented");
     eventBus.emit("Command:RECONNECT", {
       playerName: playerName
     });
