@@ -21,7 +21,7 @@ export default defineConfig({
       provider: "playwright",
       instances: [
         {
-          browser: "firefox", // must be "browser", not "name"
+          browser: "firefox", // Supported browsers: firefox, webkit, chromium.
           headless: true, // headless in CI
         },
       ],
