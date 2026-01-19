@@ -1,9 +1,13 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from "vite";
+import path from "path"
 
-// https://vite.dev/config/
-/// <reference types="vitest/config" />
 export default defineConfig({
+  resolve:{
+    alias: {
+      "@mnauConfig": path.resolve(__dirname, "mnau.config.ts"),
+    }
+  },
   server: {
     port: 5173,
     open: true,
