@@ -8,6 +8,10 @@ export class Player {
     this.isReady = false;
     this.score = score;
   }
+
+  public setPlayerName(name: string){
+    this.name = name
+  }
 }
 
 export class MainPlayer extends Player {

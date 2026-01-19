@@ -6,15 +6,14 @@ import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
 import { eventBus } from "./EventBus.ts";
+import { MessagesMenu } from "./msgMenu.ts";
 
 async function dummy() {
   console.log("works");
 
   eventBus.emit("Command:REGISTER_PLAYER", {
     "playerName": "konon1",
-    "ip": "localhost",
     "lobbyName": "",
-    "port": "8080",
     "newLobby": false,
     "privateLobby": false
   })
@@ -63,14 +62,16 @@ async function dummy() {
   })
   await new Promise((res) => setTimeout(res, 100));
   eventBus.emit("Action:START_GAME", undefined)
-  await new Promise((res) => setTimeout(res, 100));
-  eventBus.emit("Action:HIDDEN_DRAW", {
-    "playerName": "konon1",
-    "cardCount": 4
-  })
+  // await new Promise((res) => setTimeout(res, 100));
+  // eventBus.emit("Action:HIDDEN_DRAW", {
+  //   "playerName": "konon1",
+  //   "cardCount": 4
+  // })
+  // await new Promise((res) => setTimeout(res, 100));
+  // eventBus.emit("Helper:SET_SCORE", { playerRank: ["konon1", "konon2"], score: {"konon1": 1, "konon2":2} })
+  // eventBus.emit("Action:END_GAME", undefined)
 
 };
-
 (async () => {
   const loading_screen = new LoadingScreen();
   loading_screen.show();
@@ -84,23 +85,40 @@ async function dummy() {
   await cardManager.loadCardTextures();
   cardManager.createFallingCards(50);
 
-  GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  GameSettings.basicInit()
 
   new WebSocketHandle();
   new Game(app);
   new EndScreen(app);
+  new MessagesMenu()
 
   // dummy()
 
   // TODO:
+  // page open = send /userInfo 
+  //    code: 200 - ackt like user is already logged in
+  //    code: 401 - do nothing
+  //    code: 40x - session expired - send another request /refresh - get 200 again /userInfo
+  // set input to display for player name which is registered
+  // Register
   // add disconnect from lobby
-  // freeze form when connected
   // cglobal card skin selection
   // card stacking
-  // endscreen ready state
-  // player remove after end
+  // problikonout pass p5i pass
+  // player rank onlz for player rank
+  // use onlz score for display score
+  // display next color until new card is played
+  // sounds
+  // remove on endScreen
+  
   
   // Done:
+  // freeze form when connected
+  // Remove IP/port move it to config / vibe code it
+  // Reconnect
+  // endscreen ready state
+  // player remove after end
+  // fix unready second games
   // fix card count after reseting
   // show player rank in the middle of game
   // player rank + ready state

@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@500&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <title>MňauMňauGame</title>
 </head>
 
@@ -23,16 +24,6 @@
             <label for="playerName">Player Name:</label>
             <input type="text" id="playerName" name="playerName" maxlength="20" autocomplete="additional-name" />
           </div>
-          <div class="form-group">
-            <label for="ip">IP:</label>
-            <input type="text" id="IP" name="ip" />
-          </div>
-
-          <div class="form-group">
-            <label for="port">PORT:</label>
-            <input type="text" id="PORT" name="port" value="8080" />
-          </div>
-
           <div class="form-group">
             <label for="port">Lobby name: </label>
             <input type="text" class="notImplemented" id="lobbyName" />
@@ -58,12 +49,26 @@
             </h1>
             <div class="players-box" id="connectionInfo">
               No connection info
-          </div>
+            </div>
           </div>
           <button class="btn" id="readyButton">MAKE ME READY</button>
         </div>
       </div>
+      <div class="footer">
+        <button class="footer-btn" id="settingsBtn" title="Settings">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button class="footer-btn" id="instagramBtn" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </button>
+        <button class="footer-btn profile-btn" id="profileBtn" title="Profile">
+          <i class="fas fa-user"></i>
+        </button>
+      </div>
     </div>
+    <button class="footer-btn" id="msgBtn" title="Messages">
+      <i class="fas fa-envelope"></i>
+    </button>
 
     <!-- end screen -->
     <div id="endScreen">

@@ -1,13 +1,20 @@
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
+import { LoginMenu } from "./loginMenu";
 import { Player, MainPlayer } from "./player";
+import { SettingsMenu } from "./setttingsMenu";
 
 export class LoadingScreen {
   mainPlayer: MainPlayer;
   connectedPlayers: Player[];
 
+  settingsMenu: SettingsMenu;
+  loginMenu: LoginMenu
+
   constructor() {
     this.mainPlayer = new MainPlayer("");
     this.connectedPlayers = [];
+    this.settingsMenu = new SettingsMenu();
+    this.loginMenu = new LoginMenu();
     this.addEvents();
     this.updateConnectionInfo();
   }
@@ -33,7 +40,6 @@ export class LoadingScreen {
     const input = document.getElementById(
       "playerName",
     ) as HTMLInputElement | null;
-    const ip = document.getElementById("IP") as HTMLInputElement | null;
 
     if (input) {
       input.addEventListener("input", () => {
@@ -43,9 +49,6 @@ export class LoadingScreen {
           input.classList.remove("max-reached");
         }
       });
-    }
-    if (ip) {
-      ip.value = window.location.hostname; // now works
     }
     const connectButton = document.getElementById(
       "connectButton",
@@ -91,6 +94,17 @@ export class LoadingScreen {
       this.readyPlayerButtonClicked();
     });
 
+    const settingsButton = document.getElementById(
+      "settingsBtn",
+    ) as HTMLButtonElement;
+    settingsButton.addEventListener("click", () => {
+      this.settingsMenu.open();
+    });
+
+    document.getElementById("profileBtn")?.addEventListener("click", () => {
+      this.loginMenu.open(); // your login/register modal
+    });
+
     window.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         this.registerPlayer();
@@ -115,6 +129,14 @@ export class LoadingScreen {
       this.mainPlayer.playerID = payload.playerID;
       this.updateConnectionInfo();
     });
+    eventBus.on("Helper:REQUEST_CONNECTED_PLAYERS", () => {
+      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
+    })
+    eventBus.on("Helper:REGISTER_PLAYERS", () => {
+      const playerNames = (this.connectedPlayers ?? []).map(p => p.name);
+      eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames })
+    })
   }
 
   public getPlayersList(): string[] {
@@ -135,6 +157,7 @@ export class LoadingScreen {
     }
     this.connectedPlayers.push(new Player(player_name));
     this.updateConnectedPlayers();
+    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: (this.connectedPlayers ?? []).map(p => p.name) })
   }
 
   private removePlayerFromList(playerName: string) {
@@ -142,6 +165,7 @@ export class LoadingScreen {
       (player) => player.name !== playerName,
     );
     this.updateConnectedPlayers();
+    eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: (this.connectedPlayers ?? []).map(p => p.name) })
   }
 
   private updatePlayerList(playerNames: string[]) {
@@ -220,34 +244,19 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
     }
 
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
     this.mainPlayer = new MainPlayer(playerName);
     this.mainPlayer.setLobbyName(lobbyNane.value);
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
-      ip: ip,
       lobbyName: lobbyNane.value,
-      port: port,
       newLobby: false,
       privateLobby: false,
     });
@@ -257,60 +266,33 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
     const playerName = playerNameInput.value.trim();
+
+    this.mainPlayer = new MainPlayer(playerName);
 
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
     }
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
-    this.reconnectCommand(playerName, ip, port);
+    this.reconnectCommand(this.mainPlayer.name);
   }
 
   private createLobby() {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
-      return;
-    }
-
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
       return;
     }
     this.mainPlayer = new MainPlayer(playerName);
     this.mainPlayer.setLobbyName(lobbyNane.value);
     console.log("Createing new lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
-      playerName: playerName,
-      ip: ip,
-      port: port,
+      playerName: this.mainPlayer.name,
       lobbyName: lobbyNane.value,
       newLobby: true,
       privateLobby: false,
@@ -321,35 +303,20 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
     }
 
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
     this.mainPlayer = new MainPlayer(playerName);
     this.mainPlayer.setLobbyName(lobbyNane.value);
     console.log("Createing private lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
-      playerName: playerName,
-      ip: ip,
+      playerName: this.mainPlayer.name,
       lobbyName: lobbyNane.value,
-      port: port,
       newLobby: true,
       privateLobby: true,
     });
@@ -369,7 +336,7 @@ export class LoadingScreen {
       container.innerHTML = `<em style="color: #555;">No connection to lobby</em>`;
       return;
     } else {
-      this.disableConnectButton();
+      this.freezeForm()
     }
 
     this.connectedPlayers.forEach((player) => {
@@ -389,6 +356,51 @@ export class LoadingScreen {
       div.style.marginBottom = "5px";
       container.appendChild(div);
     });
+  }
+
+
+
+  private startGameHandler = () => {
+    eventBus.emit("Helper:SET_MAIN_PLAYER", {
+      playerName: this.getMainPlayer(),
+    });
+    eventBus.emit("Helper:REGISTER_PLAYERS", {
+      playerNames: this.getPlayersList(),
+    });
+    this.hide();
+    eventBus.off("Action:START_GAME", this.startGameHandler);
+  };
+
+  private reconnectCommand(playerName: string) {
+    eventBus.emit("Command:RECONNECT", {
+      playerName: playerName
+    });
+  }
+
+  private updateConnectionInfo() {
+    const container = document.getElementById(
+      "connectionInfo",
+    ) as HTMLDivElement;
+    const stringsToDisplay = [
+      `PlayerID: ${this.mainPlayer.playerID}`,
+      `Lobby name: ${this.mainPlayer.lobbyName}`,
+      `LobbyID: ${this.mainPlayer.lobbyID}`,
+    ];
+    container.textContent = ``;
+
+    stringsToDisplay.forEach((element) => {
+      const div = document.createElement("div");
+      div.textContent = element;
+      container.appendChild(div);
+    });
+  }
+
+  private freezeForm() {
+
+    this.disableConnectButton()
+    this.getPlayerNameInput().disabled = true
+    this.getLobbyNameInput().disabled = true
+
   }
 
   private disableConnectButton(): void {
@@ -416,41 +428,23 @@ export class LoadingScreen {
     }
   }
 
-  private startGameHandler = () => {
-    eventBus.emit("Helper:SET_MAIN_PLAYER", {
-      playerName: this.getMainPlayer(),
-    });
-    eventBus.emit("Helper:REGISTER_PLAYERS", {
-      playerNames: this.getPlayersList(),
-    });
-    this.hide();
-    eventBus.off("Action:START_GAME", this.startGameHandler);
-  };
-
-  private reconnectCommand(playerName: string, ip: string, port: string) {
-    console.log("Reconnecting is not implemented");
-    eventBus.emit("Command:RECONNECT", {
-      playerName: playerName,
-      ip: ip,
-      port: port,
-    });
+  private getPlayerNameInput(): HTMLInputElement {
+    const input = document.getElementById(
+      "playerName",
+    ) as HTMLInputElement | null;
+    if (input === null){
+      throw Error("plz, fix id of player name")
+    }
+    return input
   }
 
-  private updateConnectionInfo() {
-    const container = document.getElementById(
-      "connectionInfo",
-    ) as HTMLDivElement;
-    const stringsToDisplay = [
-      `PlayerID: ${this.mainPlayer.playerID}`,
-      `Lobby name: ${this.mainPlayer.lobbyName}`,
-      `LobbyID: ${this.mainPlayer.lobbyID}`,
-    ];
-    container.textContent = ``;
-
-    stringsToDisplay.forEach((element) => {
-      const div = document.createElement("div");
-      div.textContent = element;
-      container.appendChild(div);
-    });
+    private getLobbyNameInput(): HTMLInputElement {
+    const input = document.getElementById(
+      "lobbyName",
+    ) as HTMLInputElement | null;
+    if (input === null){
+      throw Error("plz, fix id of lobby name")
+    }
+    return input
   }
 }

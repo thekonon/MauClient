@@ -2,6 +2,7 @@ export class GameSettings {
   // General
   static screen_height: number;
   static screen_width: number;
+  static texturePack: string = "custom";
 
   static useOriginOfCard: boolean = false;
 
@@ -19,6 +20,23 @@ export class GameSettings {
   // Other players settings
   static otherPlayerMarginsPercent = 1;
   // static otherPLayerGapPercent = 30;
+
+  static basicInit(){
+    const texturePack = localStorage.getItem("texturePack")
+    if(texturePack){
+      GameSettings.setTexturePack(texturePack)
+    }
+
+    GameSettings.setScreenDimensions(window.innerHeight, window.innerWidth);
+  }
+
+  static setTexturePack(texturePack: string){
+    GameSettings.texturePack = texturePack
+  }
+
+  static getTexturePack(): string{
+    return GameSettings.texturePack
+  }
 
   static setScreenDimensions(height: number, width: number) {
     GameSettings.screen_height = height;

@@ -22,8 +22,9 @@
     "types": ["vitest/globals"],
     "baseUrl": "./",
     "paths": {
-      "@assets/*": ["/public/assets"]
+      "@assets/*": ["/public/assets"],
+      "@mnauConfig": ["mnau.config.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "mnau.config.ts"]
 }

@@ -1,5 +1,8 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./EventBus.ts";
+import { GameSettings } from "./gameSettings.ts";
+import { MainPlayer } from "./loadingScreen/player.ts";
+import MnauConfig from "@mnauConfig";
 
 interface Move {
   moveType: "PLAY";
@@ -11,7 +14,7 @@ interface Move {
 }
 
 export interface ServerMessage {
-  messageType: "ACTION" | "ERROR" | string; // expand as needed
+  messageType: "ACTION" | "ERROR" | "SERVER_MESSAGE" | string; // expand as needed
   action?: GameAction; // present when messageType === "ACTION"
   body?: ServerMessageBody;
   error?: string; // you can add more for ERROR, etc.
@@ -20,23 +23,25 @@ export interface ServerMessage {
 // The "inner" action payload
 export interface GameAction {
   type:
-    | "PLAYERS"
-    | "REGISTER_PLAYER"
-    | "START_GAME"
-    | "START_PILE"
-    | "DRAW"
-    | "PLAY_CARD"
-    | "PLAYER_SHIFT"
-    | "HIDDEN_DRAW"
-    | "PLAYER_RANK"
-    | "WIN"
-    | "LOSE"
-    | "END_GAME"
-    | "REMOVE_PLAYER"
-    | "READY" // moved from server message
-    | "UNREADY" // moved from server message
-    | "DESTROY"
-    | "DISQUALIFIED";
+  | "PLAYERS"
+  | "REGISTER_PLAYER"
+  | "START_GAME"
+  | "START_PILE"
+  | "DRAW"
+  | "PLAY_CARD"
+  | "PLAYER_SHIFT"
+  | "HIDDEN_DRAW"
+  | "PLAYER_RANK"
+  | "WIN"
+  | "LOSE"
+  | "END_GAME"
+  | "REMOVE_PLAYER"
+  | "READY" // moved from server message
+  | "UNREADY" // moved from server message
+  | "DESTROY"
+  | "DISQUALIFIED"
+  | "PASS";
+
 
   players?: string[];
   playerDto?: { username: string; playerId: string };
@@ -59,8 +64,15 @@ export interface GameAction {
 }
 
 export interface ServerMessageBody {
-  bodyType: "READY";
+  bodyType: "READY" | "CHAT_MESSAGE";
+  message?: ChatMessage;
+  username?: string;
+}
+
+interface ChatMessage {
   username: string;
+  message: string;
+  timestamp: string;
 }
 
 export class WebSocketHandle {
@@ -84,21 +96,16 @@ export class WebSocketHandle {
     Array.from(this.cardNameMap.entries()).map(([key, value]) => [value, key]),
   );
 
-  public ip: string;
-  public port: string;
-
   // Websocket event
-  public onOpen(): void {}
-  public onClose(): void {}
-  public onError(_: Event): void {}
+  public onOpen(): void { }
+  public onClose(): void { }
+  public onError(_: Event): void { }
 
   // Game state
-  game_started: boolean;
+  gameStarted: boolean;
 
   // User data
-  userName: string;
-  userID: string;
-
+  user!: MainPlayer;
   // Connectio data
   private socket!: WebSocket;
   private url: string;
@@ -108,46 +115,26 @@ export class WebSocketHandle {
   private privateLobby: boolean = false;
 
   constructor() {
-    this.ip = "";
-    this.port = "";
-
-    this.game_started = false;
+    this.gameStarted = false;
     this.url = "";
-    this.userName = "";
-    this.userID = "";
+    this.user = new MainPlayer("")
     this.addEventListerners();
-  }
-
-  public setIPPort(ip: string, port: string) {
-    if (ip.length == 0) {
-      throw new Error("IP can not be empty");
-    }
-    if (port.length == 0) {
-      throw new Error("port can not be empty");
-    }
-    this.ip = ip;
-    this.port = port;
   }
 
   public setUser(userName: string) {
     if (userName.length > 21) {
       throw new Error("Username have to be shorter than 20 characters");
     }
-    this.userName = userName;
+    this.user.setPlayerName(userName);
   }
 
   public createConnection() {
-    if (this.userName == "") {
+    // TODO: user is redundant for registered players
+    if (this.user.name == "") {
       throw new Error("UserName must be set first");
     }
-    if (this.ip == "") {
-      throw new Error("IP must be set first");
-    }
-    if (this.port == "") {
-      throw new Error("Port must be set first");
-    }
 
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}`;
+    this.url = `ws://${MnauConfig.ip}:${MnauConfig.port}/game?user=${this.user.name}`;
 
     if (this.lobbyName) {
       this.url += `&lobby=${this.lobbyName}`;
@@ -163,23 +150,12 @@ export class WebSocketHandle {
   }
 
   public reconnect() {
-    if (this.userName == "") {
+    // TODO: remove player UUID, take changes from reconnect branch
+    if (this.user.name == "") {
       alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
     }
-    if (this.ip == "") {
-      alert("IP must be set first");
-      throw new Error("IP must be set first");
-    }
-    if (this.port == "") {
-      alert("PORT must be set first");
-      throw new Error("PORT must be set first");
-    }
-    const UUID = this.getUUID();
-    if (UUID === null) {
-      alert("No user UUID is saved");
-    }
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.userName}&playerId=${UUID}`;
+    this.url = `ws://${MnauConfig.ip}:${MnauConfig.port}/game?user=${this.user.name}&reconnect=true`;
     this.socket = this.createSocket();
   }
 
@@ -189,6 +165,17 @@ export class WebSocketHandle {
       control: {
         controlType: ready ? "READY" : "UNREADY",
       },
+    });
+    this.send(readyCommand);
+  }
+
+  private sendMessageCommand(message: string) {
+    const readyCommand = JSON.stringify({
+      "requestType": "CHAT",
+      "chat": {
+        "chatType": "MESSAGE",
+        "message": message
+      }
     });
     this.send(readyCommand);
   }
@@ -221,6 +208,11 @@ export class WebSocketHandle {
   }
 
   public send(data: string): void {
+    if(!this.socket) {
+      alert("Connect to lobby first");
+      console.warn("Can not send message without websocket connection")
+      return
+    };
     if (this.socket.readyState === WebSocket.OPEN) {
       console.log("Sending data", data);
       this.socket.send(data);
@@ -240,7 +232,6 @@ export class WebSocketHandle {
 
     eventBus.on("Command:REGISTER_PLAYER", (payload) => {
       this.setUser(payload.playerName);
-      this.setIPPort(payload.ip, payload.port);
       this.setLobbyName(payload.lobbyName);
       this.setNewLobby(payload.newLobby);
       this.setPrivateLobby(payload.privateLobby);
@@ -249,7 +240,6 @@ export class WebSocketHandle {
 
     eventBus.on("Command:RECONNECT", (payload) => {
       this.setUser(payload.playerName);
-      this.setIPPort(payload.ip, payload.port);
       this.reconnect();
     });
 
@@ -268,6 +258,18 @@ export class WebSocketHandle {
     eventBus.on("Command:PASS", () => {
       this.playPassCommand();
     });
+
+    eventBus.on("Command:REGISTER_NPC", () => {
+      this.addNPCcommand()
+    })
+
+    eventBus.on("Command:KICK", (payload) => {
+      this.kickCommand(payload.playerName)
+    })
+
+    eventBus.on("Command:SEND_MESSAGE", (payload => {
+      this.sendMessageCommand(payload.message)
+    }))
   }
 
   // Call this method when there is a draw card request
@@ -312,6 +314,27 @@ export class WebSocketHandle {
     this.send(pass_command);
   }
 
+  private addNPCcommand() {
+    const addNPCCommand = JSON.stringify({
+      requestType: "CONTROL",
+      control: {
+        controlType: "REGISTER_NPC",
+      },
+    });
+    this.send(addNPCCommand);
+  }
+
+  private kickCommand(userName: string) {
+    const kickCommand = JSON.stringify({
+      requestType: "CONTROL",
+      control: {
+        controlType: "KICK",
+        username: userName
+      },
+    });
+    this.send(kickCommand);
+  }
+
   // Event hooks (can be overridden or assigned externally)
   public async onMessage(data: string): Promise<void> {
     try {
@@ -336,24 +359,24 @@ export class WebSocketHandle {
 
   private handleAction(message: GameAction) {
     const handlers: Record<string, (msg: GameAction) => void> = {
-      PLAYERS: (msg) => this.players_action(msg),
-      REGISTER_PLAYER: (msg) => this.register_player_action(msg),
+      PLAYERS: (msg) => this.playersAction(msg),
+      REGISTER_PLAYER: (msg) => this.registerPlayerAction(msg),
       START_GAME: (_) => {
-        this.game_started = true;
+        this.gameStarted = true;
         eventBus.emit("Action:START_GAME", undefined);
       },
       START_PILE: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot start pile when game is not started");
-        this.start_pile_action(msg);
+        this.startPileAction(msg);
       },
       DRAW: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot draw when game is not started");
         this.drawCard(msg);
       },
       PLAY_CARD: (msg) => {
-        if (!this.game_started)
+        if (!this.gameStarted)
           return console.error("Cannot play card when game is not started");
         this.playCard(msg);
       },
@@ -374,7 +397,7 @@ export class WebSocketHandle {
         if (!msg.players)
           return console.error("Players was not specified in RANK action");
         console.log("One of the playes ended");
-        eventBus.emit("Action:PLAYER_RANK", {playersOrder: msg.players})
+        eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.players })
       },
       WIN: () => {
         console.log("You won");
@@ -429,6 +452,9 @@ export class WebSocketHandle {
       DISQUALIFIED: () => {
         window.location.reload();
       },
+      PASS: () => {
+        eventBus.emit("Action:PASS", undefined);
+      }
     };
 
     const handler = handlers[message.type];
@@ -442,10 +468,22 @@ export class WebSocketHandle {
   private handleServerMessage(message: ServerMessageBody) {
     switch (message.bodyType) {
       case "READY":
+        if (!message.username) {
+          console.error("Username is missing");
+          return
+        }
         eventBus.emit("ServerMessage:PLAYER_READY", {
           ready: true,
           playerName: message.username,
         });
+        break
+      case "CHAT_MESSAGE":
+        if(!message.message?.message){
+          console.error("Message is missing!");
+          return
+        }
+        eventBus.emit("Helper:GET_MESSAGE", {message: message.message?.message})
+        break
     }
   }
 
@@ -471,10 +509,10 @@ export class WebSocketHandle {
     });
   }
 
-  public register_player_action(message: GameAction) {
+  public registerPlayerAction(message: GameAction) {
     if (!message.playerDto)
       return console.error("Player DTO was not specified");
-    if (message.playerDto.username === this.userName) {
+    if (message.playerDto.username === this.user.name) {
       this.saveUUID(message.playerDto.playerId);
     }
     const player = message.playerDto.username;
@@ -487,21 +525,21 @@ export class WebSocketHandle {
     }
   }
 
-  public players_action(message: GameAction) {
+  public playersAction(message: GameAction) {
     if (!message.players)
       return console.error("Players field was not specified");
     const players = message.players;
     eventBus.emit("Action:PLAYERS", { playerNames: players });
   }
 
-  public async start_pile_action(message: GameAction) {
+  public async startPileAction(message: GameAction) {
     // TODO: move this to pile
     if (!message.card) return console.error("Card was not specified");
     const card_info = message.card;
     const card = await Card.create(
       this.cardNameMap.get(card_info.color)!,
       this.cardNameMap.get(card_info.type)!,
-      "custom",
+      GameSettings.getTexturePack(),
     );
     eventBus.emit("Action:START_PILE", card);
   }
@@ -515,7 +553,7 @@ export class WebSocketHandle {
       const card = await Card.create(
         this.cardNameMap.get(color)!,
         this.cardNameMap.get(type)!,
-        "custom",
+        GameSettings.getTexturePack(),
       );
       eventBus.emit("Action:DRAW", card);
     }

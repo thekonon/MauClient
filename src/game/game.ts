@@ -7,6 +7,7 @@ import { AnotherPlayer } from "./anotherPlayer";
 import { GameSettings } from "../gameSettings";
 import { eventBus } from "../EventBus";
 import { Player } from "src/loadingScreen/player";
+import { StatusDisplay } from "./statusDisplay";
 
 export class Game extends Container {
   private app: Application;
@@ -15,6 +16,7 @@ export class Game extends Container {
   pile: Pile;
   deck?: Deck;
   otherPlayers: AnotherPlayer[];
+  statusDisplay: StatusDisplay;
 
   /* Info about players */
   mainPlayer: string;
@@ -31,6 +33,8 @@ export class Game extends Container {
 
     // Create a pile - place to which cards go
     this.pile = new Pile();
+
+    this.statusDisplay = new StatusDisplay();
 
     this.mainPlayer = "";
     this.otherPlayers = [];
@@ -70,7 +74,7 @@ export class Game extends Container {
       })();
     });
   }
-  
+
   public show() {
     // Add player hand and deck to app
     if (!this.isShown) {
@@ -90,25 +94,41 @@ export class Game extends Container {
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(type, value, "custom");
-      this.otherPlayers.forEach((player) => {
-        if (player.playerName === playerName) {
-          if (played_card) player.addChild(played_card);
-          player.addCardCount(-1);
-        }
-      });
+      played_card = await Card.create(type, value, GameSettings.getTexturePack());
+      const player = this.otherPlayers.find(p => p.playerName === playerName);
+      if (player && played_card) {
+        player.addChild(played_card);
+        player.addCardCount(-1);
+      }
     }
-
     // Played card goes to pile
     if (played_card) {
       played_card.changeContainer(this.pile);
       this.pile.playCard(played_card);
     }
-
-    // If previous card was queen, display new color
-    if (played_card?.value == "Q") {
-      this.pile.displayNextColor(newColor);
+    
+    const suits = ["C", "S", "H", "D"] as const;
+    
+    function isSuit(value: string): value is typeof suits[number] {
+      return suits.includes(value as any);
     }
+    
+    this.statusDisplay.displayNone();
+    // If previous card was queen, display new color
+    if (played_card?.value === "Q") {
+      this.pile.displayNextColor(newColor);
+
+      if (isSuit(newColor)) {
+        this.statusDisplay.displaySymbol(newColor);
+      }
+    }
+    if (played_card?.value === "A") {
+      this.statusDisplay.displayPass();
+    }
+    if (played_card?.value === "7") {
+      this.statusDisplay.displaySeven();
+    }
+
   }
 
   public async shiftPlayerAction(playerName: string, expireAtMs: number) {
@@ -117,7 +137,6 @@ export class Game extends Container {
       return;
     }
     await this.readyPlayers;
-
     // Get current timestamp in milliseconds
     // Periodic task every 0.1s
     if (this.intervalId !== undefined) {
@@ -152,6 +171,8 @@ export class Game extends Container {
   public async hiddenDrawAction(playerName: string, cardCount: number) {
     await this.readyPlayers;
 
+    this.statusDisplay.displayNone()
+
     // Find the target player
     const player = this.otherPlayers.find((p) => p.playerName === playerName);
     if (!player) return;
@@ -162,7 +183,7 @@ export class Game extends Container {
     // Create cards
     const cards: Card[] = [];
     for (let i = 0; i < cardCount; i++) {
-      const card = await Card.create("", "back", "custom");
+      const card = await Card.create("", "back", GameSettings.getTexturePack());
       card.position.x = GameSettings.get_deck_top_x();
       card.position.y = GameSettings.get_deck_top_y();
       card.zIndex = -1;
@@ -217,14 +238,16 @@ export class Game extends Container {
       this.resetGame();
       this.hide();
     });
-    eventBus.on("Action:PLAYER_RANK", (payload)=>{
+    eventBus.on("Action:PLAYER_RANK", (payload) => {
       const latestWinner = payload.playersOrder.at(-1);
       this.otherPlayers.forEach(player => {
-        if(player.playerName === latestWinner){
+        if (player.playerName === latestWinner) {
           player.playerWon()
         }
       });
     })
+    eventBus.on("Action:PASS", () => {this.statusDisplay.displayNone()})
+    eventBus.on("Command:DRAW", () => {this.statusDisplay.displayNone()})
   }
 
   private expires(expireAtMs: number) {
@@ -248,6 +271,7 @@ export class Game extends Container {
     this.addChild(this.playerHand);
     this.addChild(this.deck!);
     this.addChild(this.pile);
+    this.addChild(this.statusDisplay)
     this.otherPlayers.forEach((player) => {
       this.addChild(player);
     });

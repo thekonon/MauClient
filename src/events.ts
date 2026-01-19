@@ -4,14 +4,12 @@ import { Card } from "./game/card";
 export interface AppEvents {
   "Command:REGISTER_PLAYER": {
     playerName: string;
-    ip: string;
     lobbyName: string;
-    port: string;
     newLobby: boolean;
     privateLobby: boolean;
   };
   "Command:PLAYER_READY": { playerReady: boolean };
-  "Command:RECONNECT": { playerName: string; ip: string; port: string };
+  "Command:RECONNECT": { playerName: string };
   "ServerMessage:PLAYER_READY": { ready: boolean; playerName: string };
   "Action:PLAYERS": { playerNames: string[] };
   "Action:REGISTER_PLAYER": { playerName: string };
@@ -33,11 +31,18 @@ export interface AppEvents {
   "Action:END_GAME": void;
   "Action:REMOVE_PLAYER": { playerName: string };
   "Action:DESTROY": void;
+  "Action:PASS": void;
   "Command:PLAY_CARD": { type: string; value: string; nextColor: string };
   "Command:DRAW": void;
   "Command:PASS": void;
+  "Command:REGISTER_NPC": void;
+  "Command:KICK": {playerName: string};
   "Helper:SET_MAIN_PLAYER": { playerName: string };
   "Helper:REGISTER_PLAYERS": { playerNames: string[] };
   "Helper:SET_IDS": { lobbyID: string; playerID: string };
-  "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;}
+  "Helper:SET_SCORE": {playerRank: string[], score: Record<string, number>;};
+  "Helper:REQUEST_CONNECTED_PLAYERS": void;
+  "Helper:GET_CONNECTED_PLAYERS": {players: string[]};
+  "Helper:GET_MESSAGE": {message: string};
+  "Command:SEND_MESSAGE": {message: string};
 }
