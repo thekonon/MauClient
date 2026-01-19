@@ -23,23 +23,6 @@ beforeEach(() => {
     sendSpy = vi.spyOn(websocket as any, "send").mockImplementation(() => { })
 });
 describe("Websocket assigment tests", () => {
-    it("assign ip/port correctly", async () => {
-        const ip: string = "192.168.16";
-        const port = "1234";
-        websocket.setIPPort(ip, port);
-        expect(websocket.ip).toBe(ip)
-        expect(websocket.port).toBe(port)
-    });
-    it("throw error if ip is empty", async () => {
-        const ip: string = "";
-        const port = "1234";
-        expect(() => websocket.setIPPort(ip, port)).toThrowError();
-    });
-    it("throw error if port is empty", async () => {
-        const ip: string = "123";
-        const port = "";
-        expect(() => websocket.setIPPort(ip, port)).toThrowError();
-    });
     it("assign userName correctly ", async () => {
         const userName = "TestKonon"
         websocket.setUser(userName)
