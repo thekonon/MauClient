@@ -37,7 +37,6 @@ export class LoadingScreen {
     const input = document.getElementById(
       "playerName",
     ) as HTMLInputElement | null;
-    const ip = document.getElementById("IP") as HTMLInputElement | null;
 
     if (input) {
       input.addEventListener("input", () => {
@@ -47,9 +46,6 @@ export class LoadingScreen {
           input.classList.remove("max-reached");
         }
       });
-    }
-    if (ip) {
-      ip.value = window.location.hostname; // now works
     }
     const connectButton = document.getElementById(
       "connectButton",
@@ -241,34 +237,19 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
     }
 
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
     this.mainPlayer = new MainPlayer(playerName);
     this.mainPlayer.setLobbyName(lobbyNane.value);
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: playerName,
-      ip: ip,
       lobbyName: lobbyNane.value,
-      port: port,
       newLobby: false,
       privateLobby: false,
     });
@@ -278,10 +259,6 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
     const playerName = playerNameInput.value.trim();
 
     this.mainPlayer = new MainPlayer(playerName);
@@ -290,41 +267,18 @@ export class LoadingScreen {
       alert("Please enter a player name.");
       return;
     }
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
-    this.reconnectCommand(this.mainPlayer.name, ip, port);
+    this.reconnectCommand(this.mainPlayer.name);
   }
 
   private createLobby() {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
-      return;
-    }
-
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
       return;
     }
     this.mainPlayer = new MainPlayer(playerName);
@@ -332,8 +286,6 @@ export class LoadingScreen {
     console.log("Createing new lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: this.mainPlayer.name,
-      ip: ip,
-      port: port,
       lobbyName: lobbyNane.value,
       newLobby: true,
       privateLobby: false,
@@ -344,35 +296,20 @@ export class LoadingScreen {
     const playerNameInput = document.getElementById(
       "playerName",
     ) as HTMLInputElement;
-    const IPInput = document.getElementById("IP") as HTMLInputElement;
-    const PORTInput = document.getElementById("PORT") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
-    const ip = IPInput.value.trim();
-    const port = PORTInput.value.trim();
 
     if (playerName === "") {
       alert("Please enter a player name.");
       return;
     }
 
-    if (ip === "") {
-      alert("Kindof strange ip, don't you think?");
-      return;
-    }
-
-    if (port === "") {
-      alert("Kindof strange port, don't you think?");
-      return;
-    }
     this.mainPlayer = new MainPlayer(playerName);
     this.mainPlayer.setLobbyName(lobbyNane.value);
     console.log("Createing private lobby");
     eventBus.emit("Command:REGISTER_PLAYER", {
       playerName: this.mainPlayer.name,
-      ip: ip,
       lobbyName: lobbyNane.value,
-      port: port,
       newLobby: true,
       privateLobby: true,
     });
@@ -450,12 +387,10 @@ export class LoadingScreen {
     eventBus.off("Action:START_GAME", this.startGameHandler);
   };
 
-  private reconnectCommand(playerName: string, ip: string, port: string) {
+  private reconnectCommand(playerName: string) {
     console.log("Reconnecting is not implemented");
     eventBus.emit("Command:RECONNECT", {
-      playerName: playerName,
-      ip: ip,
-      port: port,
+      playerName: playerName
     });
   }
 

@@ -4,14 +4,12 @@ import { Card } from "./game/card";
 export interface AppEvents {
   "Command:REGISTER_PLAYER": {
     playerName: string;
-    ip: string;
     lobbyName: string;
-    port: string;
     newLobby: boolean;
     privateLobby: boolean;
   };
   "Command:PLAYER_READY": { playerReady: boolean };
-  "Command:RECONNECT": { playerName: string; ip: string; port: string };
+  "Command:RECONNECT": { playerName: string };
   "ServerMessage:PLAYER_READY": { ready: boolean; playerName: string };
   "Action:PLAYERS": { playerNames: string[] };
   "Action:REGISTER_PLAYER": { playerName: string };

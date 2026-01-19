@@ -1,7 +1,8 @@
 import { Card } from "./game/card.ts";
 import { eventBus } from "./EventBus.ts";
 import { GameSettings } from "./gameSettings.ts";
-import { MainPlayer, Player } from "./loadingScreen/player.ts";
+import { MainPlayer } from "./loadingScreen/player.ts";
+import MnauConfig from "@mnauConfig";
 
 interface Move {
   moveType: "PLAY";
@@ -149,14 +150,8 @@ export class WebSocketHandle {
     if (this.user.name == "") {
       throw new Error("UserName must be set first");
     }
-    if (this.ip == "") {
-      throw new Error("IP must be set first");
-    }
-    if (this.port == "") {
-      throw new Error("Port must be set first");
-    }
 
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.user.name}`;
+    this.url = `ws://${MnauConfig.ip}:${MnauConfig.port}/game?user=${this.user.name}`;
 
     if (this.lobbyName) {
       this.url += `&lobby=${this.lobbyName}`;
@@ -177,19 +172,11 @@ export class WebSocketHandle {
       alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
     }
-    if (this.ip == "") {
-      alert("IP must be set first");
-      throw new Error("IP must be set first");
-    }
-    if (this.port == "") {
-      alert("PORT must be set first");
-      throw new Error("PORT must be set first");
-    }
     const UUID = this.getUUID();
     if (UUID === null) {
       alert("No user UUID is saved");
     }
-    this.url = `ws://${this.ip}:${this.port}/game?user=${this.user.name}&reconnect=true`;
+    this.url = `ws://${MnauConfig.ip}:${MnauConfig.port}/game?user=${this.user.name}&reconnect=true`;
     this.socket = this.createSocket();
   }
 
@@ -266,7 +253,6 @@ export class WebSocketHandle {
 
     eventBus.on("Command:REGISTER_PLAYER", (payload) => {
       this.setUser(payload.playerName);
-      this.setIPPort(payload.ip, payload.port);
       this.setLobbyName(payload.lobbyName);
       this.setNewLobby(payload.newLobby);
       this.setPrivateLobby(payload.privateLobby);
