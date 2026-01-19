@@ -2,7 +2,6 @@ import { eventBus } from "../EventBus";
 
 export class SettingsMenu {
     private modal?: HTMLDivElement;
-    private connectedPlayers: Array<{ id: string; name: string }> = [];
 
     constructor() {
         this.addEvents();
