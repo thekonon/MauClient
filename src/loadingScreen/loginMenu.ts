@@ -144,7 +144,7 @@ export class LoginMenu {
   private async login(username: string, password: string) {
     try {
       const response = await fetch(
-        `http://${MnauConfig.ip}:${MnauConfig.port}/api/login`,
+        `http://${MnauConfig.ip}:${MnauConfig.port}/api/auth/login`,
         {
           method: "POST",
           headers: {
@@ -171,13 +171,13 @@ export class LoginMenu {
   private async register(username: string, email: string, password: string) {
     try {
       const response = await fetch(
-        `http://${MnauConfig.ip}:${MnauConfig.port}/api/register`,
+        `http://${MnauConfig.ip}:${MnauConfig.port}/api/auth/register`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({ username, email, password, password2: password }),
         },
       );
 
