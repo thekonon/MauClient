@@ -1,6 +1,6 @@
-import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 import { GameSettings } from "../gameSettings";
-
+ 
 export class QueenDialog extends Container {
   rect_x: number;
   rect_y: number;
@@ -43,14 +43,14 @@ export class QueenDialog extends Container {
       this.addChild(background);
 
       const suits: [string, string][] = [
-        ["DIAMONDS", "♦"],
-        ["HEARTS", "♥"],
-        ["CLUBS", "♣"],
-        ["SPADES", "♠"],
+        ["DIAMONDS", "assets/symbols/diamond.png"],
+        ["HEARTS", "assets/symbols/heart.png"],
+        ["CLUBS", "assets/symbols/club.png"],
+        ["SPADES", "assets/symbols/spade.png"],
       ];
 
-      suits.forEach(([suit, symbol], index) => {
-        const btn = this.create_button(suit, symbol);
+      suits.forEach(async ([suit, symbol], index) => {
+        const btn = await this.create_button(suit, symbol);
         btn.x = this.rect_x + this.margin;
         btn.y =
           this.rect_y +
@@ -131,10 +131,10 @@ export class QueenDialog extends Container {
     });
   }
 
-  private create_button(
+  private async create_button(
     displayed_text: string = "Empty",
     symbol: string,
-  ): Container {
+  ): Promise<Container> {
     const buttonContainer = new Container();
 
     const width = this.rect_width - this.margin * 2;
@@ -162,23 +162,24 @@ export class QueenDialog extends Container {
       drawButton(color);
     });
 
-    const style = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: GameSettings.fontSize,
-      fill: "#ffffff",
-    });
+    // const style = new TextStyle({
+    //   fontFamily: "Arial",
+    //   fontSize: GameSettings.fontSize,
+    //   fill: "#ffffff",
+    // });
 
-    const text = new Text({
-      text: `${symbol} - ${displayed_text} - ${symbol}`,
-      style,
-    });
+    // const text = new Text({
+    //   text: `${symbol} - ${displayed_text}`,
+    //   style,
+    // });
 
-    text.x = width / 2 - text.width / 2;
-    text.y = height / 2 - text.height / 2;
+    // text.x = width / 2 - text.width / 2;
+    // text.y = height / 2 - text.height / 2;
 
     // Add background and text
     buttonContainer.addChild(button);
-    buttonContainer.addChild(text);
+    // buttonContainer.addChild(text);
+    buttonContainer.addChild(new Sprite(await Assets.load(symbol)));
 
     return buttonContainer;
   }
