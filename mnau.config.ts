@@ -6,7 +6,7 @@ export type MnauConfigType = {
 };
 
 const MnauConfig: MnauConfigType = {
-  ip: "localhost",
+  ip: window.location.hostname,
   port: "8080",
 };
 
