@@ -1,6 +1,6 @@
-import { Assets, Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
+import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { GameSettings } from "../gameSettings";
- 
+
 export class QueenDialog extends Container {
   rect_x: number;
   rect_y: number;
@@ -16,8 +16,8 @@ export class QueenDialog extends Container {
 
   constructor() {
     super();
-    this.rect_width = GameSettings.fontSize * 10;
-    this.rect_height = GameSettings.fontSize * 8;
+    this.rect_width = GameSettings.fontSize * 3;
+    this.rect_height = GameSettings.fontSize * 5;
     this.rect_x = 0;
     this.rect_y = -this.rect_height - GameSettings.fontSize * 3;
     this.edge_radius = GameSettings.fontSize / 2;
@@ -50,7 +50,7 @@ export class QueenDialog extends Container {
       ];
 
       suits.forEach(async ([suit, symbol], index) => {
-        const btn = await this.create_button(suit, symbol);
+        const btn = await this.create_button(symbol);
         btn.x = this.rect_x + this.margin;
         btn.y =
           this.rect_y +
@@ -131,10 +131,7 @@ export class QueenDialog extends Container {
     });
   }
 
-  private async create_button(
-    displayed_text: string = "Empty",
-    symbol: string,
-  ): Promise<Container> {
+  private async create_button(symbol: string): Promise<Container> {
     const buttonContainer = new Container();
 
     const width = this.rect_width - this.margin * 2;
@@ -146,7 +143,7 @@ export class QueenDialog extends Container {
       button.roundRect(0, 0, width, height, this.edge_radius / 2).fill(color);
     };
 
-    const color = 0xff0000;
+    const color = 0x00a0af;
     const hover_color = 0x550000;
     drawButton(color);
 
@@ -162,24 +159,15 @@ export class QueenDialog extends Container {
       drawButton(color);
     });
 
-    // const style = new TextStyle({
-    //   fontFamily: "Arial",
-    //   fontSize: GameSettings.fontSize,
-    //   fill: "#ffffff",
-    // });
-
-    // const text = new Text({
-    //   text: `${symbol} - ${displayed_text}`,
-    //   style,
-    // });
-
-    // text.x = width / 2 - text.width / 2;
-    // text.y = height / 2 - text.height / 2;
+    const desiredWidth = 50;
+    const sprite = new Sprite(await Assets.load(symbol));
+    sprite.scale.set(desiredWidth / sprite.width);
+    sprite.x = width / 2 - sprite.width / 2;
+    sprite.y = height / 2 - sprite.height / 2;
 
     // Add background and text
     buttonContainer.addChild(button);
-    // buttonContainer.addChild(text);
-    buttonContainer.addChild(new Sprite(await Assets.load(symbol)));
+    buttonContainer.addChild(sprite);
 
     return buttonContainer;
   }
