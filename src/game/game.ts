@@ -119,7 +119,7 @@ export class Game extends Container {
     this.statusDisplay.displayNone();
     // If previous card was queen, display new color
     if (played_card?.value === "Q") {
-      this.pile.displayNextColor(newColor);
+      await this.pile.displayNextColor(newColor);
 
       if (isSuit(newColor)) {
         this.statusDisplay.displaySymbol(newColor);

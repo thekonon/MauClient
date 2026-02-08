@@ -1,4 +1,4 @@
-import { Container, TextStyle, Text, Point } from "pixi.js";
+import { Container, TextStyle, Text, Point, Sprite, Assets } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
 import { eventBus } from "../EventBus";
@@ -6,7 +6,7 @@ import { eventBus } from "../EventBus";
 export class Pile extends Container {
   private card_queue: Card[] = [];
   private last_finished_card: Card | null = null;
-  private previousText: Text | null = null;
+  private previousText: Container | null = null;
   constructor() {
     super();
     this.displayNextColor("NotSelected");
@@ -38,15 +38,13 @@ export class Pile extends Container {
     });
   }
 
-  public displayNextColor(suit: string) {
+  public async displayNextColor(suit: string) {
     const suits: [string, string][] = [
-      ["D", "♦"],
-      ["H", "♥"],
-      ["C", "♣"],
-      ["S", "♠"],
+      ["D", "assets/symbols/diamond.png"],
+      ["H", "assets/symbols/heart.png"],
+      ["C", "assets/symbols/club.png"],
+      ["S", "assets/symbols/spade.png"],
     ];
-
-    const symbol = suits.find(([name]) => name === suit)?.[1] ?? suit;
 
     const style = new TextStyle({
       fontFamily: "Impact",
@@ -54,8 +52,10 @@ export class Pile extends Container {
       fill: "#000000",
     });
 
+    const cont = new Container();
+
     const text = new Text({
-      text: `NextColor: ${symbol}`,
+      text: "Next Color:",
       style,
     });
 
@@ -66,10 +66,19 @@ export class Pile extends Container {
     if (this.previousText != null) {
       this.removeChild(this.previousText);
     }
-    this.previousText = text;
+    this.previousText = cont;
 
-    text.position.copyFrom(point);
-    this.addChild(text);
+    cont.position.copyFrom(point);
+    cont.addChild(text);
+    this.addChild(cont);
+    const symbolPath = suits.find(([name]) => name === suit)?.[1];
+    if (symbolPath) {
+      const sprite = new Sprite(await Assets.load(symbolPath));
+      sprite.scale.set(50 / sprite.width);
+      sprite.x = text.width + 10;
+      sprite.y = (text.height - sprite.height) / 2 + 5;
+      cont.addChild(sprite);
+    }
   }
 
   private addEventListeners(): void {
