@@ -125,6 +125,7 @@ export class QueenDialog extends Container {
 
       exitButton.on("pointerdown", () => {
         this.exitFnc();
+        this.parent?.removeChild(this);
       });
 
       this.addChild(exitButton);
