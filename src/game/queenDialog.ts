@@ -1,6 +1,13 @@
 import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 
+const suits: [string, string][] = [
+  ["DIAMONDS", "assets/symbols/diamond.png"],
+  ["HEARTS", "assets/symbols/heart.png"],
+  ["CLUBS", "assets/symbols/club.png"],
+  ["SPADES", "assets/symbols/spade.png"],
+];
+
 export class QueenDialog extends Container {
   rect_x: number;
   rect_y: number;
@@ -41,13 +48,6 @@ export class QueenDialog extends Container {
         .fill(GameSettings.dialog_window_color);
 
       this.addChild(background);
-
-      const suits: [string, string][] = [
-        ["DIAMONDS", "assets/symbols/diamond.png"],
-        ["HEARTS", "assets/symbols/heart.png"],
-        ["CLUBS", "assets/symbols/club.png"],
-        ["SPADES", "assets/symbols/spade.png"],
-      ];
 
       suits.forEach(async ([suit, symbol], index) => {
         const btn = await this.create_button(symbol);

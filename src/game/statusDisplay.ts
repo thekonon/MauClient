@@ -1,37 +1,25 @@
-import { Container, Text } from "pixi.js";
+import { Container, Text, Assets, Sprite, Texture } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 
+type Symbol = "C" | "S" | "H" | "D";
+const symbolsMap: Record<Symbol, string> = {
+  C: "assets/symbols/club.png",
+  S: "assets/symbols/spade.png",
+  H: "assets/symbols/heart.png",
+  D: "assets/symbols/diamond.png",
+};
+
 export class StatusDisplay extends Container {
-  private text!: Text;
+  private readonly largeMultiplier: number = 0.15;
+  private readonly smallMultiplier: number = 0.1;
+  private readonly ALPHA: number = 0.5;
 
   constructor() {
-    super();
-
-    this.initialize();
-  }
-
-  public initialize() {
-    const size =
-      0.8 * Math.min(GameSettings.screen_width, GameSettings.screen_height);
-
-    this.text = new Text({
-      text: "",
-      style: {
-        fontFamily: "Arial",
-        fontSize: size,
-        fill: 0xcccccc,
-        fontWeight: "bold",
-        align: "center",
-      },
+    super({
+      pivot: 0.5,
+      x: GameSettings.get_mid_x(),
+      y: GameSettings.get_canvas_height() * 0.2,
     });
-
-    this.text.anchor.set(0.5);
-    this.text.x = GameSettings.get_mid_x();
-    this.text.y = GameSettings.get_mid_y();
-
-    this.text.alpha = 0.25;
-
-    this.addChild(this.text);
   }
 
   public show() {
@@ -43,44 +31,59 @@ export class StatusDisplay extends Container {
   }
 
   public displayPass() {
-    this.text.text = "PASS";
-    this.setBiggerSize();
+    this.removeChildren().forEach((ch) => ch.destroy());
+    this.addChild(this.createText("PASS"));
     this.show();
   }
 
-  public displaySymbol(symbol: "C" | "S" | "H" | "D") {
-    const map: Record<"C" | "S" | "H" | "D", string> = {
-      C: "♣",
-      S: "♠",
-      H: "♥",
-      D: "♦",
-    };
-    this.setBiggerSize();
-    this.text.text = map[symbol];
-    this.show();
+  public displaySymbol(symbol: Symbol): void {
+    const assetPath = symbolsMap[symbol];
+    Assets.load(assetPath).then((a) => {
+      this.addChild(this.createSymbolSprite(a));
+      this.show();
+    });
   }
 
   public displaySeven() {
-    this.setSmallerSize();
-    this.text.text = "SUFFER";
-
+    this.removeChildren().forEach((ch) => ch.destroy());
+    this.addChild(this.createText("SUFFER"));
     this.show();
   }
 
   public displayNone() {
-    this.text.text = "";
+    this.removeChildren().forEach((ch) => ch.destroy());
     this.show();
   }
 
-  public setBiggerSize() {
-    const size =
-      0.8 * Math.min(GameSettings.screen_width, GameSettings.screen_height);
-    this.text.style.fontSize = size;
+  private createText(message: string): Text {
+    const text = new Text({
+      text: message,
+      style: {
+        fontFamily: "Arial",
+        fontSize: this.getBiggerSize(),
+        fill: 0xcccccc,
+        fontWeight: "bold",
+        align: "center",
+      },
+    });
+    text.anchor.set(0.5);
+    text.alpha = this.ALPHA;
+    return text;
   }
 
-  public setSmallerSize() {
-    const size =
-      0.4 * Math.min(GameSettings.screen_width, GameSettings.screen_height); // smaller
-    this.text.style.fontSize = size;
+  private createSymbolSprite(asset: Texture): Sprite {
+    const sprite = new Sprite(asset);
+    sprite.alpha = this.ALPHA;
+    sprite.scale.set(this.getBiggerSize() / sprite.width);
+    sprite.anchor.set(0.5);
+    return sprite;
+  }
+
+  private getBiggerSize(): number {
+    return this.largeMultiplier * Math.min(GameSettings.screen_width, GameSettings.screen_height);
+  }
+
+  private getSmallerSize(): number {
+    return this.smallMultiplier * Math.min(GameSettings.screen_width, GameSettings.screen_height);
   }
 }
