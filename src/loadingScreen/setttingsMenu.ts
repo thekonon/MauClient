@@ -55,9 +55,7 @@ export class SettingsMenu {
     content.appendChild(addNpcBtn);
 
     // Texture pack dropdown
-    const texturePackDropDown = document.createElement(
-      "select",
-    ) as HTMLSelectElement;
+    const texturePackDropDown = document.createElement("select") as HTMLSelectElement;
     const options = ["custom", "default", "other", "pythonGen"];
     options.forEach((opt) => {
       const option = document.createElement("option");
@@ -117,9 +115,7 @@ export class SettingsMenu {
   }
 
   private async updateConnectedPlayers(players: string[]) {
-    const select = document.getElementById(
-      "kickPlayerSelection",
-    ) as HTMLSelectElement;
+    const select = document.getElementById("kickPlayerSelection") as HTMLSelectElement;
     if (!select) return;
     select.innerHTML = "";
 

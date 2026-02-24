@@ -73,16 +73,11 @@ export class GameSettings {
   }
 
   static get_player_hand_top_y() {
-    return (
-      this.get_canvas_height() * (1 - this.player_hand_height_percent / 100)
-    );
+    return this.get_canvas_height() * (1 - this.player_hand_height_percent / 100);
   }
 
   static get_player_hand_bot_x() {
-    return (
-      this.get_mid_x() +
-      (this.get_mid_x() * this.player_hand_width_percent) / 200
-    );
+    return this.get_mid_x() + (this.get_mid_x() * this.player_hand_width_percent) / 200;
   }
 
   static get_player_hand_bot_y() {
@@ -127,10 +122,7 @@ export class GameSettings {
 
   static get otherPlayerCardSizeScale() {
     return (
-      (this.screen_width *
-        (1 -
-          this.player_hand_width_percent / 100 -
-          (4 * this.otherPlayerMarginsPercent) / 100)) /
+      (this.screen_width * (1 - this.player_hand_width_percent / 100 - (4 * this.otherPlayerMarginsPercent) / 100)) /
       2 /
       this.card_width
     );
@@ -150,9 +142,7 @@ export class GameSettings {
       return this.screen_width * (this.otherPlayerMarginsPercent / 100);
     } else {
       return (
-        this.screen_width -
-        this.getOtherPlayerWidth() -
-        this.screen_width * (this.otherPlayerMarginsPercent / 100)
+        this.screen_width - this.getOtherPlayerWidth() - this.screen_width * (this.otherPlayerMarginsPercent / 100)
       );
     }
   }

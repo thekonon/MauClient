@@ -1,8 +1,8 @@
 // Global project settings for MnauMnauGame
 
 export type MnauConfigType = {
-  ip: string;                 // Backend IP
-  port: string;               // Docker container port
+  ip: string; // Backend IP
+  port: string; // Docker container port
 };
 
 const MnauConfig: MnauConfigType = {

@@ -365,36 +365,30 @@ export class WebSocketHandle {
         eventBus.emit("Action:START_GAME", undefined);
       },
       START_PILE: (msg) => {
-        if (!this.gameStarted)
-          return console.error("Cannot start pile when game is not started");
+        if (!this.gameStarted) return console.error("Cannot start pile when game is not started");
         this.startPileAction(msg);
       },
       DRAW: (msg) => {
-        if (!this.gameStarted)
-          return console.error("Cannot draw when game is not started");
+        if (!this.gameStarted) return console.error("Cannot draw when game is not started");
         this.drawCard(msg);
       },
       PLAY_CARD: (msg) => {
-        if (!this.gameStarted)
-          return console.error("Cannot play card when game is not started");
+        if (!this.gameStarted) return console.error("Cannot play card when game is not started");
         this.playCard(msg);
       },
       PLAYER_SHIFT: (msg) => {
-        if (!msg.playerDto)
-          return console.error("Player DTO was not specified");
+        if (!msg.playerDto) return console.error("Player DTO was not specified");
         if (!msg.expireAtMs || msg.expireAtMs === -1)
           return console.error("Report this to Pepa, i got no expiration time");
         this.shiftPlayer(msg.playerDto.username, msg.expireAtMs);
       },
       HIDDEN_DRAW: (msg) => {
-        if (!msg.playerDto)
-          return console.error("Player DTO was not specified");
+        if (!msg.playerDto) return console.error("Player DTO was not specified");
         if (!msg.count) return console.error("Card count was not specified");
         this.hiddenDraw(msg.playerDto.username, msg.count);
       },
       PLAYER_RANK: (msg) => {
-        if (!msg.players)
-          return console.error("Players was not specified in RANK action");
+        if (!msg.players) return console.error("Players was not specified in RANK action");
         console.log("One of the playes ended");
         eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.players });
       },
@@ -407,10 +401,8 @@ export class WebSocketHandle {
         console.warn("Not implemented");
       },
       END_GAME: (msg) => {
-        if (!msg.playerRank)
-          return console.error("Players was not specified in RANK action");
-        if (!msg.scores)
-          return console.error("Score was not provided in the end-game event");
+        if (!msg.playerRank) return console.error("Players was not specified in RANK action");
+        if (!msg.scores) return console.error("Score was not provided in the end-game event");
         console.log("Game ended");
         eventBus.emit("Action:PLAYER_RANK", { playersOrder: msg.playerRank });
         eventBus.emit("Helper:SET_SCORE", {
@@ -420,17 +412,14 @@ export class WebSocketHandle {
         eventBus.emit("Action:END_GAME", undefined);
       },
       REMOVE_PLAYER: (msg) => {
-        if (!msg.playerDto)
-          return console.error("Player DTO was not specified");
+        if (!msg.playerDto) return console.error("Player DTO was not specified");
         eventBus.emit("Action:REMOVE_PLAYER", {
           playerName: msg.playerDto.username,
         });
       },
       READY: (msg) => {
         if (!msg.username) {
-          return console.error(
-            "username field in the ready_player was not specified",
-          );
+          return console.error("username field in the ready_player was not specified");
         }
         eventBus.emit("ServerMessage:PLAYER_READY", {
           ready: true,
@@ -439,9 +428,7 @@ export class WebSocketHandle {
       },
       UNREADY: (msg) => {
         if (!msg.username) {
-          return console.error(
-            "username field in the unready_player was not specified",
-          );
+          return console.error("username field in the unready_player was not specified");
         }
         eventBus.emit("ServerMessage:PLAYER_READY", {
           ready: false,
@@ -502,9 +489,7 @@ export class WebSocketHandle {
     }
 
     const card_info = message.card;
-    const chosenNextColor = message.nextColor
-      ? (this.cardNameMap.get(message.nextColor) ?? "")
-      : "";
+    const chosenNextColor = message.nextColor ? (this.cardNameMap.get(message.nextColor) ?? "") : "";
     eventBus.emit("Action:PLAY_CARD", {
       playerName: message.playerDto.username,
       type: this.cardNameMap.get(card_info.color)!,
@@ -514,8 +499,7 @@ export class WebSocketHandle {
   }
 
   public registerPlayerAction(message: GameAction) {
-    if (!message.playerDto)
-      return console.error("Player DTO was not specified");
+    if (!message.playerDto) return console.error("Player DTO was not specified");
     if (message.playerDto.username === this.user.name) {
       this.saveUUID(message.playerDto.playerId);
     }
@@ -530,8 +514,7 @@ export class WebSocketHandle {
   }
 
   public playersAction(message: GameAction) {
-    if (!message.players)
-      return console.error("Players field was not specified");
+    if (!message.players) return console.error("Players field was not specified");
     const players = message.players;
     eventBus.emit("Action:PLAYERS", { playerNames: players });
   }

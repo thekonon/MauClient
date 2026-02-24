@@ -42,9 +42,11 @@ import { MessagesMenu } from "./msgMenu.ts";
   // problikonout pass p5i pass
   // player rank onlz for player rank
   // use onlz score for display score
-  // display next color until new card is played
+  // display next color until new card is played -rework 
   // sounds
   // remove on endScreen
+  // remove pass / stop on pile
+  // statusDisplay
 
   // Done:
   // freeze form when connected

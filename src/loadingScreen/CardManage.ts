@@ -1,11 +1,4 @@
-import {
-  Application,
-  Sprite,
-  Container,
-  Texture,
-  Assets,
-  Ticker,
-} from "pixi.js";
+import { Application, Sprite, Container, Texture, Assets, Ticker } from "pixi.js";
 
 // extend Sprite with custom props
 interface FallingCard extends Sprite {
@@ -52,15 +45,12 @@ export class CardManager {
 
   public createFallingCards(count: number) {
     if (this.cardTextures.length === 0) {
-      console.warn(
-        "⚠️ Card textures not loaded yet! Call loadCardTextures() first.",
-      );
+      console.warn("⚠️ Card textures not loaded yet! Call loadCardTextures() first.");
       return;
     }
 
     for (let i = 0; i < count; i++) {
-      const tex =
-        this.cardTextures[Math.floor(Math.random() * this.cardTextures.length)];
+      const tex = this.cardTextures[Math.floor(Math.random() * this.cardTextures.length)];
       const card = new Sprite(tex) as FallingCard;
       card.alpha = 0.4;
 

@@ -43,8 +43,7 @@ export class PlayerHand extends Container {
 
     // button for pass action
     const passButton = this.createButton("PASS (ACE / 7)");
-    passButton.x =
-      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
+    passButton.x = GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     passButton.on("pointerdown", () => {
       eventBus.emit("Command:PASS", undefined);
@@ -52,8 +51,7 @@ export class PlayerHand extends Container {
 
     // button for pass action
     const reorderCardsButton = this.createButton("REORDER\n  CARDS");
-    reorderCardsButton.x =
-      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
+    reorderCardsButton.x = GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
     reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 2.1;
     reorderCardsButton.on("pointerdown", () => {
       console.log("Reordering cards");
@@ -99,15 +97,12 @@ export class PlayerHand extends Container {
   }
 
   public draw_card(card: Card) {
-    card.x =
-      GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
-    card.y =
-      GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
+    card.x = GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
+    card.y = GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
     card.height = GameSettings.card_height;
     card.width = GameSettings.card_width;
 
-    [card.end_animation_point_x, card.end_animation_point_y] =
-      this.get_new_card_location();
+    [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location();
 
     this.cards_list.push(card);
     this.addChild(card);
@@ -157,9 +152,7 @@ export class PlayerHand extends Container {
     if (n === undefined) {
       n = this.cards_length();
     }
-    const x =
-      GameSettings.player_hand_padding +
-      (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
+    const x = GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
     const y = GameSettings.player_hand_padding;
     return [x, y];
   }

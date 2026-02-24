@@ -69,10 +69,8 @@ describe("card.ts unit tests", () => {
 
     card.setGlobalEndOfAnimation(newX, newY, rotation);
 
-    const expectedX =
-      (card.card_sprite.height - card.card_sprite.width) / 2 + newX;
-    const expectedY =
-      -(card.card_sprite.height + card.card_sprite.width) / 2 + newY;
+    const expectedX = (card.card_sprite.height - card.card_sprite.width) / 2 + newX;
+    const expectedY = -(card.card_sprite.height + card.card_sprite.width) / 2 + newY;
 
     expect(card.end_animation_point_x).toBeCloseTo(expectedX);
     expect(card.end_animation_point_y).toBeCloseTo(expectedY);
@@ -81,8 +79,8 @@ describe("card.ts unit tests", () => {
 
     const cardAnimationFinished = new Promise<void>(async (resolve) => {
       card.play(duration, undefined, resolve);
-    })
-    await cardAnimationFinished
+    });
+    await cardAnimationFinished;
 
     // await new Promise((res) => setTimeout(res, 1000 * duration * 1.05));
 

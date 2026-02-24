@@ -145,9 +145,7 @@ export class MessagesMenu {
   }
 
   private getMsgButton(): HTMLButtonElement | undefined {
-    const messageBoxBtn = document.getElementById(
-      "msgBtn",
-    ) as HTMLButtonElement;
+    const messageBoxBtn = document.getElementById("msgBtn") as HTMLButtonElement;
     if (messageBoxBtn) {
       return messageBoxBtn;
     } else {

@@ -1,13 +1,4 @@
-import {
-  Assets,
-  Sprite,
-  Texture,
-  Container,
-  Point,
-  FederatedPointerEvent,
-  Graphics,
-  Bounds,
-} from "pixi.js";
+import { Assets, Sprite, Texture, Container, Point, FederatedPointerEvent, Graphics, Bounds } from "pixi.js";
 import { gsap } from "gsap";
 import { GameSettings } from "../gameSettings";
 import { QueenDialog } from "./queenDialog";
@@ -77,12 +68,7 @@ export class Card extends Container {
     return new Card(type, value, sprite, useOriginOfCard);
   }
 
-  private constructor(
-    type: string,
-    value: string,
-    sprite: Sprite,
-    useOriginOfCard: boolean = true,
-  ) {
+  private constructor(type: string, value: string, sprite: Sprite, useOriginOfCard: boolean = true) {
     super();
 
     this.type = type;
@@ -112,11 +98,7 @@ export class Card extends Container {
     this.addChild(this.spriteContainer);
   }
 
-  public play(
-    duration?: number,
-    rotation?: number,
-    onFinish: () => void = () => {},
-  ) {
+  public play(duration?: number, rotation?: number, onFinish: () => void = () => {}) {
     if (this.useOriginOfCard) {
       gsap.to(this, {
         x: this.end_animation_point_x,
@@ -159,10 +141,7 @@ export class Card extends Container {
       this.end_animation_point_x = x;
       this.end_animation_point_y = y;
     } else {
-      const topLeftEdge = new Point(
-        -this.card_sprite.width / 2,
-        -this.card_sprite.height / 2,
-      );
+      const topLeftEdge = new Point(-this.card_sprite.width / 2, -this.card_sprite.height / 2);
 
       // Simulate end of rotation in order to get the end point
       const prevRotation = this.spriteContainer.rotation;
@@ -193,17 +172,12 @@ export class Card extends Container {
       this.end_animation_point_x = x;
       this.end_animation_point_y = y;
     } else {
-      const topLeftEdge = new Point(
-        -this.card_sprite.width / 2,
-        -this.card_sprite.height / 2,
-      );
+      const topLeftEdge = new Point(-this.card_sprite.width / 2, -this.card_sprite.height / 2);
 
       // Simulate end of rotation in order to get the end point
       const prevRotation = this.spriteContainer.rotation;
       this.spriteContainer.rotation = rotation;
-      const localDiff = this.spriteContainer.parent.toLocal(
-        this.spriteContainer.toGlobal(topLeftEdge),
-      );
+      const localDiff = this.spriteContainer.parent.toLocal(this.spriteContainer.toGlobal(topLeftEdge));
       this.spriteContainer.rotation = prevRotation;
 
       const testGraphics = new Graphics()
@@ -257,35 +231,20 @@ export class Card extends Container {
       this.wasDragged = true;
     }
 
-    if (
-      currentPosition.x - this.dragOffset.x <
-      -GameSettings.get_player_hand_width() * 0.1
-    ) {
+    if (currentPosition.x - this.dragOffset.x < -GameSettings.get_player_hand_width() * 0.1) {
       return;
     }
-    if (
-      currentPosition.y - this.dragOffset.y <
-      -GameSettings.get_player_hand_height() * 0.1
-    ) {
+    if (currentPosition.y - this.dragOffset.y < -GameSettings.get_player_hand_height() * 0.1) {
       return;
     }
-    if (
-      currentPosition.y - this.dragOffset.y + this.card_sprite.height >
-      GameSettings.get_player_hand_width() * 1.1
-    ) {
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_width() * 1.1) {
       return;
     }
-    if (
-      currentPosition.y - this.dragOffset.y + this.card_sprite.height >
-      GameSettings.get_player_hand_height() * 1.1
-    ) {
+    if (currentPosition.y - this.dragOffset.y + this.card_sprite.height > GameSettings.get_player_hand_height() * 1.1) {
       return;
     }
 
-    this.position.set(
-      currentPosition.x - this.dragOffset.x,
-      currentPosition.y - this.dragOffset.y,
-    );
+    this.position.set(currentPosition.x - this.dragOffset.x, currentPosition.y - this.dragOffset.y);
   }
 
   private onDragEnd(_: FederatedPointerEvent): void {
@@ -301,10 +260,7 @@ export class Card extends Container {
     } else {
       // Drag finished — optional: snap back or drop logic here
       console.log("snapping back");
-      this.position.set(
-        this.dragStartPosition.x - this.dragOffset.x,
-        this.dragStartPosition.y - this.dragOffset.y,
-      );
+      this.position.set(this.dragStartPosition.x - this.dragOffset.x, this.dragStartPosition.y - this.dragOffset.y);
     }
   }
   private async onCardClick() {
@@ -323,7 +279,7 @@ export class Card extends Container {
       dialog.zIndex = 999999999999;
       this.parent.addChild(dialog);
       nextColor = await dialog.show();
-      this.parent.removeChild(dialog);
+      this.parent.removeChild(dialog).destroy();
       this.isDialogActive = false;
     }
     eventBus.emit("Command:PLAY_CARD", {
@@ -333,11 +289,7 @@ export class Card extends Container {
     });
   }
 
-  private static async load_texture(
-    type: string,
-    value: string,
-    texture: string,
-  ): Promise<Texture> {
+  private static async load_texture(type: string, value: string, texture: string): Promise<Texture> {
     const path = `assets/${texture}/${type}${value}.png`;
     try {
       return await Assets.load(path);

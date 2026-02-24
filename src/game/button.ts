@@ -37,12 +37,7 @@ export function createButton(): FancyButton {
     textureSpace: "local",
   });
 
-  defaultView
-    .clear()
-    .roundRect(0, 0, 200, 100, 15)
-    .fill(0x000000)
-    .roundRect(10, 10, 180, 80, 10)
-    .fill(globalGradient);
+  defaultView.clear().roundRect(0, 0, 200, 100, 15).fill(0x000000).roundRect(10, 10, 180, 80, 10).fill(globalGradient);
 
   return fncbtn;
 }

@@ -37,9 +37,7 @@ export class LoadingScreen {
   }
 
   public addEvents() {
-    const input = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement | null;
+    const input = document.getElementById("playerName") as HTMLInputElement | null;
 
     if (input) {
       input.addEventListener("input", () => {
@@ -50,19 +48,13 @@ export class LoadingScreen {
         }
       });
     }
-    const connectButton = document.getElementById(
-      "connectButton",
-    ) as HTMLButtonElement;
+    const connectButton = document.getElementById("connectButton") as HTMLButtonElement;
     connectButton.addEventListener("click", () => {
       this.registerPlayer();
     });
 
-    const createLobbyButton = document.getElementById(
-      "createLobbyButton",
-    ) as HTMLInputElement | null;
-    const createPrivateLobbyButton = document.getElementById(
-      "createPrivateLobbyButton",
-    ) as HTMLInputElement | null;
+    const createLobbyButton = document.getElementById("createLobbyButton") as HTMLInputElement | null;
+    const createPrivateLobbyButton = document.getElementById("createPrivateLobbyButton") as HTMLInputElement | null;
 
     if (createLobbyButton) {
       createLobbyButton.addEventListener("click", () => {
@@ -80,23 +72,17 @@ export class LoadingScreen {
       console.log("createPrivateLobby button was not found");
     }
 
-    const reconnectButton = document.getElementById(
-      "reconnectButton",
-    ) as HTMLButtonElement;
+    const reconnectButton = document.getElementById("reconnectButton") as HTMLButtonElement;
     reconnectButton.addEventListener("click", () => {
       this.reconnectPlayer();
     });
 
-    const readyButton = document.getElementById(
-      "readyButton",
-    ) as HTMLButtonElement;
+    const readyButton = document.getElementById("readyButton") as HTMLButtonElement;
     readyButton.addEventListener("click", () => {
       this.readyPlayerButtonClicked();
     });
 
-    const settingsButton = document.getElementById(
-      "settingsBtn",
-    ) as HTMLButtonElement;
+    const settingsButton = document.getElementById("settingsBtn") as HTMLButtonElement;
     settingsButton.addEventListener("click", () => {
       this.settingsMenu.open();
     });
@@ -141,9 +127,7 @@ export class LoadingScreen {
 
   public getPlayersList(): string[] {
     let listWithoutMainPlayer = this.connectedPlayers;
-    listWithoutMainPlayer = listWithoutMainPlayer.filter(
-      (item) => item.name != this.getMainPlayer(),
-    );
+    listWithoutMainPlayer = listWithoutMainPlayer.filter((item) => item.name != this.getMainPlayer());
     return listWithoutMainPlayer.map((player) => player.name);
   }
 
@@ -163,9 +147,7 @@ export class LoadingScreen {
   }
 
   private removePlayerFromList(playerName: string) {
-    this.connectedPlayers = this.connectedPlayers.filter(
-      (player) => player.name !== playerName,
-    );
+    this.connectedPlayers = this.connectedPlayers.filter((player) => player.name !== playerName);
     this.updateConnectedPlayers();
     eventBus.emit("Helper:GET_CONNECTED_PLAYERS", {
       players: (this.connectedPlayers ?? []).map((p) => p.name),
@@ -205,9 +187,7 @@ export class LoadingScreen {
   }
 
   private unsetReadyButtonReady() {
-    const readyButton = document.getElementById(
-      "readyButton",
-    ) as HTMLInputElement;
+    const readyButton = document.getElementById("readyButton") as HTMLInputElement;
 
     if (readyButton.classList.contains("ready")) {
       readyButton.textContent = "Make me ready";
@@ -216,9 +196,7 @@ export class LoadingScreen {
   }
 
   private setReadyButtonReady() {
-    const readyButton = document.getElementById(
-      "readyButton",
-    ) as HTMLInputElement;
+    const readyButton = document.getElementById("readyButton") as HTMLInputElement;
 
     if (!readyButton.classList.contains("ready")) {
       readyButton.textContent = "I am ready";
@@ -227,9 +205,7 @@ export class LoadingScreen {
   }
 
   public toggleReadyButtonReady() {
-    const readyButton = document.getElementById(
-      "readyButton",
-    ) as HTMLInputElement;
+    const readyButton = document.getElementById("readyButton") as HTMLInputElement;
 
     if (!readyButton.classList.contains("ready")) {
       this.setReadyButtonReady();
@@ -245,9 +221,7 @@ export class LoadingScreen {
   }
 
   private registerPlayer() {
-    const playerNameInput = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement;
+    const playerNameInput = document.getElementById("playerName") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
 
@@ -267,9 +241,7 @@ export class LoadingScreen {
   }
 
   private reconnectPlayer() {
-    const playerNameInput = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement;
+    const playerNameInput = document.getElementById("playerName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
 
     this.mainPlayer = new MainPlayer(playerName);
@@ -282,9 +254,7 @@ export class LoadingScreen {
   }
 
   private createLobby() {
-    const playerNameInput = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement;
+    const playerNameInput = document.getElementById("playerName") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
 
@@ -304,9 +274,7 @@ export class LoadingScreen {
   }
 
   private createPrivateLobby() {
-    const playerNameInput = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement;
+    const playerNameInput = document.getElementById("playerName") as HTMLInputElement;
     const lobbyNane = document.getElementById("lobbyName") as HTMLInputElement;
     const playerName = playerNameInput.value.trim();
 
@@ -380,9 +348,7 @@ export class LoadingScreen {
   }
 
   private updateConnectionInfo() {
-    const container = document.getElementById(
-      "connectionInfo",
-    ) as HTMLDivElement;
+    const container = document.getElementById("connectionInfo") as HTMLDivElement;
     const stringsToDisplay = [
       `PlayerID: ${this.mainPlayer.playerID}`,
       `Lobby name: ${this.mainPlayer.lobbyName}`,
@@ -404,21 +370,14 @@ export class LoadingScreen {
   }
 
   private disableConnectButton(): void {
-    const buttonsIDs = [
-      "connectButton",
-      "createLobbyButton",
-      "createPrivateLobbyButton",
-      "reconnectButton",
-    ];
+    const buttonsIDs = ["connectButton", "createLobbyButton", "createPrivateLobbyButton", "reconnectButton"];
     buttonsIDs.forEach((id) => {
       this.disableButton(id);
     });
   }
 
   private disableButton(buttonID: string): void {
-    const button = document.getElementById(
-      buttonID,
-    ) as HTMLButtonElement | null;
+    const button = document.getElementById(buttonID) as HTMLButtonElement | null;
 
     if (button) {
       button.disabled = true;
@@ -429,9 +388,7 @@ export class LoadingScreen {
   }
 
   private getPlayerNameInput(): HTMLInputElement {
-    const input = document.getElementById(
-      "playerName",
-    ) as HTMLInputElement | null;
+    const input = document.getElementById("playerName") as HTMLInputElement | null;
     if (input === null) {
       throw Error("plz, fix id of player name");
     }
@@ -439,9 +396,7 @@ export class LoadingScreen {
   }
 
   private getLobbyNameInput(): HTMLInputElement {
-    const input = document.getElementById(
-      "lobbyName",
-    ) as HTMLInputElement | null;
+    const input = document.getElementById("lobbyName") as HTMLInputElement | null;
     if (input === null) {
       throw Error("plz, fix id of lobby name");
     }

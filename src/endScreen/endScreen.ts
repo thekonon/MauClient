@@ -53,9 +53,7 @@ export class EndScreen extends Container {
 
     eventBus.on("Action:DESTROY", () => {
       console.log("Destoying");
-      const playAgainButton = document.getElementById(
-        "playAgainButton",
-      ) as HTMLButtonElement;
+      const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
       // playAgainButton.disabled = true;
       if (playAgainButton) {
         playAgainButton.disabled = true;
@@ -73,9 +71,7 @@ export class EndScreen extends Container {
 
   private setButtonEvents(): void {
     const playAgainButton = this.getReadyPlayerButton();
-    const returnToLobbyButton = document.getElementById(
-      "returnToLobbyButton",
-    ) as HTMLButtonElement;
+    const returnToLobbyButton = document.getElementById("returnToLobbyButton") as HTMLButtonElement;
     playAgainButton.onclick = () => {
       this.readyButtonOnClick();
     };
@@ -87,9 +83,7 @@ export class EndScreen extends Container {
   }
 
   private updateLeaderBoard() {
-    const container = document.getElementById(
-      "endScreen-leaderboard-display",
-    ) as HTMLDivElement;
+    const container = document.getElementById("endScreen-leaderboard-display") as HTMLDivElement;
 
     container.innerHTML = "";
     this.players.forEach((player) => {
@@ -156,9 +150,7 @@ export class EndScreen extends Container {
   }
 
   private getReadyPlayerButton(): HTMLButtonElement {
-    const playAgainButton = document.getElementById(
-      "playAgainButton",
-    ) as HTMLButtonElement;
+    const playAgainButton = document.getElementById("playAgainButton") as HTMLButtonElement;
     if (!playAgainButton) {
       throw Error("PlayAgain button not found");
     }
@@ -171,13 +163,7 @@ export class EndScreen extends Container {
   }
 
   private setWinners(winners: string[]) {
-    const elementIds = [
-      "first-place",
-      "second-place",
-      "third-place",
-      "fourth-place",
-      "fifth-place",
-    ];
+    const elementIds = ["first-place", "second-place", "third-place", "fourth-place", "fifth-place"];
 
     const paddedWinners = [...winners, ...Array(5).fill("")].slice(0, 5);
 

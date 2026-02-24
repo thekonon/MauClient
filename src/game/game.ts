@@ -82,22 +82,13 @@ export class Game extends Container {
     }
   }
 
-  public async playCard(
-    playerName: string,
-    type: string,
-    value: string,
-    newColor: string = "",
-  ) {
+  public async playCard(playerName: string, type: string, value: string, newColor: string = "") {
     // When there is request to play a card - find the right one and play it
     let played_card: Card | null = null;
     if (playerName == this.mainPlayer) {
       played_card = this.playerHand.playCard(type, value);
     } else {
-      played_card = await Card.create(
-        type,
-        value,
-        GameSettings.getTexturePack(),
-      );
+      played_card = await Card.create(type, value, GameSettings.getTexturePack());
       const player = this.otherPlayers.find((p) => p.playerName === playerName);
       if (player && played_card) {
         player.addChild(played_card);
@@ -228,12 +219,7 @@ export class Game extends Container {
       this.hiddenDrawAction(payload.playerName, payload.cardCount);
     });
     eventBus.on("Action:PLAY_CARD", (payload) => {
-      this.playCard(
-        payload.playerName,
-        payload.type,
-        payload.value,
-        payload.newColor,
-      );
+      this.playCard(payload.playerName, payload.type, payload.value, payload.newColor);
     });
     eventBus.on("Action:END_GAME", async () => {
       await new Promise((res) => setTimeout(res, 300));
