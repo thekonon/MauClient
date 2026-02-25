@@ -29,7 +29,6 @@ import { RestManager } from "./loadingScreen/restManager.ts";
   new MessagesMenu();
   new RestManager();
 
-
   // dummy()
 
   // TODO:
@@ -45,7 +44,7 @@ import { RestManager } from "./loadingScreen/restManager.ts";
   // problikonout pass p5i pass
   // player rank onlz for player rank
   // use onlz score for display score
-  // display next color until new card is played -rework 
+  // display next color until new card is played -rework
   // sounds
   // remove on endScreen
   // remove pass / stop on pile

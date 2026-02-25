@@ -4,10 +4,10 @@ export class LoginMenu {
   private modal?: HTMLDivElement;
   private isRegisterMode = false;
 
-  constructor(){
-    eventBus.on("Helper:LOGIN", ()=>{
-      this.close()
-    })
+  constructor() {
+    eventBus.on("Helper:LOGIN", () => {
+      this.close();
+    });
   }
 
   public open() {
@@ -104,13 +104,13 @@ export class LoginMenu {
       }
 
       if (this.isRegisterMode) {
-        if(!emailInput){
-          alert("Issue in loginMenu, dev fix plz")
-          return
+        if (!emailInput) {
+          alert("Issue in loginMenu, dev fix plz");
+          return;
         }
-        if(!passwordVerifyInput){
-          alert("Issue in loginMenu, dev fix plz")
-          return
+        if (!passwordVerifyInput) {
+          alert("Issue in loginMenu, dev fix plz");
+          return;
         }
         const email = emailInput.value.trim();
         const password2 = passwordVerifyInput.value;
@@ -147,10 +147,10 @@ export class LoginMenu {
   }
 
   private async login(username: string, password: string) {
-    eventBus.emit("Rest:LOGIN", {username:username, password:password})
+    eventBus.emit("Rest:LOGIN", { username: username, password: password });
   }
-  
+
   private async register(username: string, email: string, password: string, password2: string) {
-    eventBus.emit("Rest:REGISTER", {username:username, email:email, password:password, password2:password2})
+    eventBus.emit("Rest:REGISTER", { username: username, email: email, password: password, password2: password2 });
   }
 }

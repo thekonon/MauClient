@@ -45,11 +45,11 @@ export interface AppEvents {
   "Helper:GET_CONNECTED_PLAYERS": { players: string[] };
   "Helper:GET_MESSAGE": { message: string };
   "Command:SEND_MESSAGE": { message: string };
-  "Helper:LOGIN": {username: string};
-  "Rest:REGISTER": {username: string, email: string, password: string, password2: string};
-  "Rest:LOGIN": {username: string, password: string};
+  "Helper:LOGIN": { username: string };
+  "Rest:REGISTER": { username: string; email: string; password: string; password2: string };
+  "Rest:LOGIN": { username: string; password: string };
   "Rest:REFRESH": void;
   "Rest:LOGOUT": void;
   "Rest:WHOAMI": void;
-  "Rest:TIMELEFT": void
+  "Rest:TIMELEFT": void;
 }

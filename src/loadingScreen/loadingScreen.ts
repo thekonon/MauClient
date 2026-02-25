@@ -93,22 +93,22 @@ export class LoadingScreen {
 
     const refreshButton = document.getElementById("refreshBtn") as HTMLButtonElement;
     refreshButton.addEventListener("click", () => {
-      eventBus.emit("Rest:REFRESH", undefined)
+      eventBus.emit("Rest:REFRESH", undefined);
     });
 
     const whoamiButton = document.getElementById("whoamiBtn") as HTMLButtonElement;
     whoamiButton.addEventListener("click", () => {
-      eventBus.emit("Rest:WHOAMI", undefined)
+      eventBus.emit("Rest:WHOAMI", undefined);
     });
 
     const timeleftButton = document.getElementById("timeleftBtn") as HTMLButtonElement;
     timeleftButton.addEventListener("click", () => {
-      eventBus.emit("Rest:TIMELEFT", undefined)
+      eventBus.emit("Rest:TIMELEFT", undefined);
     });
-    
+
     const logoutButton = document.getElementById("logoutBtn") as HTMLButtonElement;
     logoutButton.addEventListener("click", () => {
-      eventBus.emit("Rest:LOGOUT", undefined)
+      eventBus.emit("Rest:LOGOUT", undefined);
     });
 
     window.addEventListener("keydown", (e) => {
@@ -144,8 +144,8 @@ export class LoadingScreen {
       eventBus.emit("Helper:GET_CONNECTED_PLAYERS", { players: playerNames });
     });
     eventBus.on("Helper:LOGIN", (payload) => {
-      this.login(payload.username)
-    })
+      this.login(payload.username);
+    });
   }
 
   public getPlayersList(): string[] {
@@ -158,8 +158,8 @@ export class LoadingScreen {
     return this.mainPlayer.name;
   }
 
-  private login(username: string){
-    const playerNameField = this.getPlayerNameInput()
+  private login(username: string) {
+    const playerNameField = this.getPlayerNameInput();
     playerNameField.disabled = true;
     playerNameField.value = username;
   }
