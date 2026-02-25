@@ -1,4 +1,5 @@
 import MnauConfig from "@mnauConfig";
+import { eventBus } from "../EventBus";
 
 interface RegisterPayload {
     username: string;
@@ -72,11 +73,19 @@ type RestAPICommand =
 export class RestManager {
 
     constructor() {
-
-
+        this.addEvents()
     }
 
-    public async register(username: string, email: string, password: string, password2: string) {
+    private addEvents(){
+        eventBus.on("Rest:REGISTER", (payload)=>{this.register(payload.username, payload.email, payload.password, payload.password2)});
+        eventBus.on("Rest:LOGIN", (payload)=>{this.login(payload.username,payload.password)});
+        eventBus.on("Rest:REFRESH", ()=>{this.refresh()})
+        eventBus.on("Rest:LOGOUT", ()=>{this.logout()})
+        eventBus.on("Rest:WHOAMI", ()=>{this.whoami()})
+        eventBus.on("Rest:TIMELEFT", ()=>{this.timeleft()})
+    }
+
+    private async register(username: string, email: string, password: string, password2: string) {
 
         const command: RegisterCommand = {
             prefix: "auth/",
@@ -94,7 +103,7 @@ export class RestManager {
 
     }
 
-    public async login(username: string, password: string) {
+    private async login(username: string, password: string) {
 
         const command: LoginCommand = {
             prefix: "auth/",
@@ -106,11 +115,19 @@ export class RestManager {
             }
         }
         const response = await this.sendCommand(command);
-        // handle response here
+        
+        if(response.ok){
+            const data = await response.json()
 
+            console.log(data)
+            
+            eventBus.emit(
+                "Helper:LOGIN", {username: data.user}
+            )
+        }
     }
 
-    public async refresh() {
+    private async refresh(): Promise<boolean> {
 
         const command: RefreshCommand = {
             prefix: "auth/",
@@ -118,10 +135,16 @@ export class RestManager {
             method: "POST",
         }
         const response = await this.sendCommand(command);
-        // handle response here
+
+        if(response.ok){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
-    public async logout() {
+    private async logout() {
 
         const command: LogoutCommand = {
             prefix: "auth/",
@@ -129,28 +152,55 @@ export class RestManager {
             method: "POST",
         }
         const response = await this.sendCommand(command);
-        // handle response here
     }
 
-    public async whoami() {
+    private async whoami() {
         const command: WhoAmICommand = {
             prefix: "",
             method: "GET",
             type: "whoami"
         }
+        
+        const userLoggedIn = await this.refresh()
+
+        if(!userLoggedIn){
+            alert("Log in before running such commands!")
+            return 
+        }
 
         const response = await this.sendCommand(command);
+
+        if(response.ok){
+            const data = await response.json()
+            alert(`You are logged as ${data.user},\n${data.message}`)
+            console.log(data)
+
+        }
         // handle response here
     }
 
-    public async timeleft() {
+    private async timeleft() {
         const command: TimeLeftCommand = {
             prefix: "",
             method: "GET",
             type: "time-left"
         }
 
+        const userLoggedIn = await this.refresh()
+
+        if(!userLoggedIn){
+            alert("Log in before running such commands!")
+            return 
+        }
+
         const response = await this.sendCommand(command);
+
+        if(response.ok){
+            const data = await response.json()
+            alert(`Time left for user: ${data.user} - ${data.timeLeftSeconds}`)
+            console.log(data)
+
+        }
         // handle response here
     }
 
