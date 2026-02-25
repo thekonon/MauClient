@@ -4,9 +4,9 @@ import { Card } from "./card";
 import { eventBus } from "../eventBus";
 
 export class PlayerHand extends Container {
-  cards_list: Card[];
+  cardsList: Card[];
 
-  card_size: number;
+  cardSize: number;
   delta: number;
 
   background!: Graphics;
@@ -15,11 +15,11 @@ export class PlayerHand extends Container {
 
   public constructor() {
     super();
-    this.cards_list = []; // List of cards in player hand
+    this.cardsList = []; // List of cards in player hand
 
     this.drawHand();
 
-    this.card_size = 100; // Size of card
+    this.cardSize = 100; // Size of card
     this.delta = 10; // gap between two cards
 
     this.x = GameSettings.get_player_hand_top_x();
@@ -42,17 +42,9 @@ export class PlayerHand extends Container {
       .fill(backgroundColor);
 
     // button for pass action
-    const passButton = this.createButton("PASS (ACE / 7)");
-    passButton.x = GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
-    passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
-    passButton.on("pointerdown", () => {
-      eventBus.emit("Command:PASS", undefined);
-    });
-
-    // button for pass action
     const reorderCardsButton = this.createButton("REORDER\n  CARDS");
     reorderCardsButton.x = GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
-    reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 2.1;
+    reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 1.05;
     reorderCardsButton.on("pointerdown", () => {
       console.log("Reordering cards");
       this.reorderCards();
@@ -73,7 +65,6 @@ export class PlayerHand extends Container {
     this.remainingTime.y = -GameSettings.fontSize * 1.2;
 
     this.addChild(this.background);
-    this.addChild(passButton);
     this.addChild(reorderCardsButton);
     this.addChild(this.remainingTime);
   }
@@ -104,7 +95,7 @@ export class PlayerHand extends Container {
 
     [card.end_animation_point_x, card.end_animation_point_y] = this.getNewCardLocation();
 
-    this.cards_list.push(card);
+    this.cardsList.push(card);
     this.addChild(card);
     card.play(undefined, undefined, () => {
       this.reorderCards();
@@ -112,10 +103,10 @@ export class PlayerHand extends Container {
   }
 
   public playCard(type: string, value: string): Card | null {
-    for (let i = 0; i < this.cards_list.length; i++) {
-      const card = this.cards_list[i];
+    for (let i = 0; i < this.cardsList.length; i++) {
+      const card = this.cardsList[i];
       if (card.type === type && card.value === value) {
-        this.cards_list.splice(i, 1); // Properly remove from array
+        this.cardsList.splice(i, 1); // Properly remove from array
         return card;
       }
     }
@@ -125,12 +116,16 @@ export class PlayerHand extends Container {
   }
 
   public restart(): void {
-    this.cards_list.forEach((card) => {
+    this.cardsList.forEach((card) => {
       card.card_sprite.destroy();
       card.spriteContainer.destroy();
       card.destroy();
     });
-    this.cards_list = [];
+    this.cardsList = [];
+  }
+  
+  public redraw(){
+
   }
 
   private addEventListeners(): void {
@@ -140,8 +135,8 @@ export class PlayerHand extends Container {
   }
 
   private reorderCards() {
-    for (let i = 0; i < this.cards_list.length; i++) {
-      const card = this.cards_list[i];
+    for (let i = 0; i < this.cardsList.length; i++) {
+      const card = this.cardsList[i];
       const new_location = this.getNewCardLocation(i);
       card.setLocalEndOfAnimation(new_location[0], new_location[1], 0);
       card.play(0.1, 0);
@@ -158,7 +153,7 @@ export class PlayerHand extends Container {
   }
 
   private cardsLength(): number {
-    return this.cards_list.length;
+    return this.cardsList.length;
   }
 
   private createButton(displayed_text: string = "Empty"): Container {
