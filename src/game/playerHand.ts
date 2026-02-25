@@ -17,7 +17,7 @@ export class PlayerHand extends Container {
     super();
     this.cards_list = []; // List of cards in player hand
 
-    this.draw_hand();
+    this.drawHand();
 
     this.card_size = 100; // Size of card
     this.delta = 10; // gap between two cards
@@ -27,7 +27,7 @@ export class PlayerHand extends Container {
     this.addEventListeners();
   }
 
-  public draw_hand(backgroundColor = 0xde3249): void {
+  public drawHand(backgroundColor = 0xde3249): void {
     this.background = new Graphics();
     // place for card
 
@@ -55,7 +55,7 @@ export class PlayerHand extends Container {
     reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 2.1;
     reorderCardsButton.on("pointerdown", () => {
       console.log("Reordering cards");
-      this.reorder_cards();
+      this.reorderCards();
     });
 
     const style = new TextStyle({
@@ -96,18 +96,18 @@ export class PlayerHand extends Container {
     this.remainingTime.text = `Remaining time: ${remainingTime}`;
   }
 
-  public draw_card(card: Card) {
+  private drawCard(card: Card) {
     card.x = GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
     card.y = GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
     card.height = GameSettings.card_height;
     card.width = GameSettings.card_width;
 
-    [card.end_animation_point_x, card.end_animation_point_y] = this.get_new_card_location();
+    [card.end_animation_point_x, card.end_animation_point_y] = this.getNewCardLocation();
 
     this.cards_list.push(card);
     this.addChild(card);
     card.play(undefined, undefined, () => {
-      this.reorder_cards();
+      this.reorderCards();
     });
   }
 
@@ -135,29 +135,29 @@ export class PlayerHand extends Container {
 
   private addEventListeners(): void {
     eventBus.on("Action:DRAW", (card) => {
-      this.draw_card(card);
+      this.drawCard(card);
     });
   }
 
-  private reorder_cards() {
+  private reorderCards() {
     for (let i = 0; i < this.cards_list.length; i++) {
       const card = this.cards_list[i];
-      const new_location = this.get_new_card_location(i);
+      const new_location = this.getNewCardLocation(i);
       card.setLocalEndOfAnimation(new_location[0], new_location[1], 0);
       card.play(0.1, 0);
     }
   }
 
-  private get_new_card_location(n?: number): [number, number] {
+  private getNewCardLocation(n?: number): [number, number] {
     if (n === undefined) {
-      n = this.cards_length();
+      n = this.cardsLength();
     }
     const x = GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
     const y = GameSettings.player_hand_padding;
     return [x, y];
   }
 
-  private cards_length(): number {
+  private cardsLength(): number {
     return this.cards_list.length;
   }
 
