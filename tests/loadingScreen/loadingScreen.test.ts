@@ -43,6 +43,30 @@ describe("LoadingScreen class", () => {
       <button id="readyButton"></button>
       <button id="settingsBtn"></button>
       <button id="profileBtn"></button>
+      <!-- Footer buttons -->
+      <div class="footer">
+        <button class="footer-btn" id="settingsBtn" title="Settings">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button class="footer-btn" id="instagramBtn" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </button>
+        <button class="footer-btn profile-btn" id="profileBtn" title="Profile">
+          <i class="fas fa-user"></i>
+        </button>
+        <button class="footer-btn" id="refreshBtn" title="Refresh">
+          <i class="fas fa-refresh"></i>
+        </button>
+        <button class="footer-btn" id="whoamiBtn" title="WhoAmI">
+          <i class="fa-solid fa-i"></i>
+        </button>
+        <button class="footer-btn" id="timeleftBtn" title="TimeLeft">
+          <i class="fa-solid fa-clock"></i>
+        </button>
+        <button class="footer-btn" id="logoutBtn" title="Logout">
+          <i class="fas fa-sign-out"></i>
+        </button>
+      </div>
     `;
 
     // Mock eventBus emit/on/off
