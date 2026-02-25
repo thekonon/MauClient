@@ -149,7 +149,6 @@ export class WebSocketHandle {
   }
 
   public reconnect() {
-    // TODO: remove player UUID, take changes from reconnect branch
     if (this.user.name == "") {
       alert("In order to reconnect playerName have to be given");
       throw new Error("UserName must be set first");
@@ -500,9 +499,6 @@ export class WebSocketHandle {
 
   public registerPlayerAction(message: GameAction) {
     if (!message.playerDto) return console.error("Player DTO was not specified");
-    if (message.playerDto.username === this.user.name) {
-      this.saveUUID(message.playerDto.playerId);
-    }
     const player = message.playerDto.username;
     eventBus.emit("Action:ADD_PLAYER", { playerName: player });
     if (message.playerDto.playerId && message.gameId) {

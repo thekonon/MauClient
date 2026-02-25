@@ -269,6 +269,10 @@ export class Game extends Container {
     });
   }
 
+  private redrawEverything(){
+    
+  }
+
   private resetGame(): void {
     this.playerHand.restart();
     this.otherPlayers.forEach((player) => {
