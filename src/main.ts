@@ -6,26 +6,48 @@ import { WebSocketHandle } from "./websocketHandle.ts";
 import { EndScreen } from "./endScreen/endScreen.ts";
 import { CardManager } from "./loadingScreen/CardManage.ts";
 import { MessagesMenu } from "./msgMenu.ts";
+import { RestManager } from "./loadingScreen/restManager.ts";
 
 (async () => {
   const loading_screen = new LoadingScreen();
-  loading_screen.show();
+  // loading_screen.show();
 
   // Create a game instance
-  const app = new Application();
-  await app.init({ background: "#1099bb", resizeTo: window });
+  // const app = new Application();
+  // await app.init({ background: "#1099bb", resizeTo: window });
 
-  document.getElementById("pixi-container")!.appendChild(app.canvas);
-  const cardManager = new CardManager(app);
-  await cardManager.loadCardTextures();
-  cardManager.createFallingCards(50);
+  // document.getElementById("pixi-container")!.appendChild(app.canvas);
+  // const cardManager = new CardManager(app);
+  // await cardManager.loadCardTextures();
+  // cardManager.createFallingCards(50);
 
   GameSettings.basicInit();
 
-  new WebSocketHandle();
-  new Game(app);
-  new EndScreen(app);
+  // new WebSocketHandle();
+  // new Game(app);
+  // new EndScreen(app);
   new MessagesMenu();
+  const restManager = new RestManager();
+
+  const registerBtn = document.getElementById("registerBtn") as HTMLButtonElement
+  const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement
+  const refreshBtn = document.getElementById("refreshBtn") as HTMLButtonElement
+  const logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement
+  const whoamiBtn = document.getElementById("whoamiBtn") as HTMLButtonElement
+  const timeleftBtn = document.getElementById("timeLeftBtn") as HTMLButtonElement
+
+  registerBtn.addEventListener("click", () => {restManager.register("string", "string", "string", "string")});
+  loginBtn.addEventListener("click", () => {restManager.login("string", "string")});
+  refreshBtn.addEventListener("click", () => {restManager.refresh()});
+  logoutBtn.addEventListener("click", () => {restManager.logout()});
+  whoamiBtn.addEventListener("click", () => {restManager.whoami()});
+  timeleftBtn.addEventListener("click", () => {restManager.timeleft()});
+
+  (async () => {
+    fetch(`http://localhost:8080/api/whoami`,{
+      method: "GET"
+    })
+  })()
 
   // dummy()
 
