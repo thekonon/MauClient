@@ -161,9 +161,10 @@ export class RestManager {
             const options: RequestInit = {
                 method: command.method
             }
-            
-            options.headers = { "Content-Type": "application/json" };
+            options.credentials = "include"
+
             if (command.payload) {
+                options.headers = { "Content-Type": "application/json" };
                 options.body = JSON.stringify(command.payload);
             }
 

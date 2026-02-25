@@ -43,12 +43,6 @@ import { RestManager } from "./loadingScreen/restManager.ts";
   whoamiBtn.addEventListener("click", () => {restManager.whoami()});
   timeleftBtn.addEventListener("click", () => {restManager.timeleft()});
 
-  (async () => {
-    fetch(`http://localhost:8080/api/whoami`,{
-      method: "GET"
-    })
-  })()
-
   // dummy()
 
   // TODO:
