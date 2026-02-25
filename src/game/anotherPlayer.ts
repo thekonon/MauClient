@@ -43,10 +43,6 @@ export class AnotherPlayer extends Container {
     this.cardCountText.text = String(this.cardCount);
   }
 
-  public activatePlayer() {
-    this.isActive = true;
-  }
-
   public setPlayedCard(card: Card) {
     card.position = this.position;
     this.addChild(card);

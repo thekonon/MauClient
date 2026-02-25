@@ -102,7 +102,7 @@ export class RestManager {
         password2: password2,
       },
     };
-    const response = await this.sendCommand(command);
+    await this.sendCommand(command);
     // handle response here
   }
 
@@ -148,7 +148,7 @@ export class RestManager {
       type: "logout",
       method: "POST",
     };
-    const response = await this.sendCommand(command);
+    await this.sendCommand(command);
   }
 
   private async whoami() {

@@ -11,7 +11,7 @@ const symbolsMap: Record<Symbol, string> = {
 
 export class StatusDisplay extends Container {
   private readonly largeMultiplier: number = 0.15;
-  private readonly smallMultiplier: number = 0.1;
+  // private readonly smallMultiplier: number = 0.1;
   private readonly ALPHA: number = 0.5;
 
   constructor() {
@@ -83,7 +83,7 @@ export class StatusDisplay extends Container {
     return this.largeMultiplier * Math.min(GameSettings.screen_width, GameSettings.screen_height);
   }
 
-  private getSmallerSize(): number {
-    return this.smallMultiplier * Math.min(GameSettings.screen_width, GameSettings.screen_height);
-  }
+//   private getSmallerSize(): number {
+//     return this.smallMultiplier * Math.min(GameSettings.screen_width, GameSettings.screen_height);
+//   }
 }
