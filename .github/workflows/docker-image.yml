@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # Only run on SemVer tags
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set image version
+        run: echo "IMAGE_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: |
+          docker build . -f Dockerfile -t youruser/mauclient:${IMAGE_VERSION}
+          docker push youruser/mauclient:${IMAGE_VERSION}
