@@ -5,13 +5,10 @@ export class MessagesMenu {
   private messages: HTMLParagraphElement[];
 
   private messageBox!: HTMLDivElement;
-
-  private unreadMsg: boolean;
   private isOpened: boolean;
 
   constructor() {
     this.messages = [];
-    this.unreadMsg = false;
     this.isOpened = false;
     this.addEvents();
   }
@@ -130,27 +127,25 @@ export class MessagesMenu {
     this.messages.push(p);
   }
 
-  private clearMessages() {
-    this.messages = [];
-  }
+  // private clearMessages() {
+  //   this.messages = [];
+  // }
 
-  private addMessages(messages: string[]) {
-    messages.forEach((msg) => {
-      const p = document.createElement("p");
-      p.innerText += msg;
-      this.messages.push(p);
-    });
-  }
+  // private addMessages(messages: string[]) {
+  //   messages.forEach((msg) => {
+  //     const p = document.createElement("p");
+  //     p.innerText += msg;
+  //     this.messages.push(p);
+  //   });
+  // }
 
-  private overwriteMessages(messages: string[]) {
-    this.clearMessages();
-    this.addMessages(messages);
-  }
+  // private overwriteMessages(messages: string[]) {
+  //   this.clearMessages();
+  //   this.addMessages(messages);
+  // }
 
   private getMsgButton(): HTMLButtonElement | undefined {
-    const messageBoxBtn = document.getElementById(
-      "msgBtn",
-    ) as HTMLButtonElement;
+    const messageBoxBtn = document.getElementById("msgBtn") as HTMLButtonElement;
     if (messageBoxBtn) {
       return messageBoxBtn;
     } else {

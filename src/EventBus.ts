@@ -7,17 +7,11 @@ class EventBus<EventMap extends object> {
     [K in keyof EventMap]?: EventHandler<EventMap[K]>[];
   } = {};
 
-  on<K extends keyof EventMap>(
-    event: K,
-    handler: EventHandler<EventMap[K]>,
-  ): void {
+  on<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): void {
     (this.listeners[event] ??= []).push(handler);
   }
 
-  off<K extends keyof EventMap>(
-    event: K,
-    handler: EventHandler<EventMap[K]>,
-  ): void {
+  off<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): void {
     const handlers = this.listeners[event];
     if (!handlers) return;
     this.listeners[event] = handlers.filter((h) => h !== handler);

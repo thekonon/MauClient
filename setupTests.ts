@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 // Mock window.alert
-Object.defineProperty(window, 'alert', {
+Object.defineProperty(window, "alert", {
   writable: true,
   value: vi.fn(),
 });

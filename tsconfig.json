@@ -26,5 +26,6 @@
       "@mnauConfig": ["mnau.config.ts"]
     }
   },
-  "include": ["src", "mnau.config.ts"]
+  "include": ["src", "mnau.config.ts"],
+  "noImplicitAny": false,
 }

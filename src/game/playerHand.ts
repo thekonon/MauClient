@@ -1,25 +1,28 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
 import { GameSettings } from "../gameSettings";
 import { Card } from "./card";
-import { eventBus } from "../eventBus";
+import { eventBus } from "../EventBus";
 
 export class PlayerHand extends Container {
-  cards_list: Card[];
+  cardsList: Card[];
 
-  card_size: number;
+  cardSize: number;
   delta: number;
 
+  isActive: boolean;
   background!: Graphics;
+  reorderCardsButton!: Container;
 
   remainingTime!: Text;
 
   public constructor() {
     super();
-    this.cards_list = []; // List of cards in player hand
+    this.cardsList = []; // List of cards in player hand
+    this.isActive = false;
 
-    this.draw_hand();
+    this.drawHand();
 
-    this.card_size = 100; // Size of card
+    this.cardSize = 100; // Size of card
     this.delta = 10; // gap between two cards
 
     this.x = GameSettings.get_player_hand_top_x();
@@ -27,7 +30,20 @@ export class PlayerHand extends Container {
     this.addEventListeners();
   }
 
-  public draw_hand(backgroundColor = 0xde3249): void {
+  public show() {
+    this.addChild(this.background);
+    this.addChild(this.reorderCardsButton);
+    this.addChild(this.remainingTime);
+  }
+
+  public hide() {
+    this.removeChild(this.background);
+    this.removeChild(this.reorderCardsButton);
+    this.removeChild(this.remainingTime);
+  }
+
+  public drawHand(backgroundColor = 0xde3249): void {
+    this.hide()
     this.background = new Graphics();
     // place for card
 
@@ -42,22 +58,13 @@ export class PlayerHand extends Container {
       .fill(backgroundColor);
 
     // button for pass action
-    const passButton = this.createButton("PASS (ACE / 7)");
-    passButton.x =
-      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
-    passButton.y = -GameSettings.playerHandButtonHeight * 1.05;
-    passButton.on("pointerdown", () => {
-      eventBus.emit("Command:PASS", undefined);
-    });
-
-    // button for pass action
-    const reorderCardsButton = this.createButton("REORDER\n  CARDS");
-    reorderCardsButton.x =
-      GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
-    reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 2.1;
-    reorderCardsButton.on("pointerdown", () => {
+    this.reorderCardsButton = this.createButton("REORDER\n  CARDS");
+    this.reorderCardsButton.x = GameSettings.get_player_hand_width() - GameSettings.playerHandButtonWidth;
+    this.reorderCardsButton.y = -GameSettings.playerHandButtonHeight * 1.05;
+    this.reorderCardsButton.on("pointerdown", () => {
       console.log("Reordering cards");
-      this.reorder_cards();
+      this.hide()
+      this.reorderCards();
     });
 
     const style = new TextStyle({
@@ -73,11 +80,7 @@ export class PlayerHand extends Container {
 
     this.remainingTime.x = 0;
     this.remainingTime.y = -GameSettings.fontSize * 1.2;
-
-    this.addChild(this.background);
-    this.addChild(passButton);
-    this.addChild(reorderCardsButton);
-    this.addChild(this.remainingTime);
+    this.show();
   }
 
   public updateBackgroundColor(newColor: number = 0xde3249) {
@@ -98,29 +101,11 @@ export class PlayerHand extends Container {
     this.remainingTime.text = `Remaining time: ${remainingTime}`;
   }
 
-  public draw_card(card: Card) {
-    card.x =
-      GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
-    card.y =
-      GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
-    card.height = GameSettings.card_height;
-    card.width = GameSettings.card_width;
-
-    [card.end_animation_point_x, card.end_animation_point_y] =
-      this.get_new_card_location();
-
-    this.cards_list.push(card);
-    this.addChild(card);
-    card.play(undefined, undefined, () => {
-      this.reorder_cards();
-    });
-  }
-
   public playCard(type: string, value: string): Card | null {
-    for (let i = 0; i < this.cards_list.length; i++) {
-      const card = this.cards_list[i];
+    for (let i = 0; i < this.cardsList.length; i++) {
+      const card = this.cardsList[i];
       if (card.type === type && card.value === value) {
-        this.cards_list.splice(i, 1); // Properly remove from array
+        this.cardsList.splice(i, 1); // Properly remove from array
         return card;
       }
     }
@@ -130,42 +115,59 @@ export class PlayerHand extends Container {
   }
 
   public restart(): void {
-    this.cards_list.forEach((card) => {
+    this.cardsList.forEach((card) => {
       card.card_sprite.destroy();
       card.spriteContainer.destroy();
       card.destroy();
     });
-    this.cards_list = [];
+    this.cardsList = [];
+  }
+
+  public redraw() {
+
+  }
+
+  private drawCard(card: Card) {
+    card.x = GameSettings.get_deck_top_x() - GameSettings.get_player_hand_top_x();
+    card.y = GameSettings.get_deck_top_y() - GameSettings.get_player_hand_top_y();
+    card.height = GameSettings.card_height;
+    card.width = GameSettings.card_width;
+
+    [card.end_animation_point_x, card.end_animation_point_y] = this.getNewCardLocation();
+
+    this.cardsList.push(card);
+    this.addChild(card);
+    card.play(undefined, undefined, () => {
+      this.reorderCards();
+    });
   }
 
   private addEventListeners(): void {
     eventBus.on("Action:DRAW", (card) => {
-      this.draw_card(card);
+      this.drawCard(card);
     });
   }
 
-  private reorder_cards() {
-    for (let i = 0; i < this.cards_list.length; i++) {
-      const card = this.cards_list[i];
-      const new_location = this.get_new_card_location(i);
+  private reorderCards() {
+    for (let i = 0; i < this.cardsList.length; i++) {
+      const card = this.cardsList[i];
+      const new_location = this.getNewCardLocation(i);
       card.setLocalEndOfAnimation(new_location[0], new_location[1], 0);
       card.play(0.1, 0);
     }
   }
 
-  private get_new_card_location(n?: number): [number, number] {
+  private getNewCardLocation(n?: number): [number, number] {
     if (n === undefined) {
-      n = this.cards_length();
+      n = this.cardsLength();
     }
-    const x =
-      GameSettings.player_hand_padding +
-      (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
+    const x = GameSettings.player_hand_padding + (GameSettings.card_width + GameSettings.player_hand_card_delta) * n;
     const y = GameSettings.player_hand_padding;
     return [x, y];
   }
 
-  private cards_length(): number {
-    return this.cards_list.length;
+  private cardsLength(): number {
+    return this.cardsList.length;
   }
 
   private createButton(displayed_text: string = "Empty"): Container {

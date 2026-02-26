@@ -1,8 +1,14 @@
-import MnauConfig from "@mnauConfig";
+import { eventBus } from "../EventBus";
 
 export class LoginMenu {
   private modal?: HTMLDivElement;
   private isRegisterMode = false;
+
+  constructor() {
+    eventBus.on("Helper:LOGIN", () => {
+      this.close();
+    });
+  }
 
   public open() {
     if (this.modal) return;
@@ -77,11 +83,8 @@ export class LoginMenu {
     togglePwdBtn.innerText = "👁";
     togglePwdBtn.className = "toggle-password-btn";
     togglePwdBtn.onclick = () => {
-      passwordInput.type =
-        passwordInput.type === "password" ? "text" : "password";
-      if (passwordVerifyInput)
-        passwordVerifyInput.type =
-          passwordVerifyInput.type === "password" ? "text" : "password";
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+      if (passwordVerifyInput) passwordVerifyInput.type = passwordVerifyInput.type === "password" ? "text" : "password";
     };
     passwordWrapper.appendChild(togglePwdBtn);
 
@@ -101,13 +104,17 @@ export class LoginMenu {
       }
 
       if (this.isRegisterMode) {
-        const email = emailInput?.value.trim();
-        const passwordVerify = passwordVerifyInput?.value;
-        if (!email || !passwordVerify || password !== passwordVerify) {
-          alert("Invalid fields or passwords do not match");
+        if (!emailInput) {
+          alert("Issue in loginMenu, dev fix plz");
           return;
         }
-        this.register(username, email, password);
+        if (!passwordVerifyInput) {
+          alert("Issue in loginMenu, dev fix plz");
+          return;
+        }
+        const email = emailInput.value.trim();
+        const password2 = passwordVerifyInput.value;
+        this.register(username, email, password, password2);
       } else {
         this.login(username, password);
       }
@@ -123,9 +130,7 @@ export class LoginMenu {
     // Switch Login / Register
     const switchModeBtn = document.createElement("button");
     switchModeBtn.className = "settings-btn secondary";
-    switchModeBtn.innerText = this.isRegisterMode
-      ? "Already have an account? Login"
-      : "No account? Register";
+    switchModeBtn.innerText = this.isRegisterMode ? "Already have an account? Login" : "No account? Register";
 
     switchModeBtn.onclick = () => {
       this.isRegisterMode = !this.isRegisterMode;
@@ -142,56 +147,10 @@ export class LoginMenu {
   }
 
   private async login(username: string, password: string) {
-    try {
-      const response = await fetch(
-        `http://${MnauConfig.ip}:${MnauConfig.port}/api/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        },
-      );
-
-      if (!response.ok) {
-        const err = await response.json();
-        alert(`Login failed: ${err.message}`);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Login success:", data);
-      // data could contain token, user info, etc.
-    } catch (err) {
-      console.error("Login error:", err);
-    }
+    eventBus.emit("Rest:LOGIN", { username: username, password: password });
   }
 
-  private async register(username: string, email: string, password: string) {
-    try {
-      const response = await fetch(
-        `http://${MnauConfig.ip}:${MnauConfig.port}/api/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, email, password }),
-        },
-      );
-
-      if (!response.ok) {
-        const err = await response.json();
-        alert(`Registration failed: ${err.message}`);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Register success:", data);
-      // optionally auto-login or show success message
-    } catch (err) {
-      console.error("Register error:", err);
-    }
+  private async register(username: string, email: string, password: string, password2: string) {
+    eventBus.emit("Rest:REGISTER", { username: username, email: email, password: password, password2: password2 });
   }
 }

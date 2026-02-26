@@ -1,5 +1,12 @@
-import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Assets, Container, Graphics, Sprite } from "pixi.js";
 import { GameSettings } from "../gameSettings";
+
+const suits: [string, string][] = [
+  ["DIAMONDS", "assets/symbols/diamond.png"],
+  ["HEARTS", "assets/symbols/heart.png"],
+  ["CLUBS", "assets/symbols/club.png"],
+  ["SPADES", "assets/symbols/spade.png"],
+];
 
 export class QueenDialog extends Container {
   rect_x: number;
@@ -16,8 +23,8 @@ export class QueenDialog extends Container {
 
   constructor() {
     super();
-    this.rect_width = GameSettings.fontSize * 10;
-    this.rect_height = GameSettings.fontSize * 8;
+    this.rect_width = GameSettings.fontSize * 3;
+    this.rect_height = GameSettings.fontSize * 5;
     this.rect_x = 0;
     this.rect_y = -this.rect_height - GameSettings.fontSize * 3;
     this.edge_radius = GameSettings.fontSize / 2;
@@ -31,31 +38,15 @@ export class QueenDialog extends Container {
     return new Promise((resolve) => {
       const background = new Graphics();
       background
-        .roundRect(
-          this.rect_x,
-          this.rect_y,
-          this.rect_width,
-          this.rect_height,
-          this.edge_radius,
-        )
+        .roundRect(this.rect_x, this.rect_y, this.rect_width, this.rect_height, this.edge_radius)
         .fill(GameSettings.dialog_window_color);
 
       this.addChild(background);
 
-      const suits: [string, string][] = [
-        ["DIAMONDS", "♦"],
-        ["HEARTS", "♥"],
-        ["CLUBS", "♣"],
-        ["SPADES", "♠"],
-      ];
-
-      suits.forEach(([suit, symbol], index) => {
-        const btn = this.create_button(suit, symbol);
+      suits.forEach(async ([suit, symbol], index) => {
+        const btn = await this.create_button(symbol);
         btn.x = this.rect_x + this.margin;
-        btn.y =
-          this.rect_y +
-          index * (this.button_height + this.margin) +
-          this.margin;
+        btn.y = this.rect_y + index * (this.button_height + this.margin) + this.margin;
         btn.interactive = true;
         btn.on("pointerdown", () => {
           resolve(suit);
@@ -68,9 +59,7 @@ export class QueenDialog extends Container {
       // Draw the button background with border
       exitButton
         .roundRect(
-          this.rect_x +
-            this.rect_width -
-            GameSettings.fontSize * this.exitButtonSizeModifier,
+          this.rect_x + this.rect_width - GameSettings.fontSize * this.exitButtonSizeModifier,
           this.rect_y - GameSettings.fontSize * this.exitButtonSizeModifier,
           GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
           GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
@@ -80,23 +69,10 @@ export class QueenDialog extends Container {
 
       // Draw the red cross
       const crossPadding = GameSettings.fontSize * 0.3;
-      const x1 =
-        this.rect_x +
-        this.rect_width -
-        GameSettings.fontSize * this.exitButtonSizeModifier +
-        crossPadding;
-      const y1 =
-        this.rect_y -
-        GameSettings.fontSize * this.exitButtonSizeModifier +
-        crossPadding;
-      const x2 =
-        x1 +
-        GameSettings.fontSize * 2 * this.exitButtonSizeModifier -
-        2 * crossPadding;
-      const y2 =
-        y1 +
-        GameSettings.fontSize * 2 * this.exitButtonSizeModifier -
-        2 * crossPadding;
+      const x1 = this.rect_x + this.rect_width - GameSettings.fontSize * this.exitButtonSizeModifier + crossPadding;
+      const y1 = this.rect_y - GameSettings.fontSize * this.exitButtonSizeModifier + crossPadding;
+      const x2 = x1 + GameSettings.fontSize * 2 * this.exitButtonSizeModifier - 2 * crossPadding;
+      const y2 = y1 + GameSettings.fontSize * 2 * this.exitButtonSizeModifier - 2 * crossPadding;
 
       exitButton
         .setStrokeStyle({ width: 5, color: 0x000000, alpha: 1 }) // red cross
@@ -109,9 +85,7 @@ export class QueenDialog extends Container {
       exitButton
         .setStrokeStyle({ width: 2, color: 0x000000, alpha: 1 }) // width, color, alpha
         .roundRect(
-          this.rect_x +
-            this.rect_width -
-            GameSettings.fontSize * this.exitButtonSizeModifier,
+          this.rect_x + this.rect_width - GameSettings.fontSize * this.exitButtonSizeModifier,
           this.rect_y - GameSettings.fontSize * this.exitButtonSizeModifier,
           GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
           GameSettings.fontSize * 2 * this.exitButtonSizeModifier,
@@ -125,16 +99,14 @@ export class QueenDialog extends Container {
 
       exitButton.on("pointerdown", () => {
         this.exitFnc();
+        this.parent?.removeChild(this);
       });
 
       this.addChild(exitButton);
     });
   }
 
-  private create_button(
-    displayed_text: string = "Empty",
-    symbol: string,
-  ): Container {
+  private async create_button(symbol: string): Promise<Container> {
     const buttonContainer = new Container();
 
     const width = this.rect_width - this.margin * 2;
@@ -146,7 +118,7 @@ export class QueenDialog extends Container {
       button.roundRect(0, 0, width, height, this.edge_radius / 2).fill(color);
     };
 
-    const color = 0xff0000;
+    const color = 0x00a0af;
     const hover_color = 0x550000;
     drawButton(color);
 
@@ -162,23 +134,15 @@ export class QueenDialog extends Container {
       drawButton(color);
     });
 
-    const style = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: GameSettings.fontSize,
-      fill: "#ffffff",
-    });
-
-    const text = new Text({
-      text: `${symbol} - ${displayed_text} - ${symbol}`,
-      style,
-    });
-
-    text.x = width / 2 - text.width / 2;
-    text.y = height / 2 - text.height / 2;
+    const desiredWidth = 50;
+    const sprite = new Sprite(await Assets.load(symbol));
+    sprite.scale.set(desiredWidth / sprite.width);
+    sprite.x = width / 2 - sprite.width / 2;
+    sprite.y = height / 2 - sprite.height / 2;
 
     // Add background and text
     buttonContainer.addChild(button);
-    buttonContainer.addChild(text);
+    buttonContainer.addChild(sprite);
 
     return buttonContainer;
   }
