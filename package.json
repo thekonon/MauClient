@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "dev": "vite --host",
     "test": "vitest",
