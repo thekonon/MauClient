@@ -29,7 +29,10 @@ import { RestManager } from "./loadingScreen/restManager.ts";
   new MessagesMenu();
   new RestManager();
 
-  // dummy()
+  // dummy()\
+
+  // remove playerName while log in (replace player name as you are log in)
+
 
   // TODO:
   // page open = send /userInfo

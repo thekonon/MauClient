@@ -169,7 +169,7 @@ export class RestManager {
 
     if (response.ok) {
       const data = await response.json();
-      alert(`You are logged as ${data.user},\n${data.message}`);
+      alert(`You are logged as ${data.username},\n${data.message}`);
       console.log(data);
     }
     // handle response here
@@ -182,19 +182,22 @@ export class RestManager {
       type: "time-left",
     };
 
-    const userLoggedIn = await this.refresh();
+    // const userLoggedIn = await this.refresh();
 
-    if (!userLoggedIn) {
-      alert("Log in before running such commands!");
-      return;
-    }
+    // if (!userLoggedIn) {
+    //   alert("Log in before running such commands!");
+    //   return;
+    // }
 
     const response = await this.sendCommand(command);
 
     if (response.ok) {
       const data = await response.json();
-      alert(`Time left for user: ${data.user} - ${data.timeLeftSeconds}`);
+      alert(`Time left for user: ${data.username} - ${data.timeLeftSeconds}`);
       console.log(data);
+    }
+    else{
+      alert("You are not logged in")
     }
     // handle response here
   }
